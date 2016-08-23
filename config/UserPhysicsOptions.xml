@@ -890,7 +890,7 @@ STFC, Rutherford Appleton Laboratory
   - genie::ZExpAxialFormFactorModel, Bhattacharya, Paz, and Hill, Phys.Rev. D84 (2011) 073006 
   - genie::KuzminNaumov2016AxialFormFactorModel, K. Kuzmin and V. Naumov, in press (2016).
   -->
-  <param type="alg" name="AxialFormFactorModel"> genie::DipoleAxialFormFactorModel/Default </param>
+  <param type="alg" name="AxialFormFactorModel"> genie::ZExpAxialFormFactorModel/Default </param>
 
 
  <!-- 
