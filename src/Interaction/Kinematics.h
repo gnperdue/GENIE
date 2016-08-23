@@ -34,9 +34,15 @@ class TLorentzVector;
 
 namespace genie {
 
+class Kinematics;
+ostream & operator << (ostream & stream, const Kinematics & kine);
+
 class Kinematics : public TObject {
 
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TObject::Copy;
+
   Kinematics();
   Kinematics(const Kinematics & kv);
   Kinematics(TRootIOCtor*);

@@ -38,11 +38,17 @@ using std::vector;
 
 namespace genie {
 
+class GHepRecord;
 class GHepParticle;
+
+ostream & operator << (ostream & stream, const GHepRecord & event);
 
 class GHepRecord : public TClonesArray {
 
 public :
+  using TClonesArray::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TClonesArray::Copy;
+
   GHepRecord();
   GHepRecord(int size);
   GHepRecord(const GHepRecord & record);

@@ -27,9 +27,14 @@ using std::ostream;
 
 namespace genie {
 
+class NtpMCRecHeader;
+ostream & operator << (ostream & stream, const NtpMCRecHeader & hdr);
+
 class NtpMCRecHeader : public TObject {
 
 public :
+  using TObject::Copy; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+
   NtpMCRecHeader();
   NtpMCRecHeader(const NtpMCRecHeader & hdr);
   virtual ~NtpMCRecHeader();

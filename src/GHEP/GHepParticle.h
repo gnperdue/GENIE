@@ -34,9 +34,15 @@ using std::ostream;
 
 namespace genie {
 
+class GHepParticle;
+ostream & operator << (ostream & stream, const GHepParticle & p);
+
 class GHepParticle : public TObject {
 
 public :
+  using TObject::Copy; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TObject::Compare;
+
   GHepParticle();
   GHepParticle(const GHepParticle & particle);
 

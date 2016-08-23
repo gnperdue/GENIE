@@ -23,6 +23,15 @@
    Fix a problem identified by Brian Tice (Minerva)
    The nuclear modification to the pdf should be calculated in terms 
    of the experimental x, not the rescaled x.  The same goes for R(x,Q2).
+ @ Jun 06, 2016 - C. Bronner, J. Morrison
+   Fix the scaling variable used for the relations between structure functions
+   after it was confirmed by A. Bodek that x and not the modified scaling 
+   variable should be used there.
+ @ Jun 25, 2016 - JM
+   Added data members to:
+      - Allow for use of original GENIE implementation or 2016 corrections
+      - Select value of cutoff for 2xF1 to F2 relation
+
 */
 //____________________________________________________________________________
 
@@ -117,6 +126,14 @@ void QPMDISStrucFuncBase::LoadConfig(void)
   //-- include nuclear factor (shadowing / anti-shadowing / ...)
   fIncludeNuclMod = fConfig->GetBoolDef(
                "IncludeNuclMod", gc->GetBool("DISSF-IncludeNuclMod"));
+
+  //-- Use 2016 SF relation corrections
+  fUse2016Corrections = fConfig->GetBoolDef(
+        "Use2016Corrections", gc->GetBool("DISSF-Use2016Corrections"));
+
+  //-- Set min for relation between 2xF1 and F2
+  fLowQ2CutoffF1F2 = fConfig->GetDoubleDef(
+        "LowQ2CutoffF1F2", gc->GetDouble("DISSF-LowQ2CutoffF1F2"));
 
   //-- turn charm production off?
   fCharmOff  = fConfig->GetBoolDef("Charm-Prod-Off", false);
@@ -355,16 +372,38 @@ void QPMDISStrucFuncBase::Calculate(const Interaction * interaction) const
   LOG("DISSF", pDEBUG) << "R(=FL/2xF1) = " << r;
 #endif
 
-  double a = TMath::Power(x,2.) / TMath::Max(Q2, 0.8);
-  double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
-//double a = TMath::Power(x,2.) / Q2;
-//double c = (1. + 4. * kNucleonMass * a) / (1.+r);
+  if(fUse2016Corrections) {
+    //It was confirmed by A.Bodek that the modified scaling variable
+    //should just be used to compute the strucure functions F2 and xF3,
+    //but that the usual Bjorken x should be used for the relations
+    //between the structure functions.
+    //For the same reason remove the freezing of Q2 at 0.8 for those relations,
+    //although it has not been explicitly asked to A.Bodek if it should be done.
 
-  fF3 = f * xF3/x;
-  fF2 = f * F2;
-  fF1 = fF2 * 0.5*c/x;
-  fF5 = fF2/x;           // Albright-Jarlskog relation
-  fF4 = 0.;              // Nucl.Phys.B 84, 467 (1975)
+    const Kinematics & kinematics = interaction->Kine();
+    double bjx = kinematics.x();
+    
+    double a = TMath::Power(bjx,2.) / TMath::Max(Q2, fLowQ2CutoffF1F2);
+    double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
+
+    fF3 = f * xF3/bjx;
+    fF2 = f * F2;
+    fF1 = fF2 * 0.5*c/bjx;
+    fF5 = fF2/bjx;           // Albright-Jarlskog relation
+    fF4 = 0.;                // Nucl.Phys.B 84, 467 (1975)
+  } 
+  else {
+    double a = TMath::Power(x,2.) / TMath::Max(Q2, fLowQ2CutoffF1F2);
+    double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
+    //double a = TMath::Power(x,2.) / Q2;
+    //double c = (1. + 4. * kNucleonMass * a) / (1.+r);
+
+    fF3 = f * xF3/x;
+    fF2 = f * F2;
+    fF1 = fF2 * 0.5*c/x;
+    fF5 = fF2/x;           // Albright-Jarlskog relation
+    fF4 = 0.;              // Nucl.Phys.B 84, 467 (1975)
+  }
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
   LOG("DISSF", pDEBUG) 

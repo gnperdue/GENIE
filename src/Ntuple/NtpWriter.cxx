@@ -38,8 +38,6 @@
 #include "Ntuple/NtpMCJobConfig.h"
 #include "Ntuple/NtpMCJobEnv.h"
 
-#include "RVersion.h"
-
 using std::ostringstream;
 
 using namespace genie;
@@ -182,17 +180,8 @@ void NtpWriter::CreateGHEPEventBranch(void)
   fNtpMCEventRecord = 0;
   TTree::SetBranchStyle(1);
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
-  int split = 0;
-#else
-  int split = 1;
-#endif
-
   fEventBranch = fOutTree->Branch("gmcrec",
-      "genie::NtpMCEventRecord", &fNtpMCEventRecord, 32000, split);
-  // was split=1 ... but, at least w/ ROOT 6.06/04, this generates
-  //   Warning in <TTree::Bronch>: genie::NtpMCEventRecord cannot be split, resetting splitlevel to 0
-  // which the art framework turns into a fatal error
+      "genie::NtpMCEventRecord", &fNtpMCEventRecord, 32000, 1);
 }
 //____________________________________________________________________________
 void NtpWriter::CreateTreeHeader(void)

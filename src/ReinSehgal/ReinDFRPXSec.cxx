@@ -18,6 +18,7 @@
 #include <TMath.h>
 
 #include "Algorithm/AlgConfigPool.h"
+#include "Base/XSecIntegratorI.h"
 #include "Conventions/GBuild.h"
 #include "Conventions/Constants.h"
 #include "Conventions/Controls.h"
@@ -26,6 +27,7 @@
 #include "Numerical/Spline.h"
 #include "PDG/PDGUtils.h"
 #include "ReinSehgal/ReinDFRPXSec.h"
+#include "Utils/HadXSUtils.h"
 #include "Utils/KineUtils.h"
 
 using namespace genie;
@@ -40,7 +42,7 @@ XSecAlgorithmI("genie::ReinDFRPXSec")
 
 }
 //____________________________________________________________________________
-ReinDFRPXSec::ReinDFRPXSec(string config) :
+ReinDFRPXSec::ReinDFRPXSec(const std::string & config) :
 XSecAlgorithmI("genie::ReinDFRPXSec", config)
 {
 
@@ -61,24 +63,23 @@ double ReinDFRPXSec::XSec(
   const InitialState & init_state = interaction -> InitState();
   const Target &       target     = init_state.Tgt();
 
-  double E       = init_state.ProbeE(kRfHitNucRest);  // neutrino energy
-  double x       = kinematics.x();                    // bjorken x
-  double y       = kinematics.y();                    // inelasticity y
-  double M       = target.HitNucMass();               //
-  double Q2      = 2.*x*y*M*E;                        // momentum transfer Q2>0
-  double Gf      = kGF2 * M/(16*kPi3);                // GF/pi/etc factor
-  double fp      = 0.93 * kPionMass;                  // pion decay constant (cc)
+  bool   isCC    = interaction->ProcInfo().IsWeakCC();
+  double E       = init_state.ProbeE(kRfHitNucRest);          // neutrino energy
+  double x       = kinematics.x();                            // bjorken x
+  double y       = kinematics.y();                            // inelasticity y
+  double t       = kinematics.t();                            // (magnitude of) square of four-momentum xferred to proton
+  double M       = target.HitNucMass();                       //
+  double Q2      = 2.*x*y*M*E;                                // momentum transfer Q2>0
+  double Gf      = kGF2 * M/(16*kPi3);                        // GF/pi/etc factor
+  double fp      = 0.93 * kPionMass;                          // pion decay constant (cc)
   double fp2     = TMath::Power(fp,2.);         
-  double Epi     = y*E;                               // pion energy
-  double sqrtEpi = TMath::Sqrt(TMath::Max(0.,Epi));
+  double Epi     = y*E - t/(2*M);                             // pion energy.  note we use - instead of + like Rein's paper b/c our t is magnitude only
   double b       = fBeta;
   double ma2     = TMath::Power(fMa,2);
-  double propg   = TMath::Power(ma2/(ma2+Q2),2.);     // propagator term
-  double sTot    = (sqrtEpi>0) ? 12.*(2.+1./sqrtEpi)*units::mb : 0.; // pi+N total cross section (Regge parametrization)
+  double propg   = TMath::Power(ma2/(ma2+Q2),2.);             // propagator term
+  double sTot    = utils::hadxs::TotalPionNucleonXSec(Epi, isCC);   // pi+N total cross section; CC process always produces a charged pion
   double sTot2   = TMath::Power(sTot,2.);
-  double tmax    = 1.0;
-  double tmin    = TMath::Min(tmax, TMath::Power(0.5*kPionMass2/Epi,2.));
-  double tint    = (TMath::Exp(-b*tmin) - TMath::Exp(-b*tmax))/b; // t integral
+  double tFac    = TMath::Exp(-b*t);
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
   LOG("ReinDFR", pDEBUG)
@@ -89,12 +90,22 @@ double ReinDFRPXSec::XSec(
     << "b = " << b << ", t = [" << tmin << ", " << tmax << "]";
 #endif
 
-  //----- compute d^2sigma/dxdy
-  double xsec = Gf*E*fp2*(1-y)*propg*sTot2*tint;
+  // fixme: WARNING: don't leave this in here!!!
+  // only needed for comparison to Rein's paper
+//  double W2 = M*M + 2 * M * y * E - Q2;
+//  if (W2 < 4)
+//    return 0;
 
+  //----- compute d^2sigma/dxdydt
+  double xsec = Gf*E*fp2*(1-y)*propg*sTot2*tFac;
+
+  // NC XS is half of CC
+  if (!isCC)
+    xsec *= 0.5;
+ 
   //----- Check whether variable tranformation is needed
-  if(kps!=kPSxyfE) {
-    double J = utils::kinematics::Jacobian(interaction,kPSxyfE,kps);
+  if(kps!=kPSxytfE) {
+    double J = utils::kinematics::Jacobian(interaction,kPSxytfE,kps);
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
     LOG("ReinDFR", pDEBUG)
      << "Jacobian for transformation to: " 
@@ -116,42 +127,13 @@ double ReinDFRPXSec::XSec(
 //____________________________________________________________________________
 double ReinDFRPXSec::Integral(const Interaction * interaction) const
 {
-  const KPhaseSpace & phsp = interaction->PhaseSpace();
-
-  if(!phsp.IsAboveThreshold()) return 0;
-
-  Range1D_t x = phsp.Limits(kKVx);
-  Range1D_t y = phsp.Limits(kKVy);
-
-  if(y.max <= y.min) return 0;
-
-  KinePhaseSpace_t kps = kPSxyfE;
-
-  int nx=300;
-  int ny=300;
-
-  double dx = (x.max - x.min)/(nx-1);
-  double dy = (y.max - y.min)/(ny-1);
-
-  double xsec = 0;
-
-  for(int ix=0; ix<nx; ix++) {
-    double xc = x.min + ix*dx;
-    for(int iy=0; iy<ny; iy++) {
-      double yc = y.min + iy*dy;
-      interaction->KinePtr()->Setx(xc);
-      interaction->KinePtr()->Sety(yc);
-      xsec += (dx*dy * this->XSec(interaction,kps));
-    }
-  }
-
+  //expect only free protons as target
   const InitialState & init_state = interaction -> InitState();
-  double Ev = init_state.ProbeE(kRfHitNucRest);
+  const Target &       target     = init_state.Tgt();
+  if(target.A() > 1)
+    return 0;
 
-  LOG("ReinDFR", pNOTICE)
-    << "xsec (E = " << Ev << " GeV) = "
-    << xsec/(1E-38*units::cm2) << " x 1E-38 * cm2";
-
+  double xsec = fXSecIntegrator->Integrate(this,interaction);
   return xsec;
 }
 //____________________________________________________________________________
@@ -161,12 +143,6 @@ bool ReinDFRPXSec::ValidProcess(const Interaction * interaction) const
 
   if(interaction->ProcInfo().IsDiffractive()) return true;
   return false;
-}
-//____________________________________________________________________________
-bool ReinDFRPXSec::ValidKinematics(const Interaction* interaction) const
-{
-  if(interaction->TestBit(kISkipKinematicChk)) return true;
-  return true;
 }
 //____________________________________________________________________________
 void ReinDFRPXSec::Configure(const Registry & config)
@@ -188,6 +164,10 @@ void ReinDFRPXSec::LoadConfig(void)
 
   fMa   = fConfig->GetDoubleDef("Ma",   gc->GetDouble("DFR-Ma"));
   fBeta = fConfig->GetDoubleDef("beta", gc->GetDouble("DFR-Beta"));
+
+  fXSecIntegrator =
+    dynamic_cast<const XSecIntegratorI *> (this->SubAlg("XSec-Integrator"));
+  assert(fXSecIntegrator);
 }
 //____________________________________________________________________________
 

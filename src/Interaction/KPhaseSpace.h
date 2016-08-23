@@ -62,14 +62,18 @@ public:
   Range1D_t  XLim    (void) const;  ///< x  limits
   Range1D_t  YLim    (void) const;  ///< y  limits
   Range1D_t  YLim_X  (void) const;  ///< y  limits @ fixed x
+  Range1D_t  YLim    (double xsi) const;  ///< y  limits (COH)
+  Range1D_t  YLim_X  (double xsi) const;  ///< y  limits @ fixed x (COH)
+  Range1D_t  TLim    (void) const;  ///< t  limits
+
+  static double GetTMaxDFR();
 
 private:
-
   void Init(void);
 
   const Interaction * fInteraction;
 
-ClassDef(KPhaseSpace,1)
+ClassDef(KPhaseSpace,2)
 };
 
 }      // genie namespace

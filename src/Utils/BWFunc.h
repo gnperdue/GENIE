@@ -22,6 +22,11 @@
 namespace genie  {
 namespace utils  {
 namespace bwfunc {
+  //-- A realistic Breit-Wigner distribution with L-dependent and Wlimit
+  double BreitWignerLGamma(
+             double W, int L, double mass, double width0, double norm);
+  
+
 
   //-- A realistic Breit-Wigner distribution with L-dependent width.
   double BreitWignerL(

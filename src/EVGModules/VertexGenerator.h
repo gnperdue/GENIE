@@ -20,6 +20,8 @@
 #define _VERTEX_GENERATOR_H_
 
 #include "EVGCore/EventRecordVisitorI.h"
+#include "GHEP/GHepParticle.h"
+#include "Interaction/Interaction.h"
 
 namespace genie {
 
@@ -37,6 +39,10 @@ public :
   //   data to private data members
   void Configure (const Registry & config);
   void Configure (string param_set);
+
+  //-- Generate the vertex position
+  //   public so other classes can reuse this code to generate a position
+  TVector3 GenerateVertex(const Interaction * in,double A) const;
 
 private:
   void  LoadConfig (void);

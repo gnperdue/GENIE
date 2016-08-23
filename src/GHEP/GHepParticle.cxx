@@ -49,6 +49,7 @@ using std::setw;
 using std::setprecision;
 using std::setfill;
 using std::ios;
+using std::setiosflags;
 using std::cout;
 
 const double kPCutOff    = 1e-15;
@@ -73,8 +74,8 @@ TObject()
 //___________________________________________________________________________
 // TParticle-like constructor
 GHepParticle::GHepParticle(int pdg, GHepStatus_t status,
-            int mother1, int mother2, int daughter1, int daughter2,
-                        const TLorentzVector & p, const TLorentzVector & v) :
+        int mother1, int mother2, int daughter1, int daughter2,
+        const TLorentzVector & p, const TLorentzVector & v) :
 TObject(),
 fStatus(status),
 fFirstMother(mother1),
@@ -96,9 +97,9 @@ fLastDaughter(daughter2)
 //___________________________________________________________________________
 // TParticle-like constructor
 GHepParticle::GHepParticle(int pdg, GHepStatus_t status,
-         int mother1, int mother2, int daughter1, int daughter2,
-                           double px, double py, double pz, double E,
-                                    double x, double y, double z, double t) :
+        int mother1, int mother2, int daughter1, int daughter2,
+        double px, double py, double pz, double En,
+        double x, double y, double z, double t) :
 TObject(),
 fStatus(status),
 fFirstMother(mother1),
@@ -108,7 +109,7 @@ fLastDaughter(daughter2)
 {
   this->SetPdgCode(pdg);
 
-  fP4 = new TLorentzVector(px,py,pz,E);
+  fP4 = new TLorentzVector(px,py,pz,En);
   fX4 = new TLorentzVector(x,y,z,t);
 
   fRescatterCode  = -1;
@@ -181,9 +182,9 @@ double GHepParticle::KinE(bool mass_from_pdg) const
     return 0;
   }
 
-  double E = fP4->Energy();
+  double En = fP4->Energy();
   double M = ( (mass_from_pdg) ? this->Mass() : fP4->M() );
-  double K = E-M;
+  double K = En - M;
 
   K = TMath::Max(K,0.);
   return K;
@@ -259,12 +260,12 @@ void GHepParticle::SetMomentum(const TLorentzVector & p4)
       fP4 = new TLorentzVector(p4);
 }
 //___________________________________________________________________________
-void GHepParticle::SetMomentum(double px, double py, double pz, double E)
+void GHepParticle::SetMomentum(double px, double py, double pz, double En)
 {
   if(fP4)
-      fP4->SetPxPyPzE(px, py, pz, E);
+      fP4->SetPxPyPzE(px, py, pz, En);
   else
-      fP4 = new TLorentzVector(px, py, pz, E);
+      fP4 = new TLorentzVector(px, py, pz, En);
 }
 //___________________________________________________________________________
 void GHepParticle::SetPosition(const TLorentzVector & v4)
@@ -284,9 +285,9 @@ void GHepParticle::SetPosition(double x, double y, double z, double t)
   else    fX4 = new TLorentzVector(x,y,z,t);
 }
 //___________________________________________________________________________
-void GHepParticle::SetEnergy(double E)
+void GHepParticle::SetEnergy(double En)
 {
-  this->SetMomentum(this->Px(), this->Py(), this->Pz(), E);
+  this->SetMomentum(this->Px(), this->Py(), this->Pz(), En);
 }
 //___________________________________________________________________________
 void GHepParticle::SetPx(double px)
@@ -364,7 +365,7 @@ void GHepParticle::SetPolarization(const TVector3 & polz)
 // sets the polarization angles
 
   double p = polz.Mag();
-  if(! p>0) {
+  if(! (p>0) ) {
     LOG("GHepParticle", pERROR) 
            << "Input polarization vector has non-positive norm! Ignoring it";
     return;

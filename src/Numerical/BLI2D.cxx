@@ -410,7 +410,7 @@ void BLI2DNonUnifGrid::Init(
   fYmin  = 0.;
   fYmax  = 0.;
   fZmin  = std::numeric_limits<double>::max();
-  fZmax  = std::numeric_limits<double>::min();
+  fZmax  = std::numeric_limits<double>::min(); 
   fX     = 0;
   fY     = 0;
   fZ     = 0;

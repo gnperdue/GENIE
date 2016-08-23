@@ -61,7 +61,7 @@ double genie::utils::gsl::dXSec_dQ2_E::DoEval(double xin) const
   fInteraction->KinePtr()->SetQ2(Q2);
   double xsec = fModel->XSec(fInteraction, kPSQ2fE);
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-  LOG("GXSecFunc", pDEBUG) << "xsec(Q2 = " << Q2 << ") = " << xsec;
+  LOG("GSLXSecFunc", pDEBUG) << "xsec(Q2 = " << Q2 << ") = " << xsec;
 #endif
   return xsec/(1E-38 * units::cm2);
 }
@@ -187,6 +187,91 @@ ROOT::Math::IBaseFunctionMultiDim *
 {
   return 
     new genie::utils::gsl::d2XSec_dQ2dy_E(fModel,fInteraction);
+}
+//____________________________________________________________________________
+genie::utils::gsl::d2XSec_dQ2dydt_E::d2XSec_dQ2dydt_E(
+     const XSecAlgorithmI * m, const Interaction * i) :
+ROOT::Math::IBaseFunctionMultiDim(),
+fModel(m),
+fInteraction(i)
+{
+  
+}
+genie::utils::gsl::d2XSec_dQ2dydt_E::~d2XSec_dQ2dydt_E()
+{
+
+}
+unsigned int genie::utils::gsl::d2XSec_dQ2dydt_E::NDim(void) const
+{
+  return 3;
+}
+double genie::utils::gsl::d2XSec_dQ2dydt_E::DoEval(const double * xin) const
+{
+// inputs:  
+//   Q2 [-]
+//    y [-]
+//    t [-]
+// outputs: 
+//   differential cross section [10^-38 cm^2]
+//
+  //double  E = fInteraction->InitState().ProbeE(kRfLab);
+  double Q2 = xin[0];
+  double  y = xin[1];
+  double  t = xin[2];
+  fInteraction->KinePtr()->SetQ2(Q2);
+  fInteraction->KinePtr()->Sety(y);
+  fInteraction->KinePtr()->Sett(t);
+  kinematics::UpdateXFromQ2Y(fInteraction);
+  double xsec = fModel->XSec(fInteraction, kPSQ2yfE);
+  return xsec/(1E-38 * units::cm2);
+}
+ROOT::Math::IBaseFunctionMultiDim * 
+   genie::utils::gsl::d2XSec_dQ2dydt_E::Clone() const
+{
+  return 
+    new genie::utils::gsl::d2XSec_dQ2dydt_E(fModel,fInteraction);
+}
+//____________________________________________________________________________
+genie::utils::gsl::d3XSec_dxdydt_E::d3XSec_dxdydt_E(
+     const XSecAlgorithmI * m, const Interaction * i) :
+ROOT::Math::IBaseFunctionMultiDim(),
+fModel(m),
+fInteraction(i)
+{
+
+}
+genie::utils::gsl::d3XSec_dxdydt_E::~d3XSec_dxdydt_E()
+{
+
+}
+unsigned int genie::utils::gsl::d3XSec_dxdydt_E::NDim(void) const
+{
+  return 3;
+}
+double genie::utils::gsl::d3XSec_dxdydt_E::DoEval(const double * xin) const
+{
+// inputs:
+//    x [-]
+//    y [-]
+//    t [-]
+// outputs:
+//   differential cross section [10^-38 cm^2]
+//
+  //double  E = fInteraction->InitState().ProbeE(kRfLab);
+  double  x = xin[0];
+  double  y = xin[1];
+  double  t = xin[2];
+  fInteraction->KinePtr()->Setx(x);
+  fInteraction->KinePtr()->Sety(y);
+  fInteraction->KinePtr()->Sett(t);
+  double xsec = fModel->XSec(fInteraction, kPSxytfE);
+  return xsec/(1E-38 * units::cm2);
+}
+ROOT::Math::IBaseFunctionMultiDim *
+   genie::utils::gsl::d3XSec_dxdydt_E::Clone() const
+{
+  return
+    new genie::utils::gsl::d3XSec_dxdydt_E(fModel,fInteraction);
 }
 //____________________________________________________________________________
 genie::utils::gsl::d2XSec_dWdQ2_E::d2XSec_dWdQ2_E(
@@ -858,7 +943,7 @@ double genie::utils::gsl::dXSec_Log_Wrapper::DoEval (const double * xin) const
       a = fMins[i];
       b = fMaxes[i];
       x = xin[i];
-      toEval[i] = a + (b-a)/(constants::ke-1.) * (exp(x/(b-a)) - 1.);
+      toEval[i] = a + (b-a)/(constants::kNapierConst-1.) * (exp(x/(b-a)) - 1.);
     }
     else {
       toEval[i] = xin[i];

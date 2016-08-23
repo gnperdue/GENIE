@@ -22,7 +22,6 @@
 #include "Conventions/GMode.h"
 #include "Interaction/Target.h"
 #include "Messenger/Messenger.h"
-#include "Nuclear/NuclearModelI.h"
 #include "Numerical/RandomGen.h"
 #include "EVGCore/EVGThreadException.h"
 #include "GHEP/GHepRecord.h"
@@ -33,6 +32,8 @@
 #include "Utils/NuclearUtils.h"
 #include "Utils/PrintUtils.h"
 #include "NucleonDecay/NucleonDecayPrimaryVtxGenerator.h"
+
+#include "Interfaces/NuclearModelI.h"
 #include "NucleonDecay/NucleonDecayUtils.h"
 #include "NucleonDecay/NucleonDecayMode.h"
 
@@ -330,7 +331,7 @@ void NucleonDecayPrimaryVtxGenerator::GenerateDecayProducts(
   // Get the maximum weight
   //double wmax = fPhaseSpaceGenerator.GetWtMax();
   double wmax = -1;
-  for(int i=0; i<200; i++) {
+  for(int idec=0; idec<200; idec++) {
      double w = fPhaseSpaceGenerator.Generate();   
      wmax = TMath::Max(wmax,w);
   }

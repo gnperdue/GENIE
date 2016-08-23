@@ -7,7 +7,6 @@
 #pragma link C++ namespace genie;
 #pragma link C++ namespace genie::utils::rew;
 #pragma link C++ namespace genie::rew;
-#pragma link C++ namespace genie::rew::margin;
 
 #pragma link C++ class genie::rew::GSyst;
 #pragma link C++ class genie::rew::GSystSet;
@@ -27,11 +26,19 @@
 #pragma link C++ class genie::rew::GReWeightNuXSecNCEL;
 #pragma link C++ class genie::rew::GReWeightNuXSecCCQE;
 #pragma link C++ class genie::rew::GReWeightNuXSecCCQEvec;
+#pragma link C++ class genie::rew::GReWeightNuXSecCCQEaxial;
 #pragma link C++ class genie::rew::GReWeightNuXSecCCRES;
 #pragma link C++ class genie::rew::GReWeightNuXSecNCRES;
 #pragma link C++ class genie::rew::GReWeightNuXSecCOH;
 #pragma link C++ class genie::rew::GReWeightNuXSecDIS;
 #pragma link C++ class genie::rew::GReWeightNuXSecNC;
 #pragma link C++ class genie::rew::GReWeightNuXSecHelper;
+
+
+#pragma link C++ class genie::rew::GReWeightInfo;
+#pragma link C++ class genie::rew::GReWeightIORecord;
+#pragma link C++ class genie::rew::GReWeightIOBranchDesc;
+
+#pragma link C++ ioctortype TRootIOCtor;
 
 #endif
