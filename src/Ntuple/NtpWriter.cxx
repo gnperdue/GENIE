@@ -143,7 +143,9 @@ void NtpWriter::OpenFile(string filename)
   LOG("Ntp", pINFO) 
       << "Opening the output ROOT file: " << filename;
 
-  fOutFile = new TFile(filename.c_str(),"RECREATE");
+  // use "TFile::Open()" instead of "new TFile()" so that it can handle
+  // alternative URLs (e.g. xrootd, etc)
+  fOutFile = TFile::Open(filename.c_str(),"RECREATE");
 }
 //____________________________________________________________________________
 void NtpWriter::CreateTree(void)

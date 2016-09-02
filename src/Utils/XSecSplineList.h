@@ -38,6 +38,9 @@ class XSecAlgorithmI;
 class Interaction;
 class Spline;
 
+class XSecSplineList;
+ostream & operator << (ostream & stream, const XSecSplineList & xsl);
+
 class XSecSplineList {
 
 public:
@@ -50,10 +53,10 @@ public:
   const Spline * GetSpline    (const XSecAlgorithmI * alg, const Interaction * i) const;
   const Spline * GetSpline    (string spline_key) const;
   void           CreateSpline (const XSecAlgorithmI * alg, const Interaction * i,
-                                   int nknots = -1, double Emin = -1, double Emax = -1);
+                                   int nknots = -1, double e_min = -1, double e_max = -1);
 
-  int  NSplines (void) const { return fSplineMap.size();        }
-  bool IsEmpty  (void) const { return (fSplineMap.size() == 0); }
+  int    NSplines (void) const { return fSplineMap.size();        }
+  bool   IsEmpty  (void) const { return (fSplineMap.size() == 0); }
 
   // Set XSecSplineList options
   void   SetLogE   (bool   on); ///< set opt to build splines as f(E) or as f(logE)

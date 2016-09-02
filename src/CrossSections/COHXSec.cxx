@@ -24,6 +24,7 @@
 #include <Math/IntegratorMultiDim.h>
 #include "Math/AdaptiveIntegratorMultiDim.h"
 
+#include "Algorithm/AlgConfigPool.h"
 #include "Conventions/GBuild.h"
 #include "Conventions/Constants.h"
 #include "Conventions/Controls.h"
@@ -72,7 +73,7 @@ double COHXSec::Integrate(
   Range1D_t yl = kps.Limits(kKVy);
   Range1D_t Q2l;
   Q2l.min = controls::kASmallNum;
-  Q2l.max = 1.0;  // TODO - No magic numbers! 
+  Q2l.max = fQ2Max;
 
   Interaction * interaction = new Interaction(*in);
   interaction->SetBit(kISkipProcessChk);
@@ -104,8 +105,7 @@ double COHXSec::Integrate(
     double kine_max[2] = { xl.max, yl.max };
     xsec = ig.Integral(kine_min, kine_max) * (1E-38 * units::cm2);
   } 
-  else if (model->Id().Name() == "genie::BergerSehgalCOHPiPXSec" || 
-           model->Id().Name() == "genie::BergerSehgalFMCOHPiPXSec") 
+  else if (model->Id().Name() == "genie::BergerSehgalCOHPiPXSec2015")
   {
     ROOT::Math::IBaseFunctionMultiDim * func = 
       new utils::gsl::d2XSec_dQ2dy_E(model, interaction);
@@ -122,6 +122,30 @@ double COHXSec::Integrate(
     }
     double kine_min[2] = { Q2l.min, yl.min };
     double kine_max[2] = { Q2l.max, yl.max };
+    xsec = ig.Integral(kine_min, kine_max) * (1E-38 * units::cm2);
+    delete func;
+  }
+  else if (model->Id().Name() == "genie::BergerSehgalFMCOHPiPXSec2015") 
+  {
+    Range1D_t tl;
+    tl.min = controls::kASmallNum;
+    tl.max = fTMax;
+
+    ROOT::Math::IBaseFunctionMultiDim * func = 
+      new utils::gsl::d2XSec_dQ2dydt_E(model, interaction);
+    ROOT::Math::IntegrationMultiDim::Type ig_type = 
+      utils::gsl::IntegrationNDimTypeFromString(fGSLIntgType);
+    ROOT::Math::IntegratorMultiDim ig(ig_type);
+    ig.SetRelTolerance(fGSLRelTol);
+    ig.SetFunction(*func);
+    if (ig_type == ROOT::Math::IntegrationMultiDim::kADAPTIVE) {
+    ROOT::Math::AdaptiveIntegratorMultiDim * cast =
+      dynamic_cast<ROOT::Math::AdaptiveIntegratorMultiDim*>( ig.GetIntegrator() );
+      assert(cast);
+      cast->SetMinPts(fGSLMinEval);
+    }
+    double kine_min[3] = { Q2l.min, yl.min, tl.min };
+    double kine_max[3] = { Q2l.max, yl.max, tl.max };
     xsec = ig.Integral(kine_min, kine_max) * (1E-38 * units::cm2);
     delete func;
   }
@@ -149,10 +173,19 @@ void COHXSec::Configure(string config)
 //____________________________________________________________________________
 void COHXSec::LoadConfig(void)
 {
+  AlgConfigPool * confp = AlgConfigPool::Instance();
+  const Registry * gc = confp->GlobalParameterList();
+
   // Get GSL integration type & relative tolerance
   fGSLIntgType = fConfig->GetStringDef("gsl-integration-type",  "adaptive");
   fGSLRelTol   = fConfig->GetDoubleDef("gsl-relative-tolerance", 1E-2); 
   fGSLMaxEval  = (unsigned int) fConfig->GetIntDef ("gsl-max-eval", 500000); 
   fGSLMinEval  = (unsigned int) fConfig->GetIntDef ("gsl-min-eval",  5000); 
+
+  //-- COH model parameter t_max for t = (q - p_pi)^2
+  fTMax = fConfig->GetDoubleDef("COH-t-max", gc->GetDouble("COH-t-max"));
+  //-- COH model bounds of integration for Q^2
+  fQ2Min = fConfig->GetDoubleDef("COH-Q2-min", gc->GetDouble("COH-Q2-min"));
+  fQ2Max = fConfig->GetDoubleDef("COH-Q2-max", gc->GetDouble("COH-Q2-max"));
 }
 //____________________________________________________________________________

@@ -53,6 +53,9 @@ using std::ostream;
 namespace genie {
 namespace flux  {
 
+class GNuMIFluxPassThroughInfo;
+ostream & operator << (ostream & stream, const GNuMIFluxPassThroughInfo & info);
+
 /// GNuMIFluxPassThroughInfo:
 /// =========================
 /// A small persistable C-struct -like class that mirrors (some of) the 
@@ -174,7 +177,7 @@ public:
    int getProcessID(TString sval);
    int getVolID(TString sval);
 
-   static const int MAX_N_TRAJ = 10; ///< Maximum number of trajectories to store
+   static const unsigned int MAX_N_TRAJ = 10; ///< Maximum number of trajectories to store
 
    Int_t    ntrajectory;
    Bool_t   overflow;
@@ -211,8 +214,10 @@ ClassDef(GNuMIFluxPassThroughInfo,5)
 /// ==========
 /// An implementation of the GFluxI interface that provides NuMI flux
 ///
-class GNuMIFlux : public GFluxI, 
-    public GFluxExposureI, public GFluxFileConfigI 
+class GNuMIFlux 
+  : public genie::GFluxI
+  , public genie::flux::GFluxExposureI
+  , public genie::flux::GFluxFileConfigI 
 {
 
 public :
@@ -377,7 +382,6 @@ private:
   // Private data members
   //
   double         fMaxEv;          ///< maximum energy
-
   bool           fEnd;            ///< end condition reached
 
   std::vector<string> fNuFluxFilePatterns;   ///< (potentially wildcarded) path(s)

@@ -128,7 +128,7 @@ void HNIntranuke2014::SimulateHadronicFinalState(GHepRecord* ev, GHepParticle* p
   // check particle id
   int pdgc = p->Pdg();
   bool is_pion    = (pdgc==kPdgPiP || pdgc==kPdgPiM || pdgc==kPdgPi0);
-  // bool is_kaon    = (pdgc==kPdgKP);  // UNUSED variable - comment out to quiet compiler warning
+  // bool is_kaon    = (pdgc==kPdgKP);   // UNUSED - comment to quiet compiler warnings
   bool is_baryon  = (pdgc==kPdgProton || pdgc==kPdgNeutron);
   bool is_gamma   = (pdgc==kPdgGamma);										
   if(!(is_pion || is_baryon  || is_gamma))
@@ -183,6 +183,9 @@ void HNIntranuke2014::SimulateHadronicFinalState(GHepRecord* ev, GHepParticle* p
 	  ev->AddParticle(*p);
 	  return;
 	}
+      else if(fate == kIHNFtCmp){utils::intranuke2014::PreEquilibrium(ev,p,fRemnA,fRemnZ,fRemnP4,fDoFermi,fFermiFac,fNuclmodel,fNucRmvE,kIMdHN);}
+      
+
     }
   catch(exceptions::INukeException exception)
     {
@@ -266,15 +269,16 @@ INukeFateHN_t HNIntranuke2014::HadronFateHN(const GHepParticle * p) const
 	                           * fHadroData2014->Frac(pdgc, kIHNFtElas,   ke, fRemnA, fRemnZ);
       double frac_inel     = this->FateWeight(pdgc, kIHNFtInelas)
 	                           * fHadroData2014->Frac(pdgc, kIHNFtInelas, ke, fRemnA, fRemnZ);
+      double frac_cmp      = this->FateWeight(pdgc, kIHNFtCmp)
+	                           * fHadroData2014->Frac(pdgc, kIHNFtCmp,    ke, fRemnA , fRemnZ);
 
        LOG("HNIntranuke2014", pINFO) 
           << "\n frac{" << INukeHadroFates::AsString(kIHNFtElas)    << "} = " << frac_elas
           << "\n frac{" << INukeHadroFates::AsString(kIHNFtInelas)  << "} = " << frac_inel;
 
        // compute total fraction (can be <1 if fates have been switched off)
-       double tf = frac_elas     +
-                   frac_inel;
-
+       double tf = frac_elas + frac_inel + frac_cmp;
+   
        double r = tf * rnd->RndFsi().Rndm();
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
@@ -284,6 +288,7 @@ INukeFateHN_t HNIntranuke2014::HadronFateHN(const GHepParticle * p) const
        double cf=0; // current fraction
        if(r < (cf += frac_elas    )) return kIHNFtElas;    // elas
        if(r < (cf += frac_inel    )) return kIHNFtInelas;  // inelas
+       if(r < (cf += frac_cmp     )) return kIHNFtCmp; // cmp 
 
        LOG("HNIntranuke2014", pWARN) 
          << "No selection after going through all fates! "
@@ -321,8 +326,9 @@ double HNIntranuke2014::FateWeight(int pdgc, INukeFateHN_t fate) const
       if (fate == kIHNFtCEx && pdgc==kPdgPiP ) { return (nn>=1) ? 1. : 0.; }
       if (fate == kIHNFtCEx && pdgc==kPdgPiM ) { return (np>=1) ? 1. : 0.; }
       if (fate == kIHNFtAbs)      { return ((nn>=1) && (np>=1)) ? 1. : 0.; }
-    }
+      if (fate == kIHNFtCmp )     { return ((pdgc==kPdgProton||pdgc==kPdgNeutron)&&fDoCompoundNucleus&&fRemnA>5) ? 1. : 0.; }
 
+    }
   return 1.;
 }
 //___________________________________________________________________________
@@ -361,11 +367,11 @@ void HNIntranuke2014::AbsorbHN(
   // -- Subscript "z" is for parallel component, "t" is for transverse
 
   int pcode, t1code, t2code, scode, s2code; // particles
-  double M1, M2, M2_1, M2_2, M3, M4;        // rest energies, in GeV
+  double M1, M2_1, M2_2, M3, M4;        // rest energies, in GeV
   double E1L, P1L, E2L, P2L, E3L, P3L, E4L, P4L;
-  double P1zL, P1tL, P2zL, P2tL;
+  double P1zL, P2zL;
   double beta, gm; // speed and gamma for CM frame in lab
-  double Et, P1CM, E2CM, P2CM;
+  double Et, E2CM;
   double C3CM, S3CM;  // cos and sin of scattering angle
   double Theta1, Theta2, theta5;
   double PHI3;        // transverse scattering angle
@@ -419,7 +425,6 @@ void HNIntranuke2014::AbsorbHN(
   M1   = pLib->Find(pcode) ->Mass();
   M2_1 = pLib->Find(t1code)->Mass();
   M2_2 = pLib->Find(t2code)->Mass();
-  M2   = M2_1 + M2_2;
   M3   = pLib->Find(scode) ->Mass();
   M4   = pLib->Find(s2code)->Mass();
 
@@ -474,9 +479,7 @@ void HNIntranuke2014::AbsorbHN(
 
   // get parallel and transverse components
   P1zL = P1L*TMath::Cos(Theta1);
-  P1tL = TMath::Sqrt(P1L*P1L - P1zL*P1zL);
   P2zL = P2L*TMath::Cos(Theta2);
-  P2tL = TMath::Sqrt(P2L*P2L - P2zL*P2zL);
   tVect.SetXYZ(1,0,0);
   if(TMath::Abs((tVect - bDir).Mag())<.01) tVect.SetXYZ(0,1,0);
   theta5 = tVect.Angle(bDir);
@@ -490,10 +493,8 @@ void HNIntranuke2014::AbsorbHN(
   // boost to CM frame to get scattered particle momenta
   E1CM = gm*E1L - gm*beta*P1zL;
   P1zCM = gm*P1zL*bDir - gm*tbeta*E1L;
-  P1CM = (P1zCM + P1tL*tTrans).Mag();
   E2CM = gm*E2L - gm*beta*P2zL;
   P2zCM = gm*P2zL*bDir - gm*tbeta*E2L;
-  P2CM = (P2zCM - P2tL*tTrans).Mag();
   Et = E1CM + E2CM;
   E3CM = (Et*Et + (M3*M3) - (M4*M4)) / (2.0*Et);
   E4CM = Et - E3CM;
@@ -539,7 +540,9 @@ void HNIntranuke2014::AbsorbHN(
       LOG("HNIntranuke2014",pINFO) << "AbsorbHN failed: Pauli blocking";
 #endif
       p->SetStatus(kIStHadronInTheNucleus);
-      utils::intranuke2014::StepParticle(p,fFreeStep,fTrackingRadius);
+
+      //utils::intranuke2014::StepParticle(p,fFreeStep,fTrackingRadius); //not needed
+
       ev->AddParticle(*p);
       return;
     }
@@ -685,13 +688,17 @@ void HNIntranuke2014::ElasHN(
 
   if (pass==true)
   {
-    //  give each of the particles a free step
-    utils::intranuke2014::StepParticle(p,fFreeStep,fTrackingRadius);
-    utils::intranuke2014::StepParticle(t,fFreeStep,fTrackingRadius);
+
+    //utils::intranuke2014::StepParticle(p,fFreeStep,fTrackingRadius); //not needed
+    //utils::intranuke2014::StepParticle(t,fFreeStep,fTrackingRadius);
+
     ev->AddParticle(*p);
     ev->AddParticle(*t);
   } else
   {
+    
+    delete t; //fixes a troublesome memory leak
+
     LOG("HNIntranuke2014", pINFO) << "Elastic in hN failed calling TwoBodyCollision";
     exceptions::INukeException exception;
     exception.SetReason("hN scattering kinematics through TwoBodyCollision failed");
@@ -725,6 +732,11 @@ void HNIntranuke2014::InelasticHN(GHepRecord* ev, GHepParticle* p) const
     }
   else
     {
+      
+      delete s1; //fixes potential memory leak
+      delete s2;
+      delete s3;
+      
       LOG("HNIntranuke2014", pNOTICE) << "Error: could not create pion production final state";
       exceptions::INukeException exception;
       exception.SetReason("PionProduction in hN failed");

@@ -25,8 +25,9 @@
 
 namespace genie {
 
-//class IntegratorI;
-class XSecIntegratorI : public Algorithm {
+class IntegratorI;
+
+ class XSecIntegratorI : public Algorithm {
 
 public:
   virtual ~XSecIntegratorI();
@@ -39,12 +40,15 @@ protected:
   XSecIntegratorI(string name);
   XSecIntegratorI(string name, string config);
 
-/////  const IntegratorI * fIntegrator; ///< GENIE numerical integrator 
+  const IntegratorI * fIntegrator; ///< GENIE numerical integrator 
 
   string fGSLIntgType; ///< name of GSL numerical integrator
   double fGSLRelTol;   ///< required relative tolerance (error)
   int    fGSLMaxEval;  ///< GSL max evaluations
   int    fGSLMinEval;  ///< GSL min evaluations. Ignored by some integrators.
+  int    fGSLNCalls;   ///< GSL number of function calls (apply only to MC integratioon methods)
+  double fGSLThreshold;///< the threshold for the neutrino energy, above which the initial number of function multiply by fGSLNCallsFactor
+  double fGSLNCallsFactor;///< factor that is multiplied by the initial number of function calls when the threshold is reached 
 };
 
 }       // genie namespace

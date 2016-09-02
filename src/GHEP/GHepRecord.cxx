@@ -78,6 +78,7 @@ using std::setw;
 using std::setprecision;
 using std::setfill;
 using std::ios;
+using std::setiosflags;
 
 using namespace genie;
 
@@ -983,6 +984,10 @@ bool GHepRecord::Accept(void) const
 void GHepRecord::SetPrintLevel(int print_level) 
 { 
   fPrintLevel = print_level; 
+}
+int  GHepRecord::GetPrintLevel()
+{ 
+  return fPrintLevel; 
 }
 //___________________________________________________________________________
 void GHepRecord::Print(ostream & stream) const

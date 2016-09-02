@@ -1,6 +1,6 @@
 # NOTICE
 
-This is an _unofficial_ repository for release 2.10.10 of the GENIE Neutrino 
+This is an _unofficial_ repository for release 2.11.0 of the GENIE Neutrino 
 Event MC generator. Please see the [official webpage](http://genie.hepforge.org)
 for code that is appropriate for publications-level physics analysis. 
 
@@ -18,9 +18,9 @@ You can see the list of available branches with
 
 You can check out a branch directly with, for example, 
 
-    git checkout R-2_10_10
+    git checkout R-2_11_0
 
-to get the `R-2_10_10` branch.
+to get the `R-2_11_0` branch.
 
 ## About GENIE
 

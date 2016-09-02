@@ -32,9 +32,14 @@ using std::ostream;
 
 namespace genie {
 
+class NtpMCEventRecord;
+ostream & operator<< (ostream& stream, const NtpMCEventRecord & rec);
+
 class NtpMCEventRecord : public NtpMCRecordI {
 
 public :
+  using NtpMCRecordI::Copy; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+
   NtpMCEventRecord();
   NtpMCEventRecord(const NtpMCEventRecord & ntpmcrec);
   virtual ~NtpMCEventRecord();

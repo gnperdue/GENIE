@@ -23,6 +23,15 @@
    Fix a problem identified by Brian Tice (Minerva)
    The nuclear modification to the pdf should be calculated in terms 
    of the experimental x, not the rescaled x.  The same goes for R(x,Q2).
+ @ Jun 06, 2016 - C. Bronner, J. Morrison
+   Fix the scaling variable used for the relations between structure functions
+   after it was confirmed by A. Bodek that x and not the modified scaling 
+   variable should be used there.
+ @ Jun 25, 2016 - JM
+   Added data members to:
+      - Allow for use of original GENIE implementation or 2016 corrections
+      - Select value of cutoff for 2xF1 to F2 relation
+
 */
 //____________________________________________________________________________
 
@@ -117,6 +126,14 @@ void QPMDISStrucFuncBase::LoadConfig(void)
   //-- include nuclear factor (shadowing / anti-shadowing / ...)
   fIncludeNuclMod = fConfig->GetBoolDef(
                "IncludeNuclMod", gc->GetBool("DISSF-IncludeNuclMod"));
+
+  //-- Use 2016 SF relation corrections
+  fUse2016Corrections = fConfig->GetBoolDef(
+        "Use2016Corrections", gc->GetBool("DISSF-Use2016Corrections"));
+
+  //-- Set min for relation between 2xF1 and F2
+  fLowQ2CutoffF1F2 = fConfig->GetDoubleDef(
+        "LowQ2CutoffF1F2", gc->GetDouble("DISSF-LowQ2CutoffF1F2"));
 
   //-- turn charm production off?
   fCharmOff  = fConfig->GetBoolDef("Charm-Prod-Off", false);
@@ -238,7 +255,7 @@ void QPMDISStrucFuncBase::Calculate(const Interaction * interaction) const
   // Compute structure functions for the EM, NC and CC cases
   //
 
-  double F2=0, xF3=0;
+  double F2val=0, xF3val=0;
 
   // ***  NEUTRAL CURRENT
 
@@ -274,8 +291,8 @@ void QPMDISStrucFuncBase::Calculate(const Interaction * interaction) const
     LOG("DISSF", pINFO) << "xf3: q = " << q3 << ", bar{q} = " << qb3;
 #endif
 
-    F2  = q2+qb2;
-    xF3 = q3-qb3;
+    F2val  = q2+qb2;
+    xF3val = q3-qb3;
   } 
 
   // ***  CHARGED CURRENT
@@ -310,11 +327,8 @@ void QPMDISStrucFuncBase::Calculate(const Interaction * interaction) const
       return;
     }
 
-#ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-    LOG("DISSF", pINFO) << "Q(x,Q2) = " << q << ", Qbar(x,Q2) = " << qbar;
-#endif
-    F2  = 2*(q+qbar);
-    xF3 = 2*(q-qbar);
+    F2val  = 2*(q+qbar);
+    xF3val = 2*(q-qbar);
   }
 
   // ***  ELECTROMAGNETIC
@@ -336,35 +350,53 @@ void QPMDISStrucFuncBase::Calculate(const Interaction * interaction) const
     double q    = qu  + qd  + qs;
     double qbar = qbu + qbd + qbs;
 
-    F2  = q + qbar;;
-    xF3 = 0.;
-
-#ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-    LOG("DISSF", pINFO) << "Q(x,Q2) = " << q << ", Qbar(x,Q2) = " << qbar;
-#endif
+    F2val  = q + qbar;;
+    xF3val = 0.;
 
   }
 
-  double Q2 = this->Q2        (interaction);
-  double x  = this->ScalingVar(interaction);
-  double f  = this->NuclMod   (interaction); // nuclear modification
-  double r  = this->R         (interaction); // R ~ FL
+  double Q2val = this->Q2        (interaction);
+  double x     = this->ScalingVar(interaction);
+  double f     = this->NuclMod   (interaction); // nuclear modification
+  double r     = this->R         (interaction); // R ~ FL
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
   LOG("DISSF", pDEBUG) << "Nucl. mod   = " << f;
   LOG("DISSF", pDEBUG) << "R(=FL/2xF1) = " << r;
 #endif
 
-  double a = TMath::Power(x,2.) / TMath::Max(Q2, 0.8);
-  double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
-//double a = TMath::Power(x,2.) / Q2;
-//double c = (1. + 4. * kNucleonMass * a) / (1.+r);
+  if(fUse2016Corrections) {
+    //It was confirmed by A.Bodek that the modified scaling variable
+    //should just be used to compute the strucure functions F2 and xF3,
+    //but that the usual Bjorken x should be used for the relations
+    //between the structure functions.
+    //For the same reason remove the freezing of Q2 at 0.8 for those relations,
+    //although it has not been explicitly asked to A.Bodek if it should be done.
 
-  fF3 = f * xF3/x;
-  fF2 = f * F2;
-  fF1 = fF2 * 0.5*c/x;
-  fF5 = fF2/x;           // Albright-Jarlskog relation
-  fF4 = 0.;              // Nucl.Phys.B 84, 467 (1975)
+    const Kinematics & kinematics = interaction->Kine();
+    double bjx = kinematics.x();
+    
+    double a = TMath::Power(bjx,2.) / TMath::Max(Q2val, fLowQ2CutoffF1F2);
+    double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
+
+    fF3 = f * xF3val/bjx;
+    fF2 = f * F2val;
+    fF1 = fF2 * 0.5*c/bjx;
+    fF5 = fF2/bjx;           // Albright-Jarlskog relation
+    fF4 = 0.;                // Nucl.Phys.B 84, 467 (1975)
+  } 
+  else {
+    double a = TMath::Power(x,2.) / TMath::Max(Q2val, fLowQ2CutoffF1F2);
+    double c = (1. + 4. * kNucleonMass2 * a) / (1.+r);
+    //double a = TMath::Power(x,2.) / Q2val;
+    //double c = (1. + 4. * kNucleonMass * a) / (1.+r);
+
+    fF3 = f * xF3val / x;
+    fF2 = f * F2val;
+    fF1 = fF2 * 0.5 * c / x;
+    fF5 = fF2 / x;         // Albright-Jarlskog relation
+    fF4 = 0.;              // Nucl.Phys.B 84, 467 (1975)
+  }
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
   LOG("DISSF", pDEBUG) 
@@ -382,19 +414,19 @@ double QPMDISStrucFuncBase::Q2(const Interaction * interaction) const
 
   // if Q2 (or q2) is set then prefer this value
   if (kinematics.KVSet(kKVQ2) || kinematics.KVSet(kKVq2)) {
-    double Q2 = kinematics.Q2();
-    return Q2;
+    double Q2val = kinematics.Q2();
+    return Q2val;
   }
   // if Q2 was not set, then compute it from x,y,Ev,Mnucleon
   if (kinematics.KVSet(kKVy)) {
     const InitialState & init_state = interaction->InitState();
     double Mn = init_state.Tgt().HitNucP4Ptr()->M(); // could be off-shell
-    //double x  = this->ScalingVar(interaction);       // could be redefined
-    double x  = kinematics.x();
-    double y  = kinematics.y();
-    double Ev = init_state.ProbeE(kRfHitNucRest);
-    double Q2 = 2*Mn*Ev*x*y;
-    return Q2;
+    //double x     = this->ScalingVar(interaction);       // could be redefined
+    double x     = kinematics.x();
+    double y     = kinematics.y();
+    double Ev    = init_state.ProbeE(kRfHitNucRest);
+    double Q2val = 2*Mn*Ev*x*y;
+    return Q2val;
   }
   LOG("DISSF", pERROR) << "Could not compute Q2!";
   return 0;
@@ -462,9 +494,9 @@ double QPMDISStrucFuncBase::R(const Interaction * interaction) const
     const Kinematics & kine  = interaction->Kine();
     double x  = kine.x();
 //    double x  = this->ScalingVar(interaction);
-    double Q2 = this->Q2(interaction);
-    double R = utils::phys::RWhitlow(x, Q2);
-    return R;
+    double Q2val = this->Q2(interaction);
+    double Rval  = utils::phys::RWhitlow(x, Q2val);
+    return Rval;
   }
   return 0;
 }
@@ -476,15 +508,15 @@ void QPMDISStrucFuncBase::CalcPDFs(const Interaction * interaction) const
   fPDFc -> Reset();
 
   // Get the kinematical variables x,Q2 (could include corrections)
-  double x  = this->ScalingVar(interaction);
-  double Q2 = this->Q2(interaction);
+  double x     = this->ScalingVar(interaction);
+  double Q2val = this->Q2(interaction);
 
   // Get the hit nucleon mass (could be off-shell)
   const Target & tgt = interaction->InitState().Tgt();
   double M = tgt.HitNucP4().M(); 
 
   // Get the Q2 for which PDFs will be evaluated
-  double Q2pdf = TMath::Max(Q2, fQ2min);
+  double Q2pdf = TMath::Max(Q2val, fQ2min);
 
   // Compute PDFs at (x,Q2)
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
@@ -494,7 +526,7 @@ void QPMDISStrucFuncBase::CalcPDFs(const Interaction * interaction) const
 
   // Check whether it is above charm threshold
   bool above_charm = 
-           utils::kinematics::IsAboveCharmThreshold(x,Q2,M,fMc);
+           utils::kinematics::IsAboveCharmThreshold(x, Q2val, M, fMc);
   if(above_charm) {
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
     LOG("DISSF", pDEBUG) 
@@ -504,14 +536,14 @@ void QPMDISStrucFuncBase::CalcPDFs(const Interaction * interaction) const
        LOG("DISSF", pINFO) << "Charm production is turned off";
     } else {
        // compute the slow rescaling var
-       double xc = utils::kinematics::SlowRescalingVar(x,Q2,M,fMc);    
+       double xc = utils::kinematics::SlowRescalingVar(x, Q2val, M, fMc);    
        if(xc<0 || xc>1) {
           LOG("DISSF", pINFO) << "Unphys. slow rescaling var: xc = " << xc;
        } else {
           // compute PDFs at (xc,Q2)
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
           LOG("DISSF", pDEBUG) 
-              << "Calculating PDFs @ xc (slow rescaling) = " << x << ", Q2 = " << Q2;
+              << "Calculating PDFs @ xc (slow rescaling) = " << x << ", Q2 = " << Q2val;
 #endif
           fPDFc->Calculate(xc, Q2pdf);
        }

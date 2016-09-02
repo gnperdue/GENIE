@@ -10,7 +10,7 @@
 
 \created  May 02, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -36,6 +36,9 @@ class TRootIOCtor;
 
 namespace genie {
 
+class InitialState;
+ostream & operator << (ostream & stream, const InitialState & i); 
+
 class InitialState : public TObject {
 
 public:
@@ -55,6 +58,7 @@ public:
   TLorentzVector * GetTgtP4   (RefFrame_t rf = kRfLab) const;
   TLorentzVector * GetProbeP4 (RefFrame_t rf = kRfHitNucRest) const;
   double           ProbeE     (RefFrame_t rf) const;
+  double           CMEnergy   () const; ///< centre-of-mass energy (sqrt s)
 
   void SetPdgs     (int tgt_pdgc, int probe_pdgc);
   void SetProbePdg (int pdg_code);

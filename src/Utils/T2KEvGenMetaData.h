@@ -33,9 +33,13 @@ using std::map;
 namespace genie {
 namespace utils {
 
+class T2KEvGenMetaData;
+ostream & operator << (ostream & stream, const T2KEvGenMetaData & md);
+
 class T2KEvGenMetaData: public TObject
 {
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
 
   T2KEvGenMetaData() :
       jnubeam_version(""), 

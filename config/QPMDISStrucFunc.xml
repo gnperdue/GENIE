@@ -17,12 +17,18 @@ CKM-Vcd                    double  Yes                                          
 CKM-Vcs                    double  Yes                                          GPL: CKM-Vcs
 CKM-Vud                    double  Yes                                          GPL: CKM-Vud
 CKM-Vcs                    double  Yes                                          GPL: CKM-Vus
+Use2016Corrections         bool    Yes   Use SF corrections?                    GPL: DISSF-Use2016Corrections
+LowQ2CutoffF1F2            double  Yes   min for F1/F2 SF relation              GPL: DISSF-LowQ2CutoffF1F2
 -->
 
 <alg_conf>
 
   <param_set name="Default"> 
      <param type="alg" name="PDF-Set">   genie::PDFLIB/GRVLO </param>
+  </param_set>
+
+  <param_set name="Optional"> 
+     <param type="alg" name="PDF-Set">  genie::GRV98LO/Default </param>
   </param_set>
 
 </alg_conf>

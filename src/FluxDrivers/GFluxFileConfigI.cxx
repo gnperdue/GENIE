@@ -52,9 +52,9 @@ namespace flux {
   }
 
   //___________________________________________________________________________
-  void GFluxFileConfigI::GetBranchInfo(std::vector<std::string>& branchNames,
-                                       std::vector<std::string>& branchClassNames,
-                                       std::vector<void**>&      branchObjPointers)
+  void GFluxFileConfigI::GetBranchInfo(std::vector<std::string>& /* branchNames */,
+                                       std::vector<std::string>& /* branchClassNames */,
+                                       std::vector<void**>&      /* branchObjPointers */)
   {
     // allow flux driver to report back current status and/or ntuple entry 
     // info for possible recording in the output file by supplying
@@ -63,6 +63,8 @@ namespace flux {
 
     // default is not to supply anything
   }
+
+  //___________________________________________________________________________
   TTree* GFluxFileConfigI::GetMetaDataTree()
   {
     return 0;

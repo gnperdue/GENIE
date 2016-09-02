@@ -94,8 +94,17 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
   Range1D_t xl = kps.Limits(kKVx);
   Range1D_t yl = kps.Limits(kKVy);
 
+  // Note that the t limits used here are NOT the same as what you get from KPhaseSpace::TLim().
+  // We use a larger range here because the limits from KPhaseSpace::TLim() depend on x and y,
+  // and using the rejection method in a region that's changing depending on some of the
+  // values guarantees that some regions will be oversampled.  We want to avoid that.
+  Range1D_t tl;
+  tl.min = 0;
+  tl.max = KPhaseSpace::GetTMaxDFR();
+
   LOG("DFRKinematics", pNOTICE) << "x: [" << xl.min << ", " << xl.max << "]";
   LOG("DFRKinematics", pNOTICE) << "y: [" << yl.min << ", " << yl.max << "]";
+  LOG("DFRKinematics", pNOTICE) << "t: [" << tl.min << ", " << tl.max << "]";
 
 /*
   Range1D_t W  = kps.Limits(kKVW);
@@ -119,15 +128,16 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
   //   space the max xsec is irrelevant
   double xsec_max = (fGenerateUniformly) ? -1 : this->MaxXSec(evrec);
 
-  //-- Try to select a valid (x,y) pair using the rejection method
+  //-- Try to select a valid (x,y,t) triplet using the rejection method
 
   double dx = xl.max - xl.min;
   double dy = yl.max - yl.min;
-  double gx=-1, gy=-1, gW=-1, gQ2=-1, xsec=-1;
+  double dt = tl.max - tl.min;
+  double gx=-1, gy=-1, gt=-1, gW=-1, gQ2=-1, xsec=-1;
 
   unsigned int iter = 0;
   bool accept = false;
-  while(1) {
+  while(true) {
      iter++;
      if(iter > kRjMaxIterations) {
        LOG("DFRKinematics", pWARN)
@@ -139,31 +149,35 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
        throw exception;
      }
 
-     //-- random x,y
+     //-- random x,y,t
      gx = xl.min + dx * rnd->RndKine().Rndm();
      gy = yl.min + dy * rnd->RndKine().Rndm();
+     gt = tl.min + dt * rnd->RndKine().Rndm();
+
      interaction->KinePtr()->Setx(gx);
      interaction->KinePtr()->Sety(gy);
-     LOG("DFRKinematics", pNOTICE) 
-        << "Trying: x = " << gx << ", y = " << gy;
+     interaction->KinePtr()->Sett(gt);
+
+     LOG("DFRKinematics", pDEBUG)
+       << "Trying: x = " << gx << ", y = " << gy << ", t = " << gt;
 
      //-- compute the cross section for current kinematics
-     xsec = fXSecModel->XSec(interaction, kPSxyfE);
+     xsec = fXSecModel->XSec(interaction, kPSxytfE);
 
      //-- decide whether to accept the current kinematics
      if(!fGenerateUniformly) {
         this->AssertXSecLimits(interaction, xsec, xsec_max);
-        double t = xsec_max * rnd->RndKine().Rndm();
-	double J = 1;
+        double n = xsec_max * rnd->RndKine().Rndm();
+        double J = 1;
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
         LOG("DFRKinematics", pDEBUG)
-              << "xsec= " << xsec << ", J= " << J << ", Rnd= " << t;
+              << "xsec= " << xsec << ", J= " << J << ", Rnd= " << n;
 #endif
-        accept = (t < J*xsec);
+        accept = (n < J*xsec);
      } 
      else {
-        accept = (xsec>0);
+       accept = (xsec>0);
      }
 
      //-- If the generated kinematics are accepted, finish-up module's job
@@ -175,7 +189,7 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
          // for uniform kinematics, compute an event weight as
          // wght = (phase space volume)*(differential xsec)/(event total xsec)
          if(fGenerateUniformly) {
-            double vol     = kinematics::PhaseSpaceVolume(interaction,kPSxyfE);
+            double vol     = kinematics::PhaseSpaceVolume(interaction,kPSxytfE);
             double totxsec = evrec->XSec();
             double wght    = (vol/totxsec)*xsec;
             LOG("DFRKinematics", pNOTICE)  << "Kinematics wght = "<< wght;
@@ -186,23 +200,6 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
             evrec->SetWeight(wght);
          }
 
-         // the DFR cross section should be a triple differential cross section
-         // d^2xsec/dxdydt where t is the the square of the 4p transfer to the
-         // nucleus. The cross section used for kinematical selection should have
-         // the t-dependence integrated out. The t-dependence is of the form
-         // ~exp(-bt). Now that the x,y kinematical variables have been selected
-         // we can generate a t using the t-dependence as a PDF.
-         double Epi   = gy*Ev; // pion energy
-         double tmax    = 1.0;
-         double tmin    = TMath::Min(tmax, TMath::Power(0.5*kPionMass2/Epi,2.));
-         double b     = fBeta;
-         double tsum  = (TMath::Exp(-b*tmin) - TMath::Exp(-b*tmax))/b; 
-         double rt    = tsum * rnd->RndKine().Rndm();
-         double gt    = -1.*TMath::Log(-1.*b*rt + TMath::Exp(-1.*b*tmin))/b;
-
-         LOG("DFRKinematics", pNOTICE)
-           << "Selected: t = "<< gt << ", from ["<< tmin << ", "<< tmax << "]";
-
          // compute W,Q2 for selected x,y
          kinematics::XYtoWQ2(Ev,M,gW,gQ2,gx,gy);
 
@@ -210,7 +207,7 @@ void DFRKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
                 << "Selected x,y => W = " << gW << ", Q2 = " << gQ2;
 
          // set the cross section for the selected kinematics
-         evrec->SetDiffXSec(xsec*TMath::Exp(-b*gt), kPSxytfE);
+         evrec->SetDiffXSec(xsec, kPSxytfE);
 
          // lock selected kinematics & clear running values
          interaction->KinePtr()->SetW (gW,  true);
@@ -279,11 +276,13 @@ double DFRKinematicsGenerator::ComputeMaxXSec(
   double max_xsec = 0.0;
 
   const KPhaseSpace & kps = interaction->PhaseSpace();
-  Range1D_t xl = kps.Limits(kKVx);
-  Range1D_t yl = kps.Limits(kKVy);
+  Range1D_t xl  = kps.XLim();
+  Range1D_t yl  = kps.YLim();
+  Range1D_t Wl  = kps.WLim();
 
   int    Ny      = 20;
-  int    Nx      = 40;
+  int    Nx      = 20;
+  int    Nt      = 10;
   double xmin    = xl.min;
   double xmax    = xl.max;
   double ymin    = yl.min;
@@ -291,10 +290,11 @@ double DFRKinematicsGenerator::ComputeMaxXSec(
   double dx      = (xmax-xmin)/(Nx-1);
   double dy      = (ymax-ymin)/(Ny-1);
 
+
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
   LOG("DFRKinematics", pDEBUG) 
     << "Searching max. in x [" << xmin << ", " << xmax 
-    << "], y [" << ymin << ", " << ymax << "]";
+    << "], y [" << ymin << ", " << ymax << "], z [" << zmin << ", " << zmax << "]";
 #endif
   double xseclast_y = -1;
   bool increasing_y;
@@ -306,65 +306,51 @@ double DFRKinematicsGenerator::ComputeMaxXSec(
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
      LOG("DFRKinematics", pDEBUG) << "y = " << gy;
 #endif
-     double xseclast_x = -1;
-     //not-used//bool increasing_x;
-
      for(int j=0; j<Nx; j++) {
         double gx = xmin + j*dx;
         interaction->KinePtr()->Setx(gx);
         kinematics::UpdateWQ2FromXY(interaction);
+        Range1D_t Q2l = kps.Q2Lim_W();
 
-        double xsec = fXSecModel->XSec(interaction, kPSxyfE);
-#ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-        LOG("DFRKinematics", pINFO) 
-                << "xsec(y=" << gy << ", x=" << gx << ") = " << xsec;
-#endif
-        // update maximum xsec
-        max_xsec = TMath::Max(xsec, max_xsec);
+        // the t range depends on x and y,
+        // and you get NaNs if you try to calculate t
+        // for an unphysical (x,y) combination
+        bool in_phys = math::IsWithinLimits(interaction->KinePtr()->W(), Wl);
+        in_phys = in_phys && math::IsWithinLimits(interaction->KinePtr()->Q2(), Q2l);
+        if (!in_phys)
+          continue;
 
-        //not-used//increasing_x = (xsec-xseclast_x)>=0;
-        xseclast_x   = xsec;
+        // t range depends on x and y
+        Range1D_t tl = kps.TLim();
+        double tmin    = tl.min;
+        double tmax    = tl.max;
+        double dt      = (tmax-tmin)/(Nt-1);
+        for(int k=0; k<Nt; k++) {
+          double gt = tmin + k*dt;
+          interaction->KinePtr()->Sett(gt);
 
-/*
-        // once the cross section stops increasing, I reduce the step size and
-        // step backwards a little bit to handle cases that the max cross section
-        // is grossly underestimated (very peaky distribution & large step)
-        if(!increasing_x) {
+          double xsec = fXSecModel->XSec(interaction, kPSxytfE);
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-          LOG("DFRKinematics", pDEBUG) 
-           << "d2xsec/dxdy|x stopped increasing. Stepping back & exiting x loop";
+	  LOG("DFRKinematics", pINFO) 
+	    << "xsec(y=" << gy << ", x=" << gx << ", t=" << gt << ") = " << xsec;
 #endif
-          double dxn = dx/(Nxb+1);
-          for(int ik=0; ik<Nxb; ik++) {
-   	     gx = gx - dxn;
-             interaction->KinePtr()->Setx(gx);
-             kinematics::UpdateWQ2FromXY(interaction);
-             xsec = fXSecModel->XSec(interaction, kPSxyfE);
+          // update maximum xsec
+          max_xsec = TMath::Max(xsec, max_xsec);
+        } // t
+      } // x
+    increasing_y = max_xsec-xseclast_y>=0;
+    xseclast_y   = max_xsec;
+    if(!increasing_y) {
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-             LOG("DFRKinematics", pINFO) 
-                << "xsec(y=" << gy << ", x=" << gx << ") = " << xsec;
+      LOG("DFRKinematics", pDEBUG) 
+        << "d2xsec/dxdy stopped increasing. Exiting y loop";
 #endif
-	  }
-          break;
-        } // stepping back within last bin
-*/
-
-     } // x
-     increasing_y = max_xsec-xseclast_y>=0;
-     xseclast_y   = max_xsec;
-     if(!increasing_y) {
-#ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
-       LOG("DFRKinematics", pDEBUG) 
-           << "d2xsec/dxdy stopped increasing. Exiting y loop";
-#endif
-       break;
-     }
+      break;
+    }
   }// y
 
   // Apply safety factor, since value retrieved from the cache might
   // correspond to a slightly different energy
-  //  max_xsec *= fSafetyFactor;
-  //max_xsec *= ( (Ev<3.0) ? 2.5 : fSafetyFactor);
   max_xsec *= 3;
 
 #ifdef __GENIE_LOW_LEVEL_MESG_ENABLED__
