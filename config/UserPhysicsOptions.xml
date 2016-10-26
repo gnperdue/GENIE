@@ -80,10 +80,10 @@ STFC, Rutherford Appleton Laboratory
   - include corrections for calculating relation between 2xF1 and F2
   - Select value for Q2 cutoff in relation between 2xF1 and F2
   -->
-  <param type="bool"   name="DISSF-IncludeR">           true  </param>
-  <param type="bool"   name="DISSF-IncludeNuclMod">     true  </param>
-  <param type="bool"   name="DISSF-Use2016Corrections"> false </param>
-  <param type="double" name="DISSF-LowQ2CutoffF1F2">    0.0   </param>
+  <param type="bool"   name="DISSF-IncludeR">           true </param>
+  <param type="bool"   name="DISSF-IncludeNuclMod">     true </param>
+  <param type="bool"   name="DISSF-Use2016Corrections"> false</param>
+  <param type="double" name="DISSF-LowQ2CutoffF1F2">    0.8  </param>
 
  <!-- 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -591,8 +591,8 @@ STFC, Rutherford Appleton Laboratory
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Invariant mass window for the transition from KNO model to PYTHIA
   -->
-  <param type="double" name="KNO2PYTHIA-Wmin">  2000.30 </param>
-  <param type="double" name="KNO2PYTHIA-Wmax">  3000.00 </param>
+  <param type="double" name="KNO2PYTHIA-Wmin">  2.30 </param>
+  <param type="double" name="KNO2PYTHIA-Wmax">  3.00 </param>
 
  <!-- 
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -802,9 +802,9 @@ STFC, Rutherford Appleton Laboratory
   Specify which cross section model is to be used by each GENIE event generation thread.
   The parameter name is build as: "XSecModel@[name of thread]"
   -->
-  <!-- New Nieves QE model   -->
-  <!--
-  <param type="alg" name="XSecModel@genie::EventGenerator/QEL-CC">         genie::NievesQELCCPXSec/ZExp            </param>
+<!-- New Nieves QE model   -->
+<!--
+  <param type="alg" name="XSecModel@genie::EventGenerator/QEL-CC">         genie::NievesQELCCPXSec/Default         </param>
   -->
   <param type="alg" name="XSecModel@genie::EventGenerator/QEL-CC">         genie::LwlynSmithQELCCPXSec/Default   </param>
   <param type="alg" name="XSecModel@genie::EventGenerator/QEL-NC">         genie::AhrensNCELPXSec/Default          </param>
@@ -832,6 +832,8 @@ STFC, Rutherford Appleton Laboratory
   <param type="alg" name="XSecModel@genie::EventGenerator/DIS-NC">         genie::QPMDISPXSec/Default            </param>
   <param type="alg" name="XSecModel@genie::EventGenerator/DIS-EM">         genie::QPMDISPXSec/Default            </param>
 
+  <!-- 
+  -->
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-CC">         genie::ReinSehgalCOHPiPXSec/Default   </param>
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-NC">         genie::ReinSehgalCOHPiPXSec/Default   </param>
 
@@ -841,9 +843,14 @@ STFC, Rutherford Appleton Laboratory
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-NC">         genie::BergerSehgalFMCOHPiPXSec2015/Default   </param>
   -->
 
-  <!-- Berger-Sehgal "as in the paper" (with Paschos-Schalla integration bounds)
+  <!-- Berger-Sehgal "as in the paper"
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-CC">         genie::BergerSehgalCOHPiPXSec2015/Default   </param>
   <param type="alg" name="XSecModel@genie::EventGenerator/COH-NC">         genie::BergerSehgalCOHPiPXSec2015/Default   </param>
+  -->
+
+  <!-- Alvarez-Ruso et al COH pion
+  <param type="alg" name="XSecModel@genie::EventGenerator/COH-CC">       genie::AlvarezRusoCOHPiPXSec/Fast       </param>
+  <param type="alg" name="XSecModel@genie::EventGenerator/COH-NC">       genie::AlvarezRusoCOHPiPXSec/Fast       </param>
   -->
 
   <param type="alg" name="XSecModel@genie::EventGenerator/IMD">            genie::BardinIMDRadCorPXSec/Default   </param>
