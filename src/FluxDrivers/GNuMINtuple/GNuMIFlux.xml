@@ -254,6 +254,10 @@
       <point coord="det"> -5.000,  -2.500, -5. </point>
     </window>
 
+    <enumax> 120. 1.05 1.05 2500000 </enumax>
+    <!-- allow entry to be reused 50 times before moving on -->
+    <reuse> 50 </reuse>
+
   </param_set>
 
   <param_set name="NOvA-ND-2011">
@@ -323,6 +327,11 @@
       <point coord="det">  -8.5,  -12.5, 0.0 </point>
       <point coord="det">   8.5,    8.5, 0.0 </point>
     </window>
+
+    <enumax> 120. 1.05 1.05 2500000 </enumax>
+    <!-- allow entry to be reused 10 times before moving on -->
+    <reuse> 10 </reuse>
+
   </param_set>
 
   <param_set name="NOvA-FD-2011">
@@ -507,7 +516,10 @@
     </beamdir>
 
     <!-- position of beam origin in user coords -->
-    <beampos> 0.5628,  60.6798,  -1023.3643 </beampos>
+    <!-- old beampos 0.5628,  60.6798,  -1023.3643 -->
+    <!-- "new" beampos, locally incorporated 2014-10-13 by PAR
+         but not merged into SVN until 2017-02-21 -->
+    <beampos> 0.2486, 60.350, -1022.74 </beampos>>
 
     <!-- define flux window in detector coords -->
     <!-- need 3 positions to define a rectoid -->

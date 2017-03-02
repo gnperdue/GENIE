@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -277,7 +277,7 @@ double EmpiricalMECPXSec2015::Integral(const Interaction * interaction) const
     Interaction * inn = Interaction::QELEM(tgtpdg,nucpdg,nupdg,E);
     
     // Calculate cross section for the QE process - avg of p and n - best for isoscalar nuclei
-    double xsec = 0.5*(Z*fXSecAlgEMQE->Integral(inp) + N*fXSecAlgEMQE->Integral(inn));
+    double xsec = (Z*fXSecAlgEMQE->Integral(inp) + N*fXSecAlgEMQE->Integral(inn))/A;
     
     // Use tunable fraction 
     // FFracEMQE is fraction of QE going to MEC
