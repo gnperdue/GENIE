@@ -37,12 +37,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 #include <TParticlePDG.h>
 
 #include "Algorithm/AlgConfigPool.h"
@@ -231,13 +226,13 @@ void UnstableParticleDecayer::CopyToEventRecord(
   LOG("ParticleDecayer", pINFO) << "Copying decay to event record...";
 
   int new_mother_pos = mother_pos;
-  TMCParticle * dpmc =  0;
+  GMCParticle * dpmc =  0;
 
   TLorentzVector parent_x4 = *(p->X4());
 
   TObjArrayIter decay_iter(decay_products);
 
-  while( (dpmc = (TMCParticle *) decay_iter.Next()) ) {
+  while( (dpmc = (GMCParticle *) decay_iter.Next()) ) {
 
      int pdg = dpmc->GetKF();
      GHepStatus_t ist = GHepStatus_t (dpmc->GetKS()); 

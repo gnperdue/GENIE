@@ -3,13 +3,13 @@
   TString libs  = libs0 + ":/usr/lib:/usr/local/lib:/opt/lib:/opt/local/lib";
   gSystem->SetDynamicPath(libs.Data());
 
-  // PYTHIA 6 lib
-  gSystem->Load("libPythia6");
+  // PYTHIA 8 lib
+  gSystem->Load("libPythia8");
 
   // extra ROOT libs
   gSystem->Load("libPhysics");
   gSystem->Load("libEG");
-  gSystem->Load("libEGPythia6");
+  gSystem->Load("libEGPythia8");
   gSystem->Load("libGeom");
   gSystem->Load("libTree");
 

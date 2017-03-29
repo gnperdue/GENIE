@@ -20,7 +20,7 @@
 #ifndef _PYTHIA_HADRONIZATION_H_
 #define _PYTHIA_HADRONIZATION_H_
 
-#include <TPythia6.h>
+#include <TPythia8.h>
 
 #include "Fragmentation/HadronizationModelBase.h"
 
@@ -54,7 +54,7 @@ private:
   void SwitchDecays   (int pdgc, bool on_off) const;
   void HandleDecays   (TClonesArray * plist) const;
 */
-  mutable TPythia6 * fPythia;   ///< PYTHIA6 wrapper class
+  mutable TPythia8 * fPythia8;   ///< PYTHIA8 wrapper class
 
   const DecayModelI * fDecayer;
 

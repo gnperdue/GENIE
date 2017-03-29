@@ -19,12 +19,7 @@
 
 #include <TClonesArray.h>
 #include <TDecayChannel.h>
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 #include <TMath.h>
 
 #include "BaryonResonance/BaryonResUtils.h"
@@ -230,7 +225,7 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
   }
 
   //-- Create the event record
-  TClonesArray * particle_list = new TClonesArray("TMCParticle", 1+nd);
+  TClonesArray * particle_list = new TClonesArray("GMCParticle", 1+nd);
 
   //-- Add the mother particle to the event record (KS=11 as in PYTHIA)
   TParticlePDG * mother = PDGLibrary::Instance()->Find(pdg_code);
@@ -242,7 +237,7 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
   double M    = mother->Mass();
 
   new ( (*particle_list)[0] )
-                    TMCParticle(11,pdg_code,0,0,0,px,py,pz,E,M,0,0,0,0,0);
+                    GMCParticle(11,pdg_code,0,0,0,px,py,pz,E,M,0,0,0,0,0);
 
   //-- Add the daughter particles to the event record
   for(unsigned int id = 0; id < nd; id++) {
@@ -258,7 +253,7 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
        M    = mass[id];
 
        new ( (*particle_list)[1+id] )
-                         TMCParticle(1,pdgc[id],0,0,0,px,py,pz,E,M,0,0,0,0,0);
+                         GMCParticle(1,pdgc[id],0,0,0,px,py,pz,E,M,0,0,0,0,0);
   }
 
   //-- Set owner and return

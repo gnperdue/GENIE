@@ -19,12 +19,7 @@
 #include <ostream>
 #include <iomanip>
 
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 #include <TClonesArray.h>
 #include <TParticlePDG.h>
 #include <TIterator.h>
@@ -49,7 +44,7 @@ using std::setfill;
 using std::ios;
 
 ostream & operator<< (ostream & stream, const TClonesArray * particle_list);
-ostream & operator<< (ostream & stream, const TMCParticle * particle);
+ostream & operator<< (ostream & stream, const GMCParticle * particle);
 
 void TestPythiaTauDecays(void);
 void Decay(const DecayModelI * decayer, int pdgc, double E,  int ndecays);
@@ -224,7 +219,7 @@ void Decay(const DecayModelI * decayer, int pdgc, double E, int ndecays)
 //__________________________________________________________________________
 ostream & operator<< (ostream & stream, const TClonesArray * particle_list)
 {
-  TMCParticle * p = 0;
+  GMCParticle * p = 0;
   TObjArrayIter particle_iter(particle_list);
 
 
@@ -242,14 +237,14 @@ ostream & operator<< (ostream & stream, const TClonesArray * particle_list)
     << setfill(' ') << setw(15) << "z (mm)"
     << endl;
 
-  while( (p = (TMCParticle *) particle_iter.Next()) ) stream << p;
+  while( (p = (GMCParticle *) particle_iter.Next()) ) stream << p;
 
   stream << setfill('-') << setw(100) << "|";
 
   return stream; 
 }
 //__________________________________________________________________________
-ostream & operator<< (ostream & stream, const TMCParticle * p)
+ostream & operator<< (ostream & stream, const GMCParticle * p)
 {
   stream 
    << setiosflags(ios::scientific) << setprecision(6);

@@ -21,12 +21,7 @@
 */
 //____________________________________________________________________________
 
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 
 #include "Algorithm/AlgConfigPool.h"
 #include "BaryonResonance/BaryonResonance.h"
@@ -190,10 +185,10 @@ void RESHadronicSystemGenerator::AddResonanceDecayProducts(
      resonance->SetStatus(kIStDecayedState);
 
      // loop over the daughter and add them to the event record
-     TMCParticle * dpmc = 0;
+     GMCParticle * dpmc = 0;
      TObjArrayIter decay_iter(decay_products);
 
-     while( (dpmc = (TMCParticle *) decay_iter.Next()) ) {
+     while( (dpmc = (GMCParticle *) decay_iter.Next()) ) {
 
         int dppdg = dpmc->GetKF();
         double px = dpmc->GetPx();

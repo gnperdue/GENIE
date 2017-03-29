@@ -14,12 +14,7 @@
 */
 //____________________________________________________________________________
 
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 #include <TIterator.h>
 
 #include "Messenger/Messenger.h"
@@ -33,11 +28,11 @@ int genie::utils::fragmrec::NParticles(
                        int pdg_code, const TClonesArray * const particle_list)
 {
   int nparticles = 0;
-  TMCParticle* p = 0;
+  GMCParticle* p = 0;
 
   TObjArrayIter particle_iter(particle_list);
 
-  while( (p = (TMCParticle *) particle_iter.Next()) ) {
+  while( (p = (GMCParticle *) particle_iter.Next()) ) {
     if(p->GetKF() == pdg_code)  {
       if(p->GetKS()<10) nparticles++;
     }
@@ -49,11 +44,11 @@ int genie::utils::fragmrec::NParticles(
            int pdg_code, int status, const TClonesArray * const particle_list)
 {
   int nparticles = 0;
-  TMCParticle* p = 0;
+  GMCParticle* p = 0;
 
   TObjArrayIter particle_iter(particle_list);
 
-  while( (p = (TMCParticle *) particle_iter.Next()) )
+  while( (p = (GMCParticle *) particle_iter.Next()) )
               if(p->GetKF() == pdg_code && p->GetKS() == status) nparticles++;
 
   return nparticles;
@@ -65,10 +60,10 @@ int genie::utils::fragmrec::NPositives(const TClonesArray * const part_list)
 
   TIter piter(part_list);
 
-  TMCParticle * p = 0;
+  GMCParticle * p = 0;
   int npos = 0;
 
-  while( (p = (TMCParticle *) piter.Next()) )
+  while( (p = (GMCParticle *) piter.Next()) )
          if( PDGLibrary::Instance()->Find(p->GetKF())->Charge() > 0 ) npos++;
 
   return npos;
@@ -80,10 +75,10 @@ int genie::utils::fragmrec::NNegatives(const TClonesArray * const part_list)
 
   TIter piter(part_list);
 
-  TMCParticle * p = 0;
+  GMCParticle * p = 0;
   int nneg = 0;
 
-  while( (p = (TMCParticle *) piter.Next()) )
+  while( (p = (GMCParticle *) piter.Next()) )
          if( PDGLibrary::Instance()->Find(p->GetKF())->Charge() < 0 ) nneg++;
 
   return nneg;
@@ -94,12 +89,12 @@ void genie::utils::fragmrec::Print(const TClonesArray * const part_list)
   TIter piter(part_list);
 
   unsigned int i=0;
-  TMCParticle * particle = 0;
+  GMCParticle * particle = 0;
 
   double sum_px = 0, sum_py = 0, sum_pz = 0, sum_E = 0;
 
   
-  while( (particle = (TMCParticle *) piter.Next()) ) {
+  while( (particle = (GMCParticle *) piter.Next()) ) {
 
     sum_E  += (particle->GetEnergy());
     sum_px += (particle->GetPx());

@@ -5,7 +5,7 @@
 
 \brief      Simple utilities for the Fragmentation Event Record.
 
-            The Fragmentation event record is a TClonesArray of TMCParticles -
+            The Fragmentation event record is a TClonesArray of GMCParticles -
             equivalent to PYTHIA's PYJETS.
 
 \author     Costas Andreopoulos <costas.andreopoulos \at stfc.ac.uk>

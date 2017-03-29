@@ -39,12 +39,7 @@
 
 #include <cstdlib>
 
-#include <RVersion.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(5,15,6)
-#include <TMCParticle.h>
-#else
-#include <TMCParticle6.h>
-#endif
+#include "Fragmentation/GMCParticle.h"
 #include <TSystem.h>
 #include <TLorentzVector.h>
 #include <TClonesArray.h>
@@ -715,7 +710,7 @@ TClonesArray * KNOHadronization::DecayMethod1(
   LOG("KNOHad", pINFO) << "** Using Hadronic System Decay method 1";
 
   TLorentzVector p4had(0,0,0,W);
-  TClonesArray * plist = new TClonesArray("TMCParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("GMCParticle", pdgv.size());
 
   // do the decay
   bool ok = this->PhaseSpaceDecay(*plist, p4had, pdgv, 0, reweight_decays); 
@@ -765,7 +760,7 @@ TClonesArray * KNOHadronization::DecayMethod2(
   }
 
   // Create the particle list
-  TClonesArray * plist = new TClonesArray("TMCParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("GMCParticle", pdgv.size());
 
   RandomGen * rnd = RandomGen::Instance();
   TLorentzVector p4had(0,0,0,W);
@@ -812,7 +807,7 @@ TClonesArray * KNOHadronization::DecayMethod2(
         << "Generated baryon with P4 = " << utils::print::P4AsString(&p4N);
 
     // Insert the baryon at the event record
-    new ((*plist)[0]) TMCParticle(
+    new ((*plist)[0]) GMCParticle(
       1,baryon,-1,-1,-1, p4N.Px(),p4N.Py(),p4N.Pz(),p4N.Energy(),MN, 0,0,0,0,0);
 
     // Do a phase space decay for the N-1 particles and add them to the list
@@ -856,7 +851,7 @@ TClonesArray * KNOHadronization::DecayBackToBack(
   RandomGen * rnd = RandomGen::Instance();
 
   // Create the particle list
-  TClonesArray * plist = new TClonesArray("TMCParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("GMCParticle", pdgv.size());
 
   // Get xF,pT2 distribution (y-) maxima for the rejection method
   double xFo  = 1.1 * fBaryonXFpdf ->GetMaximum(-1,1);
@@ -883,7 +878,7 @@ TClonesArray * KNOHadronization::DecayBackToBack(
     // If the decay was allowed, then compute the baryon xF,pT2 and accept/
     // reject the phase space decays so as to reproduce the xF,pT2 PDFs
 
-    TMCParticle * baryon = (TMCParticle *) (*plist)[0];
+    GMCParticle * baryon = (GMCParticle *) (*plist)[0];
     assert(pdg::IsNeutronOrProton(baryon->GetKF()));
 
     double px  = baryon->GetPx();
@@ -914,7 +909,7 @@ bool KNOHadronization::PhaseSpaceDecay(
                    const PDGCodeList & pdgv, int offset, bool reweight) const
 {
 // General method decaying the input particle system 'pdgv' with available 4-p
-// given by 'pd'. The decayed system is used to populate the input TMCParticle 
+// given by 'pd'. The decayed system is used to populate the input GMCParticle 
 // array starting from the slot 'offset'.
 //
   LOG("KNOHad", pINFO) << "*** Performing a Phase Space Decay";
@@ -1021,7 +1016,7 @@ bool KNOHadronization::PhaseSpaceDecay(
      }
   }
 
-  // Insert final state products into a TClonesArray of TMCParticles
+  // Insert final state products into a TClonesArray of GMCParticles
 
   i=0;
   for(pdg_iter = pdgv.begin(); pdg_iter != pdgv.end(); ++pdg_iter) {
@@ -1032,7 +1027,7 @@ bool KNOHadronization::PhaseSpaceDecay(
      //-- get the 4-momentum of the i-th final state particle
      TLorentzVector * p4fin = fPhaseSpaceGenerator.GetDecay(i);
 
-     new ( plist[offset+i] ) TMCParticle(
+     new ( plist[offset+i] ) GMCParticle(
            1,               /* KS Code                          */
            pdgc,            /* PDG Code                         */
           -1,               /* parent particle                  */
@@ -1453,10 +1448,10 @@ void KNOHadronization::HandleDecays(TClonesArray * plist) const
 
      //-- loop through the fragmentation event record & decay unstables
      int idecaying   = -1; // position of decaying particle
-     TMCParticle * p =  0; // current particle
+     GMCParticle * p =  0; // current particle
 
      TIter piter(plist);
-     while ( (p = (TMCParticle *) piter.Next()) ) {
+     while ( (p = (GMCParticle *) piter.Next()) ) {
 
         idecaying++;
         int status = p->GetKS();
@@ -1489,13 +1484,13 @@ void KNOHadronization::HandleDecays(TClonesArray * plist) const
                   p->SetLastChild  ( nfp + ndp -1 ); // the end of the fragm.rec.
 
                   //--  add decay products to the fragmentation record
-                  TMCParticle * dp = 0;
+                  GMCParticle * dp = 0;
                   TIter dpiter(decay_products);
 
-                  while ( (dp = (TMCParticle *) dpiter.Next()) ) {
+                  while ( (dp = (GMCParticle *) dpiter.Next()) ) {
 
                      dp->SetParent(idecaying);
-                     new ( (*plist)[plist->GetEntries()] ) TMCParticle(*dp);
+                     new ( (*plist)[plist->GetEntries()] ) GMCParticle(*dp);
                   }
 
                   //-- clean up decay products
