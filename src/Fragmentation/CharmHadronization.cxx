@@ -503,8 +503,14 @@ TClonesArray * CharmHadronization::Hadronize(
 
       // Pythia8 status code for outgoing particles of the hardest subprocesses is 23
       // anti/colour tags for these 2 particles must complement each other
-     fPythia8->Pythia8()->event.append(qrkSyst1, 23, 101, 0, 0., 0., pzAcm, eA, mA);
-     fPythia8->Pythia8()->event.append(qrkSyst2, 23, 0, 101, 0., 0., pzBcm, eB, mB);
+      // antiparticles must have positive anticolour to avoid PYTHIA errors
+     if (qrkSyst1 > 0) {
+         fPythia8->Pythia8()->event.append(qrkSyst1, 23, 101, 0, 0., 0., pzAcm, eA, mA);
+         fPythia8->Pythia8()->event.append(qrkSyst2, 23, 0, 101, 0., 0., pzBcm, eB, mB);
+     } else {
+         fPythia8->Pythia8()->event.append(qrkSyst1, 23, 0, 101, 0., 0., pzAcm, eA, mA);
+         fPythia8->Pythia8()->event.append(qrkSyst2, 23, 101, 0, 0., 0., pzBcm, eB, mB);
+     }
      fPythia8->Pythia8()->next();
 
       // List the event information
