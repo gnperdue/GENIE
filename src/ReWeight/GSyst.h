@@ -10,7 +10,7 @@
 
 \created  Aug 1, 2009
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -45,7 +45,7 @@ typedef enum EGSyst {
   // NCEL tweaking parameters:
   kXSecTwkDial_MaNCEL,            ///< tweak Ma NCEL, affects dsigma(NCEL)/dQ2 both in shape and normalization
   kXSecTwkDial_EtaNCEL,           ///< tweak NCEL strange axial form factor eta, affects dsigma(NCEL)/dQ2 both in shape and normalization
-  // CCQE tweaking parameters:
+  // CCQE tweaking parameters (also see at end of enum for z-expansion FF knobs):
   kXSecTwkDial_NormCCQE,          ///< tweak CCQE normalization (energy independent)
   kXSecTwkDial_NormCCQEenu,       ///< tweak CCQE normalization (maintains dependence on neutrino energy)
   kXSecTwkDial_MaCCQEshape,       ///< tweak Ma CCQE, affects dsigma(CCQE)/dQ2 in shape only (normalized to constant integral)
@@ -147,7 +147,18 @@ typedef enum EGSyst {
 
   kRDcyTwkDial_BR1gamma,        ///< tweak Resonance -> X + gamma branching ratio, eg Delta+(1232) -> p gamma
   kRDcyTwkDial_BR1eta,          ///< tweak Resonance -> X + eta   branching ratio, eg N+(1440) -> p eta
-  kRDcyTwkDial_Theta_Delta2Npi  ///< distort pi angular distribution in Delta -> N + pi
+  kRDcyTwkDial_Theta_Delta2Npi,  ///< distort pi angular distribution in Delta -> N + pi
+
+  //
+  // Alternative approach to CCQE form factors (z-expansion)
+  //
+
+  kXSecTwkDial_ZNormCCQE,         ///< tweak Z-expansion CCQE normalization (energy independent)
+  kXSecTwkDial_ZExpA1CCQE,        ///< tweak Z-expansion coefficient 1, affects dsigma(CCQE)/dQ2 both in shape and normalization
+  kXSecTwkDial_ZExpA2CCQE,        ///< tweak Z-expansion coefficient 2, affects dsigma(CCQE)/dQ2 both in shape and normalization
+  kXSecTwkDial_ZExpA3CCQE,        ///< tweak Z-expansion coefficient 3, affects dsigma(CCQE)/dQ2 both in shape and normalization
+  kXSecTwkDial_ZExpA4CCQE,        ///< tweak Z-expansion coefficient 4, affects dsigma(CCQE)/dQ2 both in shape and normalization
+  kXSecTwkDial_AxFFCCQEshape     ///< tweak axial nucleon form factors (dipole -> z-expansion) - shape only effect of dsigma(CCQE)/dQ2
 
 
   //
@@ -170,6 +181,12 @@ public:
      case ( kXSecTwkDial_NormCCQEenu      ) : return "NormCCQEenu";          break;
      case ( kXSecTwkDial_MaCCQE           ) : return "MaCCQE";               break;
      case ( kXSecTwkDial_MaCCQEshape      ) : return "MaCCQEshape";          break;
+     case ( kXSecTwkDial_ZNormCCQE        ) : return "ZNormCCQE";            break;
+     case ( kXSecTwkDial_ZExpA1CCQE       ) : return "ZExpA1CCQE";           break;
+     case ( kXSecTwkDial_ZExpA2CCQE       ) : return "ZExpA2CCQE";           break;
+     case ( kXSecTwkDial_ZExpA3CCQE       ) : return "ZExpA3CCQE";           break;
+     case ( kXSecTwkDial_ZExpA4CCQE       ) : return "ZExpA4CCQE";           break;
+     case ( kXSecTwkDial_AxFFCCQEshape    ) : return "AxFFCCQEshape";        break;
      case ( kXSecTwkDial_VecFFCCQEshape   ) : return "VecFFCCQEshape";       break;
      case ( kXSecTwkDial_NormCCRES        ) : return "NormCCRES";            break;
      case ( kXSecTwkDial_MaCCRESshape     ) : return "MaCCRESshape";         break;
@@ -239,7 +256,7 @@ public:
  //......................................................................................
  static GSyst_t FromString(string syst)
  {
-   GSyst_t systematics[] = 
+   const GSyst_t systematics[] =
    {
        kXSecTwkDial_MaNCEL,
        kXSecTwkDial_EtaNCEL,
@@ -247,6 +264,12 @@ public:
        kXSecTwkDial_NormCCQEenu,   
        kXSecTwkDial_MaCCQE,        
        kXSecTwkDial_MaCCQEshape,   
+       kXSecTwkDial_ZNormCCQE,   
+       kXSecTwkDial_ZExpA1CCQE,        
+       kXSecTwkDial_ZExpA2CCQE,        
+       kXSecTwkDial_ZExpA3CCQE,        
+       kXSecTwkDial_ZExpA4CCQE,        
+       kXSecTwkDial_AxFFCCQEshape,
        kXSecTwkDial_VecFFCCQEshape,
        kXSecTwkDial_NormCCRES,    
        kXSecTwkDial_MaCCRESshape, 

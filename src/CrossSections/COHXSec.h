@@ -11,7 +11,7 @@
 
 \created  May 04, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -24,24 +24,28 @@
 
 namespace genie {
 
-class COHXSec : public XSecIntegratorI {
-public:
-  COHXSec();
-  COHXSec(string config);
-  virtual ~COHXSec();
+  class COHXSec : public XSecIntegratorI {
 
-  // XSecIntegratorI interface implementation
-  double Integrate(const XSecAlgorithmI * model, const Interaction * i) const;
+    public:
+      COHXSec();
+      COHXSec(string config);
+      virtual ~COHXSec();
 
-  // Overload the Algorithm::Configure() methods to load private data
-  // members from configuration options
-  void Configure(const Registry & config);
-  void Configure(string config);
+      // XSecIntegratorI interface implementation
+      double Integrate(const XSecAlgorithmI * model, const Interaction * i) const;
 
-private:
-  void LoadConfig (void);
-  
-};
+      // Overload the Algorithm::Configure() methods to load private data
+      // members from configuration options
+      void Configure(const Registry & config);
+      void Configure(string config);
+
+    private:
+      void LoadConfig (void);
+
+      double fQ2Min;  ///< lower bound of integration for Q^2 in Berger-Sehgal Model
+      double fQ2Max;  ///< upper bound of integration for Q^2 in Berger-Sehgal Model
+      double fTMax;   ///< upper bound for t = (q - p_pi)^2
+  };
 
 }       // genie namespace
 #endif  // _COH_XSEC_H_

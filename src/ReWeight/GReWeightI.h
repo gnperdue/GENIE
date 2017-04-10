@@ -10,7 +10,7 @@
 
 \created  Aug 1, 2009
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -54,9 +54,6 @@ namespace rew   {
   
   //! calculate a weight for the input event using the current nuisance param values
   virtual double CalcWeight (const genie::EventRecord & event) = 0;  
-
-  //! calculate penalty factors
-  virtual double CalcChisq (void) = 0;        
 
  protected:
 

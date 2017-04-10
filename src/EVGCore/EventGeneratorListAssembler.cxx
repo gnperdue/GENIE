@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -52,6 +52,13 @@ EventGeneratorList * EventGeneratorListAssembler::AssembleGeneratorList()
                            "Loading requested Event Generators", 0, '-');
 
   EventGeneratorList * evgl = new EventGeneratorList;
+  
+  if (!fConfig) {
+    SLOG("EvGenListAssembler", pFATAL) 
+      << "Cannot instantiate EventGeneratorList with no config.";
+    gAbortingInErr = true;
+    exit(-1);
+  }
 
   int nproc = fConfig->GetIntDef("NGenerators", 0);
   assert(nproc > 0);

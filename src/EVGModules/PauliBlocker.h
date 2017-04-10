@@ -11,7 +11,7 @@
 
 \created  October 08, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -42,9 +42,9 @@ public :
   void Configure (string param_set);
 
 private:
+   void LoadModelType(void);
 
-   void LoadKFTable(void);
-
+   bool fLFG;
    const FermiMomentumTable * fKFTable;
    string fKFTableName;
 };

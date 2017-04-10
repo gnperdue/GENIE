@@ -14,7 +14,7 @@
 
 \created  Jun 27, 2008
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -52,6 +52,9 @@ using std::ostream;
 
 namespace genie {
 namespace flux  {
+
+class GNuMIFluxPassThroughInfo;
+ostream & operator << (ostream & stream, const GNuMIFluxPassThroughInfo & info);
 
 /// GNuMIFluxPassThroughInfo:
 /// =========================
@@ -174,7 +177,7 @@ public:
    int getProcessID(TString sval);
    int getVolID(TString sval);
 
-   static const int MAX_N_TRAJ = 10; ///< Maximum number of trajectories to store
+   static const unsigned int MAX_N_TRAJ = 10; ///< Maximum number of trajectories to store
 
    Int_t    ntrajectory;
    Bool_t   overflow;
@@ -211,8 +214,10 @@ ClassDef(GNuMIFluxPassThroughInfo,5)
 /// ==========
 /// An implementation of the GFluxI interface that provides NuMI flux
 ///
-class GNuMIFlux : public GFluxI, 
-    public GFluxExposureI, public GFluxFileConfigI 
+class GNuMIFlux 
+  : public genie::GFluxI
+  , public genie::flux::GFluxExposureI
+  , public genie::flux::GFluxFileConfigI 
 {
 
 public :
@@ -377,7 +382,6 @@ private:
   // Private data members
   //
   double         fMaxEv;          ///< maximum energy
-
   bool           fEnd;            ///< end condition reached
 
   std::vector<string> fNuFluxFilePatterns;   ///< (potentially wildcarded) path(s)

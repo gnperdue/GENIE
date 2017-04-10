@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -112,23 +112,6 @@ double GReWeight::CalcWeight(const genie::EventRecord & event)
   return weight;
 }
 //____________________________________________________________________________
-double GReWeight::CalcChisq(void) 
-{
-// calculate the sum of penalty terms for all tweaked physics parameters
-//
-  double tot_chisq = 0.0;
-
-  map<string, GReWeightI *>::iterator it = fWghtCalc.begin();
-  for( ; it != fWghtCalc.end(); ++it) {
-    GReWeightI * wcalc = it->second;
-    double chisq = wcalc->CalcChisq(); 
-    LOG("ReW", pNOTICE) 
-       << "Calculator: " << it->first << " => chisq = " << chisq;	
-    tot_chisq *= chisq;
-  }
-  return tot_chisq;
-}
-//____________________________________________________________________________
 void GReWeight::CleanUp(void)
 {
   map<string, GReWeightI *>::iterator it = fWghtCalc.begin();
@@ -153,10 +136,6 @@ void GReWeight::Print()
         << " --o "  << GSyst::AsString(syst_vec[i])
         << " is set at " << this->Systematics().Info(syst_vec[i])->CurValue;
   }		       	        
-
-  double chi2val = this->CalcChisq();
-
-  LOG("ReW", pNOTICE) << "Chisq_{penalty} = " << chi2val;
 }
 //____________________________________________________________________________
 

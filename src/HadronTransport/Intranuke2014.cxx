@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -308,8 +308,6 @@ void Intranuke2014::TransportHadrons(GHepRecord * evrec) const
 
     // Check whether the particle needs rescattering, otherwise skip it
     if( ! this->NeedsRescattering(p) ) continue;
-
-    if(this->HandleCompoundNucleus(evrec,p,icurr)) continue;
 
     LOG("Intranuke2014", pNOTICE)
       << " >> Stepping a " << p->Name() 

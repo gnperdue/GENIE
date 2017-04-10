@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -45,8 +45,6 @@
 #include "ReWeight/GSystSet.h"
 #include "ReWeight/GSystUncertainty.h"
 #include "Registry/Registry.h"
-
-//#define _G_REWEIGHT_DIS_DEBUG_
 
 using namespace genie;
 using namespace genie::rew;
@@ -277,16 +275,6 @@ double GReWeightNuXSecDIS::CalcWeightABCV12uShape(const genie::EventRecord & eve
   interaction->KinePtr()->ClearRunningValues();
 
   return weight;
-}
-//_______________________________________________________________________________________
-double GReWeightNuXSecDIS::CalcChisq(void)
-{
-  double chisq = 
-      TMath::Power(fAhtBYTwkDial,  2.) +
-      TMath::Power(fBhtBYTwkDial,  2.) +
-      TMath::Power(fCV1uBYTwkDial, 2.) +
-      TMath::Power(fCV2uBYTwkDial, 2.);
-  return chisq;
 }
 //_______________________________________________________________________________________
 void GReWeightNuXSecDIS::Init(void)

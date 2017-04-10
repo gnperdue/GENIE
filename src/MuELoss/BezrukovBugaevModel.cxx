@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -58,7 +58,7 @@ double BezrukovBugaevModel::dE_dx(double E, MuELMaterial_t material) const
 
   // calculate (the min,max) fraction of energy, v,  carried to the photon
   double Vmin = 0.;
-  double Vmax = 1. - 0.75*kSqrte* (kMuonMass/E) * TMath::Power(Z,1/3.);
+  double Vmax = 1. - 0.75*kSqrtNapierConst* (kMuonMass/E) * TMath::Power(Z,1/3.);
 
   // integrate the Bezrukov-Bugaev differential cross section v*ds/dv for
   // muon nuclear interaction over v
@@ -130,9 +130,9 @@ double gsl::BezrukovBugaevIntegrand::DoEval(double xin) const
 
   double v = xin; // v, the fraction of energy transfered to the photon
 
-  if (! v >0) return 0;
-  if (  v >1) return 0;
-  if (! fE>0) return 0;
+  if (! (v >0)) return 0;
+  if (   v >1)  return 0;
+  if (! (fE>0)) return 0;
 
   double a    = kAem;
   double pi   = kPi;

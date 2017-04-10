@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -127,7 +127,7 @@ RayIntercept FidCylinder::InterceptUncapped(const TVector3& start, const TVector
   Double_t dist = 0;
   if ( len == 0.0 ) {
     // ray is parallel to axis
-    Double_t dist = rc.Dot(fCylAxis);
+    dist = rc.Dot(fCylAxis);
     TVector3 d = rc - dist*fCylAxis;
     dist = d.Mag();
     //LOG("GeomVolSel", pNOTICE) << " len = " << len << " is parallel, dist " << dist << ", " << fCylRadius;

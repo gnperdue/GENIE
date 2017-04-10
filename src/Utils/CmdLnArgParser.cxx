@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -53,9 +53,9 @@ CmdLnArgParser::~CmdLnArgParser()
 //____________________________________________________________________________
 char * CmdLnArgParser::Arg(char op)
 {
-  const int buf_size = 2048;
+  const int buf_size = 2048*128;
 
-  bool    set       = false;
+  bool set = false;
   char *  argument  = new char[buf_size];
   strcpy(argument, "");
 
@@ -76,7 +76,6 @@ char * CmdLnArgParser::Arg(char op)
 
          if (strlen(&argv[1][2]) ) {
             strcpy(argument,&argv[1][2]);
-            set = true;
             LOG("CLAP", pINFO) 
                << "Set opt = [" << op << "] to val = [" << argument << "]";
 
@@ -102,6 +101,7 @@ char * CmdLnArgParser::Arg(char op)
     }
   }
 
+  LOG("CLAP", pDEBUG) << "CmdLnArgParser::Arg op='" << op << "' set=" << set;
   return argument;
 }
 //____________________________________________________________________________
@@ -205,8 +205,7 @@ vector<long> CmdLnArgParser::ArgAsLongTokens(char op, string delimeter)
 //____________________________________________________________________________
 char * CmdLnArgParser::Arg(string op)
 {
-  const int buf_size = 2048;
-  bool    set        = false;
+  const int buf_size = 2048*128;
   char *  argument   = new char[buf_size];
   strcpy(argument, "");
 
@@ -229,7 +228,6 @@ char * CmdLnArgParser::Arg(string op)
 
          if (strlen(&argv[2][0]) ) {
             strcpy(argument,&argv[2][0]);
-            set = true;
             LOG("CLAP", pINFO) 
                << "Set opt = [" << op << "] to val = [" << argument << "]";
 
@@ -241,7 +239,6 @@ char * CmdLnArgParser::Arg(string op)
             argc--;
             argv++;
             strcpy(argument,&argv[1][0]);
-            set = true;
             LOG("CLAP", pINFO) 
                << "Set opt = [" << op << "] to val = [" << argument << "]";
          }
@@ -259,7 +256,7 @@ char * CmdLnArgParser::Arg(string op)
 //____________________________________________________________________________
 bool CmdLnArgParser::OptionExists(string op)
 {
-  const int buf_size = 2048;
+  const int buf_size = 2048*128;
   bool set = false;
 
   int     argc = fArgc;

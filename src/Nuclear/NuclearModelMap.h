@@ -12,7 +12,7 @@
 
 \created  May 07, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -21,9 +21,8 @@
 #ifndef _NUCLEAR_MODEL_MAP_H_
 #define _NUCLEAR_MODEL_MAP_H_
 
-#include "Nuclear/NuclearModelI.h"
-
 #include <map>
+#include "Interfaces/NuclearModelI.h"
 
 using std::map;
 
@@ -36,9 +35,19 @@ public:
   NuclearModelMap(string config);
   virtual ~NuclearModelMap();
 
-  //-- implement the NuclearModelI interface
-  bool           GenerateNucleon (const Target & t) const;
-  double         Prob            (double p, double w, const Target & t) const;
+  //-- Allow GenerateNucleon to be called with a radius  
+  bool           GenerateNucleon (const Target & t,
+                                  double hitNucleonRadius) const;
+  double         Prob            (double p, double w, const Target & t,
+                                  double hitNucleonRadius) const;
+
+  //-- implement the NuclearModelI interface             
+  bool GenerateNucleon (const Target & t) const {
+    return GenerateNucleon(t,0.0);
+  }
+  double Prob (double p, double w, const Target & t) const {
+    return Prob(p,w,t,0.0);
+  }
   NuclearModel_t ModelType       (const Target & t) const;
 
   //-- override the Algorithm::Configure methods to load configuration

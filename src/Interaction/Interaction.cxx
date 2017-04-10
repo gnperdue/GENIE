@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -222,7 +222,7 @@ int Interaction::RecoilNucleonPdg(void) const
   int recoil_nuc = 0;
   int struck_nuc = target.HitNucPdg();
 
-  if(fProcInfo->IsQuasiElastic() || fProcInfo->IsInverseBetaDecay()) {
+  if (fProcInfo->IsQuasiElastic() || fProcInfo->IsInverseBetaDecay()) {
     bool struck_is_nuc = pdg::IsNucleon(struck_nuc);
     bool is_weak = fProcInfo->IsWeak();
     bool is_em   = fProcInfo->IsEM();
@@ -234,7 +234,7 @@ int Interaction::RecoilNucleonPdg(void) const
     }
   }
 
-  if(fProcInfo->IsMEC()) {
+  if (fProcInfo->IsMEC()) {
     bool struck_is_2nuc_cluster = pdg::Is2NucleonCluster(struck_nuc);
     bool is_weak = fProcInfo->IsWeak();
     bool is_em   = fProcInfo->IsEM();
@@ -840,6 +840,30 @@ Interaction * Interaction::MECCC(
   return interaction;
 }
 //___________________________________________________________________________
+Interaction * Interaction::MECCC(int tgt, int probe, double E)
+{
+  Interaction * interaction = 
+     Interaction::Create(tgt, probe, kScMEC, kIntWeakCC);
+
+  InitialState * init_state = interaction->InitStatePtr();
+  init_state->SetProbeE(E);
+
+  return interaction;
+}
+//___________________________________________________________________________
+Interaction * Interaction::MECCC(
+   int tgt, int probe, const TLorentzVector & p4probe)
+{
+  Interaction * interaction = 
+     Interaction::Create(tgt, probe, kScMEC, kIntWeakCC);
+
+  InitialState * init_state = interaction->InitStatePtr();
+  init_state->SetProbeP4(p4probe);
+
+  return interaction;
+}
+
+//___________________________________________________________________________
 Interaction * Interaction::MECNC(int tgt, int ncluster, int probe, double E)
 {
   Interaction * interaction = 
@@ -914,14 +938,25 @@ Interaction * Interaction::GLR(int tgt, const TLorentzVector & p4probe)
   return interaction;
 }
 //___________________________________________________________________________
-Interaction * Interaction::NDecay(int tgt, int decay_mode)
+Interaction * Interaction::NDecay(int tgt, int decay_mode, int decayed_nucleon)
 {
   Interaction * interaction = 
      Interaction::Create(tgt, 0, kScNull, kIntNDecay);
   interaction->ExclTagPtr()->SetDecayMode(decay_mode);
+
+  InitialState * init_state = interaction->InitStatePtr();
+  init_state->TgtPtr()->SetHitNucPdg(decayed_nucleon);
+
   return interaction;
 }
 //___________________________________________________________________________
+Interaction * Interaction::NOsc(int tgt, int annihilation_mode)
+{
+  Interaction * interaction =
+    Interaction::Create(tgt, 0, kScNull, kIntNOsc);
+  interaction->ExclTagPtr()->SetDecayMode(annihilation_mode);
+  return interaction;
+}
 //___________________________________________________________________________
 Interaction * Interaction::ASK(int tgt, int probe, double E)
 {

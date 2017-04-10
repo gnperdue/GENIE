@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -117,7 +117,7 @@ double BSKLNBaseRESPXSec2014::XSec(
   int    LR  = utils::res::OrbitalAngularMom (resonance);
   double MR  = utils::res::Mass              (resonance);
   double WR  = utils::res::Width             (resonance);
-  double NR  = utils::res::BWNorm            (resonance);
+  double NR  = utils::res::BWNorm            (resonance,fN0ResMaxNWidths,fN2ResMaxNWidths,fGnResMaxNWidths);
 
   // Following NeuGEN, avoid problems with underlying unphysical
   // model assumptions by restricting the allowed W phase space
@@ -197,20 +197,6 @@ double BSKLNBaseRESPXSec2014::XSec(
     //ml=0;
     LOG("BSKLNBaseRESPXSec2014",pINFO) "q2="<<q2<< "m2="<<ml*ml<<" 2.*E*Eprime="<<2.*E*Eprime<<" nom="<< (q2 - ml*ml + 2.*E*Eprime)<<" den="<<2.*E*Pl;
     LOG("BSKLNBaseRESPXSec2014",pINFO) "costh2="<<costh;
-    Pl = TMath::Sqrt(Eprime*Eprime - ml*ml);
-
-    if(costh <= -1. + 1e-7) {
-      LOG("BSKLNBaseRESPXSec2014", pDEBUG)
-        << "Changing costh = " << costh << " to -1";
-      costh = -1 + 1e-6;
-    }
-    if(costh >= 1. - 1e-7){
-      LOG("BSKLNBaseRESPXSec2014", pDEBUG)
-        << "Changing costh = " << costh << " to 1";
-      costh = 1 - 1e-6;
-    }
-    vstar = (Mnuc*v + q2)/W;//missing W
-    Qstar = TMath::Sqrt(-q2 + vstar*vstar);
 
     KNL_Alambda_plus  = TMath::Sqrt(E*(Eprime - Pl));
     KNL_Alambda_minus = TMath::Sqrt(E*(Eprime + Pl));
@@ -497,7 +483,7 @@ double BSKLNBaseRESPXSec2014::XSec(
         if(is_CC && is_KLN ){
           fFKR.S = KNL_S_minus;        //2 times fFKR.S?
           fFKR.B = KNL_B_minus;
-          fFKR.S = KNL_C_minus;
+          fFKR.C = KNL_C_minus;
 
           hamplmod_KNL_minus = fHAmplModelCC;
 
@@ -527,7 +513,7 @@ double BSKLNBaseRESPXSec2014::XSec(
           if(is_CC && is_BRS ){
             fFKR.S = BRS_S_minus;
             fFKR.B = BRS_B_minus;
-            fFKR.S = BRS_C_minus;
+            fFKR.C = BRS_C_minus;
 
             hamplmod_BRS_minus = fHAmplModelCC;
             assert(hamplmod_BRS_minus);

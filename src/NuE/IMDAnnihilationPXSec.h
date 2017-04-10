@@ -15,14 +15,14 @@
 
 \created  October 3, 2011
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
 //____________________________________________________________________________
 
-#ifndef _IMD_ANNIHILATION_PARTIAL_XSEC_H_
-#define _IMD_ANNIHILATION_XSEC_H_
+#ifndef _IMD_ANNIHILATION_PXSEC_H_
+#define _IMD_ANNIHILATION_PXSEC_H_
 
 #include "Base/XSecAlgorithmI.h"
 
@@ -57,4 +57,4 @@ private:
 };
 
 }       // genie namespace
-#endif  // _IMD_ANNIHILATION_PARTIAL_XSEC_H_
+#endif  // _IMD_ANNIHILATION_PXSEC_H_

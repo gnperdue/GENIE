@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -161,6 +161,7 @@ void COHElKinematicsGenerator::ProcessEventRecord(GHepRecord * evrec) const
         interaction->KinePtr()->ClearRunningValues();
 
         // set the cross section for the selected kinematics
+        // TODO: this is kPSxyfE on the dev branch, but I think kPSyfE is right
         evrec->SetDiffXSec(xsec,kPSyfE);
 
         return;
@@ -182,10 +183,10 @@ double COHElKinematicsGenerator::ComputeMaxXSec(const Interaction * in) const
   const int N     = 50;
 
   const KPhaseSpace & kps = in->PhaseSpace();
-  Range1D_t y = kps.YLim();
+  Range1D_t yr = kps.YLim();
 
-  const double logymin = TMath::Log10(y.min);
-  const double logymax = TMath::Log10(y.max);
+  const double logymin = TMath::Log10(yr.min);
+  const double logymax = TMath::Log10(yr.max);
   const double dlogy   = (logymax - logymin) /(N-1);
 
   for(int i=0; i<N; i++) {

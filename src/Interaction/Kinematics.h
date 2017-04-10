@@ -10,7 +10,7 @@
 
 \created  May 08, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -34,9 +34,15 @@ class TLorentzVector;
 
 namespace genie {
 
+class Kinematics;
+ostream & operator << (ostream & stream, const Kinematics & kine);
+
 class Kinematics : public TObject {
 
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TObject::Copy;
+
   Kinematics();
   Kinematics(const Kinematics & kv);
   Kinematics(TRootIOCtor*);
@@ -98,7 +104,7 @@ private:
   TLorentzVector *       fP4Fsl;     ///< generated final state primary lepton 4-p  (LAB)
   TLorentzVector *       fP4HadSyst; ///< generated final state hadronic system 4-p (LAB)
 
-ClassDef(Kinematics,1)
+ClassDef(Kinematics,2)
 };
 
 }       // genie namespace

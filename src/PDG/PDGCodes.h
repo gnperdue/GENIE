@@ -11,7 +11,7 @@
 
 \created  May 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE 
 */
@@ -149,6 +149,9 @@ const int kPdgK0               =   311; // K0
 const int kPdgAntiK0           =  -311; // \bar{K0}
 const int kPdgK0L              =   130; // K0_{long}
 const int kPdgK0S              =   310; // K0_{short}
+const int kPdgKStarP           =   323; // Kstar+(892)
+const int kPdgKStarM           =  -323; // Kstar-(892) 
+const int kPdgKStar0           =   313; // Kstar0(892)
 const int kPdgDP               =   411; // D+
 const int kPdgDM               =  -411; // D-
 const int kPdgD0               =   421; // D0
@@ -170,7 +173,9 @@ const int kPdgTgtFreeN     = 1000000010;
 const int kPdgTgtDeuterium = 1000010020;
 const int kPdgTgtC12       = 1000060120;
 const int kPdgTgtO16       = 1000080160;
+const int kPdgTgtCa40      = 1000200400;
 const int kPdgTgtFe56      = 1000260560;
+
 
 // PDG codes for GENIE special particles
 const int kPdgHadronicSyst = 2000000001; // dis hadronic system before hadronization

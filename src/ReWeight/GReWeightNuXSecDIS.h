@@ -13,7 +13,7 @@
 
 \created  Aug 1, 2009
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -21,6 +21,8 @@
 
 #ifndef _G_REWEIGHT_NU_XSEC_DIS_H_
 #define _G_REWEIGHT_NU_XSEC_DIS_H_
+
+//#define _G_REWEIGHT_DIS_DEBUG_
 
 #include "ReWeight/GReWeightI.h"
 
@@ -49,7 +51,6 @@ namespace rew   {
    void   Reset          (void);
    void   Reconfigure    (void);
    double CalcWeight     (const EventRecord & event);
-   double CalcChisq      (void);
 
    // various config options
    void SetMode      (int    m )  { fMode       = m;  }
@@ -103,8 +104,10 @@ namespace rew   {
    string fCV1uBYPath;      ///<
    string fCV2uBYPath;      ///<
 
+#ifdef _G_REWEIGHT_DIS_DEBUG_
    TFile *    fTestFile;
    TNtupleD * fTestNtp;
+#endif
  };
 
 } // rew   namespace

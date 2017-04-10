@@ -13,7 +13,7 @@
 
 \created May 26, 2009
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -47,6 +47,9 @@ using std::pair;
 
 namespace genie {
 namespace geometry {
+
+class PathSegment;
+ostream & operator << (ostream & stream, const PathSegment & list);
 
 typedef std::pair<Double_t,Double_t> StepRange;
 typedef std::vector<StepRange>       StepRangeSet;
@@ -113,6 +116,10 @@ class PathSegment {
 
 inline bool operator < (const PathSegment &lhs, const PathSegment &rhs)
   { return ( lhs.fRayDist < rhs.fRayDist ); }
+
+
+class PathSegmentList;
+ostream & operator << (ostream & stream, const PathSegmentList & list);
 
 class PathSegmentList {
 

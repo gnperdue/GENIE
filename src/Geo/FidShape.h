@@ -11,7 +11,7 @@
 
 \created  August 3, 2010
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 
@@ -36,6 +36,10 @@ namespace genie {
 namespace geometry {
 
 class ROOTGeomAnalyzer;
+
+class PlaneParam;
+std::ostream& operator<< (std::ostream& stream, 
+                           const genie::geometry::PlaneParam& pparam);
 
 class RayIntercept {
   /// A class to hold information about where a ray intercepts a
@@ -79,6 +83,10 @@ class PlaneParam {
 
   Double_t a, b, c, d; // the parameters
 };
+
+class FidShape;
+std::ostream& operator<< (std::ostream& stream, 
+                          const genie::geometry::FidShape& shape);
 
 class FidShape {
   // generic fiducial shape

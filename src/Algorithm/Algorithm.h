@@ -10,7 +10,7 @@
 
 \created  May 02, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -37,6 +37,9 @@ using std::map;
 namespace genie {
 
 class Algorithm;
+
+ostream & operator << (ostream & stream, const Algorithm & alg);
+
 typedef map <string, Algorithm *>                 AlgMap;
 typedef map <string, Algorithm *>::iterator       AlgMapIter;
 typedef map <string, Algorithm *>::const_iterator AlgMapConstIter;

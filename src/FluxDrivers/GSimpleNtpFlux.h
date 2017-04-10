@@ -10,7 +10,7 @@
 
 \created  Jan 25, 2010
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -43,6 +43,9 @@ using std::ostream;
 
 namespace genie {
 namespace flux  {
+
+class GSimpleNtpEntry;    
+ostream & operator << (ostream & stream, const GSimpleNtpEntry & info);
 
 /// Small persistable C-struct -like classes that makes up the SimpleNtpFlux
 /// ntuple.  This is only valid for a particular flux window (no reweighting,
@@ -82,6 +85,10 @@ namespace flux  {
     ClassDef(GSimpleNtpEntry,1)
   };
 
+
+  class GSimpleNtpNuMI;
+  ostream & operator << (ostream & stream, const GSimpleNtpNuMI & info);
+
 /// GSimpleNtpNuMI
 /// =========================
 /// Additional elements for NuMI (allow SKZP reweighting and reference
@@ -119,6 +126,9 @@ namespace flux  {
   };
 
 
+  class GSimpleNtpAux;
+  ostream & operator << (ostream & stream, const GSimpleNtpAux & info);
+
 /// GSimpleNtpAux
 /// =========================
 /// Additional elements for expansion as "aux" branch
@@ -136,6 +146,9 @@ namespace flux  {
    ClassDef(GSimpleNtpAux,1)
   };
 
+
+  class GSimpleNtpMeta;
+  ostream & operator << (ostream & stream, const GSimpleNtpMeta & info);
 
 /// GSimpleNtpMeta
 /// =========================
@@ -183,8 +196,10 @@ namespace flux  {
 /// ==========
 /// An implementation of the GFluxI interface that provides NuMI flux
 ///
-class GSimpleNtpFlux : public GFluxI, 
-    public GFluxExposureI, public GFluxFileConfigI
+class GSimpleNtpFlux 
+  : public genie::GFluxI
+  , public genie::flux::GFluxExposureI
+  , public genie::flux::GFluxFileConfigI 
 {
 
 public :
@@ -291,7 +306,6 @@ private:
   // Private data members
   //
   double         fMaxEv;          ///< maximum energy
-
   bool           fEnd;            ///< end condition reached
 
   std::vector<string> fNuFluxFilePatterns;  ///< (potentially wildcarded) path(s)

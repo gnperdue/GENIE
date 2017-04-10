@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -677,7 +677,7 @@ int KNOHadronization::HadronShowerCharge(const Interaction* interaction) const
 //    in v n -> l- X the hadron shower charge is +1
 //    in v n -> v  X the hadron shower charge is  0
 //
-  int HadronShowerCharge = 0;
+  int hadronShowerCharge = 0;
 
   // find out the charge of the final state lepton
   double ql = interaction->FSPrimLepton()->Charge() / 3.;
@@ -696,9 +696,9 @@ int KNOHadronization::HadronShowerCharge(const Interaction* interaction) const
   double qnuc = PDGLibrary::Instance()->Find(hit_nucleon)->Charge() / 3.;
 
   // calculate the hadron shower charge
-  HadronShowerCharge = (int) ( qp + qnuc - ql );
+  hadronShowerCharge = (int) ( qp + qnuc - ql );
 
-  return HadronShowerCharge;
+  return hadronShowerCharge;
 }
 //____________________________________________________________________________
 TClonesArray * KNOHadronization::DecayMethod1(
@@ -952,7 +952,7 @@ bool KNOHadronization::PhaseSpaceDecay(
   // Get the maximum weight
   //double wmax = fPhaseSpaceGenerator.GetWtMax();
   double wmax = -1;
-  for(int i=0; i<200; i++) {
+  for(int idec=0; idec<200; idec++) {
      double w = fPhaseSpaceGenerator.Generate();   
      if(reweight) { w *= this->ReWeightPt2(pdgv); }
      wmax = TMath::Max(wmax,w);

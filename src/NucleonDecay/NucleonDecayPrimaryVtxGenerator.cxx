@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -22,7 +22,6 @@
 #include "Conventions/GMode.h"
 #include "Interaction/Target.h"
 #include "Messenger/Messenger.h"
-#include "Nuclear/NuclearModelI.h"
 #include "Numerical/RandomGen.h"
 #include "EVGCore/EVGThreadException.h"
 #include "GHEP/GHepRecord.h"
@@ -33,6 +32,8 @@
 #include "Utils/NuclearUtils.h"
 #include "Utils/PrintUtils.h"
 #include "NucleonDecay/NucleonDecayPrimaryVtxGenerator.h"
+
+#include "Interfaces/NuclearModelI.h"
 #include "NucleonDecay/NucleonDecayUtils.h"
 #include "NucleonDecay/NucleonDecayMode.h"
 
@@ -63,9 +64,10 @@ void NucleonDecayPrimaryVtxGenerator::ProcessEventRecord(
   Interaction * interaction = event->Summary();
   fCurrInitStatePdg = interaction->InitState().Tgt().Pdg();
   fCurrDecayMode = (NucleonDecayMode_t) interaction->ExclTag().DecayMode();
+  fCurrDecayedNucleon = interaction->InitState().Tgt().HitNucPdg();
 
   LOG("NucleonDecay", pNOTICE)
-    << "Simulating decay " << utils::nucleon_decay::AsString(fCurrDecayMode)
+    << "Simulating decay " << utils::nucleon_decay::AsString(fCurrDecayMode, fCurrDecayedNucleon)
     << " for an initial state with code: " << fCurrInitStatePdg;
 
   fNucleonIsBound = (pdg::IonPdgCodeToA(fCurrInitStatePdg) > 1);
@@ -113,7 +115,7 @@ void NucleonDecayPrimaryVtxGenerator::AddInitialState(
     event->AddParticle(ipdg,stis,-1,-1,-1,-1, p4i, v4);
                
     // add decayed nucleon
-    int dpdg = utils::nucleon_decay::DecayedNucleonPdgCode(fCurrDecayMode);
+    int dpdg = fCurrDecayedNucleon;
     double mn = PDGLibrary::Instance()->Find(dpdg)->Mass();
     TLorentzVector p4n(0,0,0,mn);  
     event->AddParticle(dpdg,stdc, 0,-1,-1,-1, p4n, v4);
@@ -139,13 +141,13 @@ void NucleonDecayPrimaryVtxGenerator::AddInitialState(
     if(ipdg == kPdgTgtFreeP) ipdg_short = kPdgProton;
     if(ipdg == kPdgTgtFreeN) ipdg_short = kPdgNeutron;
 
-    // Decayed nucleon code as extracted from the specified decay mode
-    int dpdg = utils::nucleon_decay::DecayedNucleonPdgCode(fCurrDecayMode);
+    // Decayed nucleon code 
+    int dpdg = fCurrDecayedNucleon;
 
     if(dpdg != ipdg_short) {
        LOG("NucleonDecay", pWARN)
            << "Couldn't generate given decay (" 
-           << utils::nucleon_decay::AsString(fCurrDecayMode) << ")"
+           << utils::nucleon_decay::AsString(fCurrDecayMode, fCurrDecayedNucleon) << ")"
            << " for given initial state (PDG = " << ipdg_short << ")";
        genie::exceptions::EVGThreadException exception;
        exception.SetReason("Decay-mode / Initial-state mismatch!");
@@ -278,7 +280,7 @@ void NucleonDecayPrimaryVtxGenerator::GenerateDecayProducts(
 {
   LOG("NucleonDecay", pINFO) << "Generating decay...";
 
-  PDGCodeList pdgv = utils::nucleon_decay::DecayProductList(fCurrDecayMode);
+  PDGCodeList pdgv = utils::nucleon_decay::DecayProductList(fCurrDecayMode, fCurrDecayedNucleon);
   LOG("NucleonDecay", pINFO) << "Decay product IDs: " << pdgv;
   assert ( pdgv.size() >  1);
 
@@ -330,7 +332,7 @@ void NucleonDecayPrimaryVtxGenerator::GenerateDecayProducts(
   // Get the maximum weight
   //double wmax = fPhaseSpaceGenerator.GetWtMax();
   double wmax = -1;
-  for(int i=0; i<200; i++) {
+  for(int idec=0; idec<200; idec++) {
      double w = fPhaseSpaceGenerator.Generate();   
      wmax = TMath::Max(wmax,w);
   }

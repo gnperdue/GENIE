@@ -10,7 +10,7 @@
 
 \created    Sep 01, 2009
 
-\cpright    Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright    Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
             For the full text of the license visit http://copyright.genie-mc.org
             or see $GENIE/LICENSE
 */
@@ -103,6 +103,48 @@ class d2XSec_dQ2dy_E: public ROOT::Math::IBaseFunctionMultiDim
 public:
   d2XSec_dQ2dy_E(const XSecAlgorithmI * m, const Interaction * i);
  ~d2XSec_dQ2dy_E();
+
+  // ROOT::Math::IBaseFunctionMultiDim interface
+  unsigned int                        NDim   (void)               const;
+  double                              DoEval (const double * xin) const;
+  ROOT::Math::IBaseFunctionMultiDim * Clone  (void)               const;
+
+private:
+  const XSecAlgorithmI * fModel;
+  const Interaction *    fInteraction;
+};
+
+//.....................................................................................
+//
+// genie::utils::gsl::d2XSec_dQ2dydt_E
+// A 3-D cross section function: d3xsec/dQ2dydt = f(Q^2,y,t)|(fixed E)
+//
+class d2XSec_dQ2dydt_E: public ROOT::Math::IBaseFunctionMultiDim
+{
+public:
+  d2XSec_dQ2dydt_E(const XSecAlgorithmI * m, const Interaction * i);
+ ~d2XSec_dQ2dydt_E();
+
+  // ROOT::Math::IBaseFunctionMultiDim interface
+  unsigned int                        NDim   (void)               const;
+  double                              DoEval (const double * xin) const;
+  ROOT::Math::IBaseFunctionMultiDim * Clone  (void)               const;
+
+private:
+  const XSecAlgorithmI * fModel;
+  const Interaction *    fInteraction;
+};
+
+//.....................................................................................
+//
+// genie::utils::gsl::d3XSec_dxdydt_E
+// A 3-D cross section function: d3xsec/dxdydt = f(x,y,t)|(fixed E)
+//
+class d3XSec_dxdydt_E: public ROOT::Math::IBaseFunctionMultiDim
+{
+public:
+  d3XSec_dxdydt_E(const XSecAlgorithmI * m, const Interaction * i);
+  ~d3XSec_dxdydt_E();
 
   // ROOT::Math::IBaseFunctionMultiDim interface
   unsigned int                        NDim   (void)               const;

@@ -13,7 +13,7 @@
 
 \created  October 09, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -25,7 +25,8 @@
 #include <map>
 
 #include <TH1D.h>
-#include "Nuclear/NuclearModelI.h"
+
+#include "Interfaces/NuclearModelI.h"
 
 using std::map;
 
@@ -40,7 +41,7 @@ public:
 
   //-- implement the NuclearModelI interface
   bool           GenerateNucleon (const Target & t) const;
-  double         Prob            (double p, double w, const Target & t) const;
+  double         Prob            (double mom, double w, const Target & t) const;
   NuclearModel_t ModelType       (const Target &) const 
   { 
     return kNucmFermiGas; 

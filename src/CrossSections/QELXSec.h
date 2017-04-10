@@ -11,7 +11,7 @@
 
 \created  May 04, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -45,12 +45,6 @@ private:
 
   void LoadConfig (void);
 
-  double IntegrateOnce(const XSecAlgorithmI * model, const Interaction * i) const;
-
-  const NuclearModelI *  fNuclModel;   ///< Nuclear model for extracting nucleon momenta
-  bool   fDoAvgOverNucleonMomentum;    ///< Average cross section over hit nucleon monentum?
-  double fEnergyCutOff;                ///< Average only for energies below this cutoff defining 
-                                       ///< the region where nuclear modeling details do matter
 };
 
 }       // genie namespace

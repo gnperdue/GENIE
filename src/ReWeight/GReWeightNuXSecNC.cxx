@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -108,12 +108,6 @@ double GReWeightNuXSecNC::CalcWeight(const genie::EventRecord & event)
   if(nupdg==kPdgAntiNuE  && !fRewNuebar ) return 1.;
 
   return fNCTwkDial;
-}
-//_______________________________________________________________________________________
-double GReWeightNuXSecNC::CalcChisq(void)
-{
-  double chisq = TMath::Power(fNCTwkDial,  2.);
-  return chisq;
 }
 //_______________________________________________________________________________________
 void GReWeightNuXSecNC::Init(void)

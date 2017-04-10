@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -329,17 +329,14 @@ void NucDeExcitationSim::AddPhoton(
 
   GHepParticle * target  = evrec->Particle(1);
   GHepParticle * remnant = 0;
-  int iremnant = -1;
   for(int i = target->FirstDaughter(); i <= target->LastDaughter(); i++) {
     remnant  = evrec->Particle(i);
-    iremnant = i;
     if(pdg::IsIon(remnant->Pdg())) break;
   }
 
   TLorentzVector x4(0,0,0,0);
   TLorentzVector p4 = this->Photon4P(E);
-  //  GHepParticle gamma(kPdgGamma, kIStStableFinalState,iremnant,-1,-1,-1, p4, x4);
-  GHepParticle gamma(kPdgGamma, kIStStableFinalState,1,-1,-1,-1, p4, x4);
+  GHepParticle gamma(kPdgGamma, kIStStableFinalState,1,-1,-1,-1, p4, x4);  // note that this assigns the parent of the photon as the initial-state nucleon/nucleus.  (do we want that??)
   evrec->AddParticle(gamma);  
 
 

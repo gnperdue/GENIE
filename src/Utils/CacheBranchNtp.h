@@ -10,7 +10,7 @@
 
 \created  November 26, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -30,9 +30,14 @@ using std::ostream;
 
 namespace genie {
 
+class CacheBranchNtp;
+ostream & operator << (ostream & stream, const CacheBranchNtp & cbntp);
+
 class CacheBranchNtp : public CacheBranchI
 {
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+
   CacheBranchNtp();
   CacheBranchNtp(string name, string brdef);
   ~CacheBranchNtp();

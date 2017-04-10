@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -179,8 +179,7 @@ void ReinSehgalRESXSecWithCache::CacheResExcitationXSec(
                       new utils::gsl::d2XSec_dWdQ2_E(fSingleResXSecModel, interaction);
                   ROOT::Math::IntegrationMultiDim::Type ig_type = 
                       utils::gsl::IntegrationNDimTypeFromString(fGSLIntgType);
-                  ROOT::Math::IntegratorMultiDim ig(ig_type);
-                  ig.SetRelTolerance(fGSLRelTol);   
+                  ROOT::Math::IntegratorMultiDim ig(ig_type,0,fGSLRelTol,Ev<fGSLThreshold  ?  fGSLNCalls : fGSLNCalls*fGSLNCallsFactor);   
                   ig.SetFunction(*func);
                   double kine_min[2] = { rW.min, rQ2.min };
                   double kine_max[2] = { rW.max, rQ2.max };

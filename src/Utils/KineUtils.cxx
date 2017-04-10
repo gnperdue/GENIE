@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -199,6 +199,19 @@ double genie::utils::kinematics::Jacobian(
   } 
 
   //
+  // transformation: {Q2,y}|E -> {x,y}|E
+  //
+  else
+  if ( TransformMatched(fromps,tops,kPSQ2yfE,kPSxyfE,forward) )
+  {
+    const InitialState & init_state = i->InitState();
+    double Ev = init_state.ProbeE(kRfHitNucRest);
+    double M  = init_state.Tgt().HitNucP4Ptr()->M();
+    double y  = kine.y();
+    J = 2*y*Ev*M;
+  }
+
+  //
   // transformation: {W,Q2}|E -> {W,lnQ2}|E
   //
   else if ( TransformMatched(fromps,tops,kPSWQ2fE,kPSWlogQ2fE,forward) ) 
@@ -288,7 +301,8 @@ Range1D_t genie::utils::kinematics::InelWLim(double Ev, double M, double ml)
   assert (s>0);
 
   Range1D_t W;
-  W.min  = kNeutronMass + kPionMass;
+  W.min  = kNeutronMass + kPhotontest;
+//  W.min  = kNeutronMass + kPionMass;
   W.max  = TMath::Sqrt(s) - ml;
   if(W.max<=W.min) {
     W.min = -1;
@@ -476,23 +490,39 @@ Range1D_t genie::utils::kinematics::CohXLim(void)
 //____________________________________________________________________________
 Range1D_t genie::utils::kinematics::CohQ2Lim(double Mn, double mpi, double mlep, double Ev)
 {
+  // The expressions for Q^2 min appears in PRD 74, 054007 (2006) by 
+  // Kartavtsev, Paschos, and Gounaris
+
+  Range1D_t Q2;
+  Q2.min = 0.0;
+  Q2.max = std::numeric_limits<double>::max();  // Value must be overriden in user options
+
   double Mn2 = Mn * Mn;
   double mlep2 = mlep * mlep;
   double s = Mn2 + 2.0 * Mn * Ev;
   double W2min = CohW2Min(Mn, mpi);
   
-  // Looks like Q2min = A * B - C
-  double A = (s - Mn * Mn) / 2.0;
+  // Looks like Q2min = A * B - C, where A, B, and C are complicated
   double a = 1.0;
   double b = mlep2 / s;
   double c = W2min / s;
   double lambda = a * a + b * b + c * c - 2.0 * a * b - 2.0 * a * c - 2.0 * b * c;
-  double B = 1 - TMath::Sqrt(lambda);
-  double C = 0.5 * (W2min + mlep2 - Mn2 * (W2min - mlep2) / s );
+  if (lambda > 0) {
+    double A = (s - Mn * Mn) / 2.0;
+    double B = 1 - TMath::Sqrt(lambda);
+    double C = 0.5 * (W2min + mlep2 - Mn2 * (W2min - mlep2) / s );
+    if (A * B - C < 0) {
+      SLOG("KineLimits", pERROR) 
+        << "Q2 kinematic limits calculation failed for CohQ2Lim. "
+        << "Assuming Q2min = 0.0";
+    }
+    Q2.min = TMath::Max(0., A * B - C);
+  } else {
+    SLOG("KineLimits", pERROR) 
+      << "Q2 kinematic limits calculation failed for CohQ2Lim. "
+      << "Assuming Q2min = 0.0";
+  }
 
-  Range1D_t Q2;
-  Q2.min = A * B - C;
-  Q2.max = std::numeric_limits<double>::max();  // Value must be overriden in user options
   return Q2;
 }
 //____________________________________________________________________________
@@ -508,6 +538,9 @@ Range1D_t genie::utils::kinematics::Cohq2Lim(double Mn, double mpi, double mlep,
 Range1D_t genie::utils::kinematics::CohW2Lim(double Mn, double mpi, double mlep, 
     double Ev, double Q2)
 {
+  // These expressions for W^2 min and max appear in PRD 74, 054007 (2006) by
+  // Kartavtsev, Paschos, and Gounaris
+
   Range1D_t W2l;
   W2l.min = -1;
   W2l.max = -1;
@@ -515,6 +548,7 @@ Range1D_t genie::utils::kinematics::CohW2Lim(double Mn, double mpi, double mlep,
   double s = Mn * Mn + 2.0 * Mn * Ev;
   double Mnterm = 1 - Mn * Mn / s;
   double Mlterm = 1 - mlep * mlep / s;
+  // Here T1, T2 are generically "term 1" and "term 2" in a long expression
   double T1 = 0.25 * s * s * Mnterm * Mnterm * Mlterm;
   double T2 = Q2 - (0.5 * s * Mnterm) + (0.5 * mlep * mlep * Mnterm);
 
@@ -581,6 +615,9 @@ Range1D_t genie::utils::kinematics::CohYLim(double EvL, double ml)
 //____________________________________________________________________________
 double genie::utils::kinematics::CohW2Min(double Mn, double mpi)
 {
+  // These expressions for W^2 min and max appear in PRD 74, 054007 (2006) by
+  // Kartavtsev, Paschos, and Gounaris
+
   return (Mn + mpi) * (Mn + mpi);
 }
 //____________________________________________________________________________
@@ -839,17 +876,19 @@ void genie::utils::kinematics::UpdateXFromQ2Y(const Interaction * in)
   if(kine->KVSet(kKVy) && kine->KVSet(kKVQ2)) {
 
     const ProcessInfo &  pi = in->ProcInfo();
+    const InitialState & init_state = in->InitState();
     double M = 0.0;
+    double Ev = 0.0;
 
     if (pi.IsCoherent()) {
       M = in->InitState().Tgt().Mass(); // nucleus mass
+      Ev = init_state.ProbeE(kRfLab);
     }
     else {
       M = in->InitState().Tgt().HitNucP4Ptr()->M(); //can be off m/shell
+      Ev = init_state.ProbeE(kRfHitNucRest);
     }
 
-    const InitialState & init_state = in->InitState();
-    double Ev = init_state.ProbeE(kRfHitNucRest);
     double y  = kine->y();
     double Q2 = kine->Q2();
 

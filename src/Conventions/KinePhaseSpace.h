@@ -10,7 +10,7 @@
 
 \created  May 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -59,9 +59,11 @@ typedef enum EKinePhaseSpace {
   kPSxytfE,
   kPSQ2yfE,
   kPSlogQ2logyfE,
+  kPSTlctl,
   kPSElOlOpifE,
   kPSElOlTpifE,
-  kPSTkTlctl
+  kPSTkTlctl,
+  kPSTnctnBnctl // Nucleon momentum, angle, binding energy, lepton com angle
 
 } KinePhaseSpace_t;
 
@@ -107,9 +109,11 @@ public:
       case(kPSxytfE)      : return "<{x,y,t}|E>";     break;
       case(kPSQ2yfE)      : return "<{Q2,y}|E>";      break;
       case(kPSlogQ2logyfE): return "<{Q2,y}|E>";      break;
-      case(kPSElOlOpifE)  : return "<{Elep,Omega_lep,Omega_pi}|E>"; break;
-      case(kPSElOlTpifE)  : return "<{Elep,Omega_lep,Theta_pi}|E>"; break;
-      case(kPSTkTlctl)    : return "<{Tk,Tl,cos(theta_l)}|E>";      break;
+      case(kPSTlctl)      : return "<{Tl,cos(theta_l)}|E>";     break;
+      case(kPSElOlOpifE)  : return "<{El,Omega_l,Omega_pi}|E>"; break;
+      case(kPSElOlTpifE)  : return "<{El,Omega_l,Theta_pi}|E>"; break;
+      case(kPSTkTlctl)    : return "<{Tk,Tl,cos(theta_l)}|E>";  break;
+      case(kPSTnctnBnctl) : return "<centre-of-mass plep,Omega_lep, p_p, omega_p|E>"; break;
     }
     return "** Undefined kinematic phase space **";
   }

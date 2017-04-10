@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -46,7 +46,7 @@ DFRInteractionListGenerator::~DFRInteractionListGenerator()
 InteractionList * DFRInteractionListGenerator::CreateInteractionList(
                                        const InitialState & init_state) const
 {
-  LOG("IntLst", pERROR)
+  LOG("IntLst", pINFO)
      << "InitialState = " << init_state.AsString();
 
   LOG("IntLst", pINFO)
@@ -77,11 +77,11 @@ InteractionList * DFRInteractionListGenerator::CreateInteractionList(
   bool hasP = (init_state.Tgt().Z() > 0);
   bool hasN = (init_state.Tgt().N() > 0);
 
-  Interaction * interaction = new Interaction(init_state, proc_info);
-
   int hit_nucleon[2] = {kPdgProton, kPdgNeutron};
 
   for(int i=0; i<2; i++) {
+
+    Interaction * interaction = new Interaction(init_state, proc_info);
 
     int nuc = hit_nucleon[i];
 
@@ -100,7 +100,12 @@ InteractionList * DFRInteractionListGenerator::CreateInteractionList(
     else {
       //v N -> v N pi0
       interaction->ExclTagPtr()->SetNPions(0,1,0);
-    } 
+    }
+
+    if (nuc == kPdgProton)
+      interaction->ExclTagPtr()->SetNProtons(1);
+    else if (nuc == kPdgNeutron)
+      interaction->ExclTagPtr()->SetNNeutrons(1);
 
     interaction->InitStatePtr()->TgtPtr()->SetHitNucPdg(nuc);
     intlist->push_back(interaction);

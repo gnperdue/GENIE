@@ -11,7 +11,7 @@
 
 \created  June 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -32,21 +32,21 @@ public:
   PDFLIB(string config);
   virtual ~PDFLIB();
 
-  //-- impement PDFModelI interface
+  // Implement PDFModelI interface
 
-  double UpValence   (double x, double q2) const;
-  double DownValence (double x, double q2) const;
-  double UpSea       (double x, double q2) const;
-  double DownSea     (double x, double q2) const;
-  double Strange     (double x, double q2) const;
-  double Charm       (double x, double q2) const;
-  double Bottom      (double x, double q2) const;
-  double Top         (double x, double q2) const;
-  double Gluon       (double x, double q2) const;
-  PDF_t  AllPDFs     (double x, double q2) const;
+  double UpValence   (double x, double Q2) const;
+  double DownValence (double x, double Q2) const;
+  double UpSea       (double x, double Q2) const;
+  double DownSea     (double x, double Q2) const;
+  double Strange     (double x, double Q2) const;
+  double Charm       (double x, double Q2) const;
+  double Bottom      (double x, double Q2) const;
+  double Top         (double x, double Q2) const;
+  double Gluon       (double x, double Q2) const;
+  PDF_t  AllPDFs     (double x, double Q2) const;
 
-  //-- override the default "Confugure" implementation 
-  //   of the Algorithm interface
+  // Override the default "Confugure" implementation 
+  // of the Algorithm interface
 
   void Configure (const Registry & config);
   void Configure (string config);
@@ -59,4 +59,4 @@ private:
 
 }         // genie namespace
 
-#endif    // _PDF_SET_MODEL_I_H_
+#endif    // _PDFLIB_H_

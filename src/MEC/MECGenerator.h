@@ -13,7 +13,7 @@
 
 \created  Sep. 22, 2008
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -49,19 +49,23 @@ public :
 
 private:
 
-  void        LoadConfig                  (void);
-  void        AddNucleonCluster           (GHepRecord * event) const;
-  void        AddTargetRemnant            (GHepRecord * event) const;
-  void        GenerateFermiMomentum       (GHepRecord * event) const;
-  void        SelectKinematics            (GHepRecord * event) const;
-  void        AddFinalStateLepton         (GHepRecord * event) const;
-  void        RecoilNucleonCluster        (GHepRecord * event) const;
-  void        DecayNucleonCluster         (GHepRecord * event) const;
-  PDGCodeList NucleonClusterConstituents  (int pdgc)           const;
+  void    LoadConfig                        (void);
+  void    AddNucleonCluster                 (GHepRecord * event) const;
+  void    AddTargetRemnant                  (GHepRecord * event) const;
+  void    GenerateFermiMomentum             (GHepRecord * event) const;
+  void    SelectEmpiricalKinematics         (GHepRecord * event) const;
+  void    AddFinalStateLepton               (GHepRecord * event) const;
+  void    RecoilNucleonCluster              (GHepRecord * event) const;
+  void    DecayNucleonCluster               (GHepRecord * event) const;
+  void    SelectNSVLeptonKinematics         (GHepRecord * event) const;
+  void    GenerateNSVInitialHadrons         (GHepRecord * event) const;
+  PDGCodeList NucleonClusterConstituents    (int pdgc)           const;
   
   mutable const XSecAlgorithmI * fXSecModel;
   mutable TGenPhaseSpace         fPhaseSpaceGenerator;
   const NuclearModelI *          fNuclModel;
+
+  double fQ3Max;
 };
 
 }      // genie namespace

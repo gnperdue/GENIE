@@ -10,7 +10,7 @@
 
 \created May 24, 2005
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -29,8 +29,11 @@ using std::ostream;
 
 namespace genie {
 
+class GEVGPool;
 class GEVGDriver;
 class InitialState;
+
+ostream & operator << (ostream & stream, const GEVGPool & pool);
 
 class GEVGPool : public map<string, GEVGDriver *> {
 

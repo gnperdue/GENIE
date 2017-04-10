@@ -12,7 +12,7 @@
 
 \created  November 1, 2005
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE 
 */
@@ -36,7 +36,8 @@ typedef enum EINukeFateHN_t {
    kIHNFtCEx,       // cex
    kIHNFtElas,      // elas
    kIHNFtInelas,    // inelas
-   kIHNFtAbs       // abs 
+   kIHNFtAbs,       // abs 
+   kIHNFtCmp         //cmp
 
 } INukeFateHN_t;   
 
@@ -70,6 +71,7 @@ public:
       case kIHNFtElas      : return "HN-mode / elas";   break;
       case kIHNFtInelas    : return "HN-mode / inelas"; break;
       case kIHNFtAbs       : return "HN-mode / abs";    break;
+      case kIHNFtCmp	   : return "HN-mode / compound"; break;
       case kIHNFtNoInteraction : return "HN-mode / no interaction"; break;
       default              : break; 
      }

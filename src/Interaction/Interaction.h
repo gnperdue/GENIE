@@ -13,7 +13,7 @@
 
 \created  April 25, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -47,9 +47,15 @@ const UInt_t kIAssumeFreeNucleon   = 1<<15; ///<
 const UInt_t kIAssumeFreeElectron  = 1<<15; ///<
 const UInt_t kINoNuclearCorrection = 1<<14; ///< if set, inhibit nuclear corrections 
 
+class Interaction;
+ostream & operator << (ostream & stream, const Interaction & i); 
+
 class Interaction : public TObject {
 
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TObject::Copy;  // 
+
   Interaction();
   Interaction(const InitialState & init, const ProcessInfo & proc);
   Interaction(const Interaction & i);
@@ -132,13 +138,16 @@ public:
   static Interaction * AMNuGamma (int tgt, int nuc, int probe, const TLorentzVector & p4probe);
   static Interaction * MECCC     (int tgt, int nuccluster, int probe, double E=0);
   static Interaction * MECCC     (int tgt, int nuccluster, int probe, const TLorentzVector & p4probe);
+  static Interaction * MECCC     (int tgt, int probe, double E=0);
+  static Interaction * MECCC     (int tgt, int probe, const TLorentzVector & p4probe);
   static Interaction * MECNC     (int tgt, int nuccluster, int probe, double E=0);
   static Interaction * MECNC     (int tgt, int nuccluster, int probe, const TLorentzVector & p4probe);
   static Interaction * MECEM     (int tgt, int nuccluster, int probe, double E=0);
   static Interaction * MECEM     (int tgt, int nuccluster, int probe, const TLorentzVector & p4probe);
   static Interaction * GLR       (int tgt, double E=0);
   static Interaction * GLR       (int tgt, const TLorentzVector & p4probe);
-  static Interaction * NDecay    (int tgt, int decay_mode=-1);
+  static Interaction * NDecay    (int tgt, int decay_mode=-1, int decayed_nucleon = 0);
+  static Interaction * NOsc      (int tgt, int annihilation_mode=-1);
   static Interaction * ASK       (int tgt, int probe, double E=0);
   static Interaction * ASK       (int tgt, int probe, const TLorentzVector & p4probe);
 

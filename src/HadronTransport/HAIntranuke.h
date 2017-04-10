@@ -21,7 +21,7 @@
 
 \created  September 20, 2005
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -32,12 +32,12 @@
 
 #include <TGenPhaseSpace.h>
 
+#include "Interfaces/NuclearModelI.h"
 #include "Algorithm/AlgFactory.h"
 #include "EVGCore/EventRecordVisitorI.h"
 #include "HadronTransport/INukeMode.h"
 #include "HadronTransport/INukeHadroFates.h"
 #include "HadronTransport/Intranuke.h"
-#include "Nuclear/NuclearModelI.h"
 
 class TLorentzVector;
 class TVector3;

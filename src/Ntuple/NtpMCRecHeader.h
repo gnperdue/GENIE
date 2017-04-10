@@ -10,7 +10,7 @@
 
 \created October 1, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -27,9 +27,14 @@ using std::ostream;
 
 namespace genie {
 
+class NtpMCRecHeader;
+ostream & operator << (ostream & stream, const NtpMCRecHeader & hdr);
+
 class NtpMCRecHeader : public TObject {
 
 public :
+  using TObject::Copy; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+
   NtpMCRecHeader();
   NtpMCRecHeader(const NtpMCRecHeader & hdr);
   virtual ~NtpMCRecHeader();

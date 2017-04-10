@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -410,7 +410,7 @@ void BLI2DNonUnifGrid::Init(
   fYmin  = 0.;
   fYmax  = 0.;
   fZmin  = std::numeric_limits<double>::max();
-  fZmax  = std::numeric_limits<double>::min();
+  fZmax  = std::numeric_limits<double>::min(); 
   fX     = 0;
   fY     = 0;
   fZ     = 0;

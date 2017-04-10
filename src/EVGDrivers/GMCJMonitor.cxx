@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -91,7 +91,6 @@ void GMCJMonitor::Init(void)
   fStatusFile = filename.str();
 
   // create a stopwatch
-  TStopwatch fWatch;
   fWatch.Reset(); 
   fWatch.Start();
   fCpuTime = 0;
@@ -105,3 +104,8 @@ void GMCJMonitor::Init(void)
 }
 //____________________________________________________________________________
 
+void GMCJMonitor::CustomizeFilename(string filename)
+{
+  fStatusFile = filename;
+}
+//____________________________________________________________________________

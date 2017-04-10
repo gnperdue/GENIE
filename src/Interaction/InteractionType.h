@@ -10,7 +10,7 @@
 
 \created  May 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */ 
@@ -35,7 +35,8 @@ typedef enum EInteractionType {
   kIntWeakCC,
   kIntWeakNC,
   kIntWeakMix, /* cc+nc+interference */
-  kIntNDecay
+  kIntNDecay,
+  kIntNOsc
 
 } InteractionType_t;
 
@@ -54,6 +55,7 @@ public:
       case(kIntWeakNC)  : return "Weak[NC]";                  break;
       case(kIntWeakMix) : return "Weak[CC+NC+interference]";  break;
       case(kIntNDecay)  : return "NucleonDecay";              break;
+      case(kIntNOsc)    : return "NeutronOsc";                break;
       default :           return "Unknown";                   break;
     }
     return "Unknown";    
@@ -90,6 +92,8 @@ public:
                                      strcmp(t,"NC") == 0 ) return kIntWeakNC;
                                      
     else if ( strcmp(t,"NDECAY") == 0 ) return kIntNDecay;
+
+    else if ( strcmp(t,"NOSC") == 0 ) return kIntNOsc;
 
     else return kIntNull;
   }

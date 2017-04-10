@@ -19,7 +19,7 @@
 
 \created  May 03, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -72,20 +72,22 @@ protected:
                                      double & kdv, double & kus, double & kds) const;
   // configuration
   //
-  double fQ2min;         ///< min Q^2 allowed for PDFs: PDF(Q2<Q2min):=PDF(Q2min)
-  bool   fCharmOff;      ///< turn charm production off?
-  bool   fIncludeR;      ///< include R (~FL) in DIS SF calculation?
-  bool   fIncludeNuclMod;///< include nuclear factor (shadowing, anti-shadowing,...)?
-  double fMc;            ///< charm mass used
-  double fVcd;           ///< CKM element Vcd used
-  double fVcs;           ///< CKM element Vcs used
-  double fVud;           ///< CKM element Vud used
-  double fVus;           ///< CKM element Vcs used
-  double fVcd2;          ///<
-  double fVcs2;          ///<
-  double fVud2;          ///<
-  double fVus2;          ///<
-  double fSin2thw;       ///<
+  double fQ2min;             ///< min Q^2 allowed for PDFs: PDF(Q2<Q2min):=PDF(Q2min)
+  bool   fCharmOff;          ///< turn charm production off?
+  bool   fIncludeR;          ///< include R (~FL) in DIS SF calculation?
+  bool   fIncludeNuclMod;    ///< include nuclear factor (shadowing, anti-shadowing,...)?
+  double fMc;                ///< charm mass used
+  double fVcd;               ///< CKM element Vcd used
+  double fVcs;               ///< CKM element Vcs used
+  double fVud;               ///< CKM element Vud used
+  double fVus;               ///< CKM element Vcs used
+  double fVcd2;              ///<
+  double fVcs2;              ///<
+  double fVud2;              ///<
+  double fVus2;              ///<
+  double fSin2thw;           ///<
+  bool   fUse2016Corrections;///< Use 2016 SF relation corrections
+  double fLowQ2CutoffF1F2;   ///< Set min for relation between 2xF1 and F2
 
   mutable double fF1;
   mutable double fF2;

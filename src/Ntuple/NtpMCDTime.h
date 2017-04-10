@@ -11,7 +11,7 @@
 
 \created October 18, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -28,9 +28,14 @@ using std::ostream;
 
 namespace genie {
 
+class NtpMCDTime;
+ostream & operator << (ostream & stream, const NtpMCDTime & dt);
+
 class NtpMCDTime : public TObject {
 
 public :
+  using TObject::Copy; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+
   NtpMCDTime();
   NtpMCDTime(const NtpMCDTime & dt);
   virtual ~NtpMCDTime();

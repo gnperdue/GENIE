@@ -16,7 +16,7 @@
 
 \created August 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -38,6 +38,7 @@ using std::string;
 
 namespace genie {
 
+class GEVGDriver;
 class EventRecord;
 class EventGeneratorList;
 class EventGeneratorI;
@@ -48,6 +49,8 @@ class Interaction;
 class InitialState;
 class Target;
 class Spline;
+
+ostream & operator << (ostream & stream, const GEVGDriver & driver);
 
 class GEVGDriver {
 

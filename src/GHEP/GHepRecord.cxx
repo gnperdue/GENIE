@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -984,6 +984,10 @@ void GHepRecord::SetPrintLevel(int print_level)
 { 
   fPrintLevel = print_level; 
 }
+int  GHepRecord::GetPrintLevel()
+{ 
+  return fPrintLevel; 
+}
 //___________________________________________________________________________
 void GHepRecord::Print(ostream & stream) const
 {
@@ -1058,7 +1062,7 @@ void GHepRecord::Print(ostream & stream) const
      stream << setfill(' ') << setw(3)  << p->LastMother()     << " | ";
      stream << setfill(' ') << setw(3)  << p->FirstDaughter()  << " | ";
      stream << setfill(' ') << setw(3)  << p->LastDaughter()   << " | ";
-     stream << setiosflags(ios::fixed) << setprecision(3);
+     stream << std::fixed << setprecision(3);
      stream << setfill(' ') << setw(7)  << p->Px()             << " | ";
      stream << setfill(' ') << setw(7)  << p->Py()             << " | ";
      stream << setfill(' ') << setw(7)  << p->Pz()             << " | ";
@@ -1091,7 +1095,7 @@ void GHepRecord::Print(ostream & stream) const
        stream << setfill(' ') << setw(6)  << " | ";
        stream << setfill(' ') << setw(6)  << " | ";
        stream << setfill(' ') << setw(6)  << " | ";
-       stream << setiosflags(ios::fixed)  << setprecision(3);
+       stream << std::fixed  << setprecision(3);
        stream << setfill(' ') << setw(7)  << p->Vx()  << " | ";
        stream << setfill(' ') << setw(7)  << p->Vy()  << " | ";
        stream << setfill(' ') << setw(7)  << p->Vz()  << " | ";
@@ -1131,7 +1135,7 @@ void GHepRecord::Print(ostream & stream) const
          << setfill(' ') << setw(18) << "      "
          << setfill(' ') << setw(12) << "          "
          << setfill(' ') << setw(12) << "          | ";
-  stream << setiosflags(ios::fixed)  << setprecision(3);
+  stream << std::fixed  << setprecision(3);
   stream << setfill(' ') << setw(7)  << sum_px  << " | ";
   stream << setfill(' ') << setw(7)  << sum_py  << " | ";
   stream << setfill(' ') << setw(7)  << sum_pz  << " | ";
@@ -1150,13 +1154,13 @@ void GHepRecord::Print(ostream & stream) const
     stream << setfill(' ') << setw(11)
                        << ((probe) ? probe->Name() : "unknown probe") << " @ (";
 
-    stream << setiosflags(ios::fixed)  << setprecision(5);
+    stream << std::fixed  << setprecision(5);
     stream << "x = " << setfill(' ') << setw(11) << this->Vertex()->X() << " m, ";
     stream << "y = " << setfill(' ') << setw(11) << this->Vertex()->Y() << " m, ";
     stream << "z = " << setfill(' ') << setw(11) << this->Vertex()->Z() << " m, ";
-    stream << setiosflags(ios::scientific) << setprecision(6);
+    stream << std::scientific << setprecision(6);
     stream << "t = " << setfill(' ') << setw(15) << this->Vertex()->T() << " s) ";
-    stream << setiosflags(ios::fixed)  << setprecision(3);
+    stream << std::fixed  << setprecision(3);
     stream << setfill(' ') << setw(2)  << "|";
 
     stream << "\n|";
@@ -1187,7 +1191,7 @@ void GHepRecord::Print(ostream & stream) const
 
   if(printlevel>=2) {
     stream << "\n| ";
-    stream << setiosflags(ios::scientific) << setprecision(5);
+    stream << std::scientific << setprecision(5);
 
     stream << "sig(Ev) = " 
            << setfill(' ') << setw(17) << fXSec/units::cm2 
@@ -1214,7 +1218,7 @@ void GHepRecord::Print(ostream & stream) const
     }
     stream << " Weight = "
            << setfill(' ') << setw(16) 
-           << setiosflags(ios::fixed) << setprecision(5)
+           << std::fixed << setprecision(5)
            << fWeight   
            << " |";
 

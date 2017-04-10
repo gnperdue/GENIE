@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -148,12 +148,12 @@ const Spline * XSecSplineList::GetSpline(string key) const
 }
 //____________________________________________________________________________
 void XSecSplineList::CreateSpline(const XSecAlgorithmI * alg,
-        const Interaction * interaction, int nknots, double Emin, double Emax)
+        const Interaction * interaction, int nknots, double e_min, double e_max)
 {
 // Build a cross section spline for the input interaction using the input
 // cross section algorithm and store in the list.
 // For building this specific entry of the spline list, the user is allowed
-// to override the list-wide nknots,Emin,Emax
+// to override the list-wide nknots,e_min,e_max
 
   double xsec[nknots];
   double E   [nknots];
@@ -163,42 +163,42 @@ void XSecSplineList::CreateSpline(const XSecAlgorithmI * alg,
 
   string key = this->BuildSplineKey(alg,interaction);
 
-  // If any of the nknots,Emin,Emax was not set or its value is not acceptable
+  // If any of the nknots,e_min,e_max was not set or its value is not acceptable
   // use the list values
   //
-  if (Emin   < 0.) Emin   = this->Emin();
-  if (Emax   < 0.) Emax   = this->Emax();
+  if (e_min   < 0.) e_min = this->Emin();
+  if (e_max   < 0.) e_max = this->Emax();
   if (nknots <= 2) nknots = this->NKnots();
-  assert(Emin < Emax);
+  assert(e_min < e_max);
 
-  // Distribute the knots in the energy range (Emin,Emax) :
+  // Distribute the knots in the energy range (e_min,e_max) :
   // - Will use 5 knots linearly spaced below the energy thresholds so that the
-  //   spline behaves correctly in (Emin,Ethr)
+  //   spline behaves correctly in (e_min,Ethr)
   // - Place 1 knot exactly on the input interaction threshold
   // - Place the remaining n-6 knots spaced either linearly or logarithmically 
   //   above the input interaction threshold
-  // The above scheme schanges appropriately if Ethr<Emin (i.e. no knots
+  // The above scheme schanges appropriately if Ethr<e_min (i.e. no knots
   // are computed below threshold)
   //
   double Ethr = interaction->PhaseSpace().Threshold();
   SLOG("XSecSplLst", pNOTICE)
     << "Energy threshold for current interaction = " << Ethr << " GeV";
 
-  int nkb = (Ethr>Emin) ? 5 : 0; // number of knots <  threshold
+  int nkb = (Ethr>e_min) ? 5 : 0; // number of knots <  threshold
   int nka = nknots-nkb;          // number of knots >= threshold
 
   // knots < energy threshold
-  double dEb =  (Ethr>Emin) ? (Ethr - Emin) / nkb : 0;
+  double dEb =  (Ethr>e_min) ? (Ethr - e_min) / nkb : 0;
   for(int i=0; i<nkb; i++) {     
-     E[i] = Emin + i*dEb;
+     E[i] = e_min + i*dEb;
   }
   // knots >= energy threshold
-  double E0  = TMath::Max(Ethr,Emin);
+  double E0  = TMath::Max(Ethr,e_min);
   double dEa = 0;
   if(this->UseLogE())
-    dEa = (TMath::Log10(Emax) - TMath::Log10(E0)) /(nka-1);
+    dEa = (TMath::Log10(e_max) - TMath::Log10(E0)) /(nka-1);
   else 
-    dEa = (Emax-E0) /(nka-1);
+    dEa = (e_max-E0) /(nka-1);
 
   for(int i=0; i<nka; i++) {
      if(this->UseLogE())
@@ -246,7 +246,7 @@ void XSecSplineList::SetMaxE(double Ev)
   if(Ev>0) fEmax = Ev;
 }
 //____________________________________________________________________________
-void XSecSplineList::SaveAsXml(string filename) const
+void XSecSplineList::SaveAsXml(string filename, bool save_init) const
 {
 //! Save XSecSplineList to XML file
 
@@ -272,9 +272,16 @@ void XSecSplineList::SaveAsXml(string filename) const
 
   for(mapiter = fSplineMap.begin(); mapiter != fSplineMap.end(); ++mapiter) {
 
-    string     key     = mapiter->first;
-    Spline *   spline  = mapiter->second;
+    string key = mapiter->first;
+    bool from_init_set = (fInitSet.count(key) == 1);
 
+    // If current spline is from the initailly loaded set,
+    // look-up input option to decide whether to write out in 
+    // new output file or not
+    if(from_init_set && !save_init) continue;
+
+    // Add current spline to output file
+    Spline * spline = mapiter->second;
     spline->SaveAsXml(outxml,"E","xsec", key, true);
   }
   outxml << "</genie_xsec_spline_list>";
@@ -381,6 +388,7 @@ XmlParserStatus_t XSecSplineList::LoadFromXml(string filename, bool keep)
                delete [] xsec;
                // insert the spline to the list
                fSplineMap.insert( map<string, Spline *>::value_type(spline_name,spline) );
+               fInitSet.insert(spline_name);
             }
  
             xmlFree(name);

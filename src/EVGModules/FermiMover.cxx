@@ -1,6 +1,6 @@
-//____________________________________________________________________________
+///____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -18,6 +18,12 @@
    the nn, pp, np pairs. 
    The code for adding the recoil nuclear target at the GHEP record was moved 
    into this processing step.
+
+ @ Mar 18, 2016- Joe Johnston (SD)
+   Call GenerateNucleon() with a target and a radius, so the local Fermi
+   gas model can access the radius.
+   Added a check to see if a local Fermi gas model is being used. If so,
+   use a local Fermi gas model when deciding whether to eject a recoil nucleon.
 */
 //____________________________________________________________________________
 
@@ -28,9 +34,14 @@
 #include <TParticlePDG.h>
 #include <TMath.h>
 
+#include "Algorithm/AlgFactory.h"
 #include "Algorithm/AlgConfigPool.h"
 #include "Conventions/Constants.h"
+#include "Conventions/Units.h"
 #include "EVGModules/FermiMover.h"
+
+#include "Types/NuclearModel.h"
+#include "Interfaces/NuclearModelI.h"
 #include "EVGCore/EVGThreadException.h"
 #include "GHEP/GHepRecord.h"
 #include "GHEP/GHepParticle.h"
@@ -38,7 +49,6 @@
 #include "GHEP/GHepFlags.h"
 #include "Interaction/Interaction.h"
 #include "Messenger/Messenger.h"
-#include "Nuclear/NuclearModelI.h"
 #include "Nuclear/FermiMomentumTablePool.h"
 #include "Nuclear/FermiMomentumTable.h"
 #include "Numerical/RandomGen.h"
@@ -46,9 +56,11 @@
 #include "PDG/PDGUtils.h"
 #include "PDG/PDGCodes.h"
 #include "Utils/KineUtils.h"
+#include "Utils/NuclearUtils.h"
 
 using namespace genie;
 using namespace genie::constants;
+using namespace genie::units;
 
 //___________________________________________________________________________
 FermiMover::FermiMover() :
@@ -98,8 +110,17 @@ void FermiMover::KickHitNucleon(GHepRecord * evrec) const
   // initial state selection)
   if(p4->Px()>0 || p4->Py()>0 || p4->Pz()>0) return;
 
+  // access the hit nucleon and target nucleus at the GHEP record
+  GHepParticle * nucleon = evrec->HitNucleon();
+  GHepParticle * nucleus = evrec->TargetNucleus();
+  assert(nucleon);
+  assert(nucleus);
+
   // generate a Fermi momentum & removal energy
-  fNuclModel->GenerateNucleon(*tgt);
+  // call GenerateNucleon with a radius in case the model is LocalFGM
+  double rad = nucleon->X4()->Vect().Mag();
+  fNuclModel->GenerateNucleon(*tgt,rad);
+
   TVector3 p3 = fNuclModel->Momentum3();
   double w    = fNuclModel->RemovalEnergy();
 
@@ -111,12 +132,6 @@ void FermiMover::KickHitNucleon(GHepRecord * evrec) const
      << "Generated nucleon removal energy: w = " << w;
   
   double pF2 = p3.Mag2(); // (fermi momentum)^2
-
-  // access the hit nucleon and target nucleus at the GHEP record
-  GHepParticle * nucleon = evrec->HitNucleon();
-  GHepParticle * nucleus = evrec->TargetNucleus();
-  assert(nucleon);
-  assert(nucleus);
 
   nucleon->SetRemovalEnergy(w);
 
@@ -183,9 +198,24 @@ void FermiMover::KickHitNucleon(GHepRecord * evrec) const
     if (fSRCRecoilNucleon) {
       const int nucleus_pdgc = nucleus->Pdg();
       const int nucleon_pdgc = nucleon->Pdg();
-      FermiMomentumTablePool * kftp = FermiMomentumTablePool::Instance();
-      const FermiMomentumTable * kft  = kftp->GetTable("Default");
-      const double kF = kft->FindClosestKF(nucleus_pdgc, nucleon_pdgc);
+
+      // Calculate the Fermi momentum, using a local Fermi gas if the
+      // nuclear model is LocalFGM, and RFG otherwise
+      double kF;
+      if(fNuclModel->ModelType(*tgt) == kNucmLocalFermiGas){
+	assert(pdg::IsProton(nucleon_pdgc) || pdg::IsNeutron(nucleon_pdgc));
+	int A = tgt->A();
+	bool is_p = pdg::IsProton(nucleon_pdgc);
+	double numNuc = (is_p) ? (double)tgt->Z():(double)tgt->N();
+	double radius = nucleon->X4()->Vect().Mag();
+	double hbarc = kLightSpeed*kPlankConstant/fermi;
+	kF= TMath::Power(3*kPi2*numNuc*
+		  genie::utils::nuclear::Density(radius,A),1.0/3.0) *hbarc;
+      }else{
+	FermiMomentumTablePool * kftp = FermiMomentumTablePool::Instance();
+	const FermiMomentumTable * kft  = kftp->GetTable("Default");
+	kF = kft->FindClosestKF(nucleus_pdgc, nucleon_pdgc);
+      }
       if (TMath::Sqrt(pF2) > kF) {
         double Pp = (nucleon->Pdg() == kPdgProton) ? 0.05 : 0.95;
         RandomGen * rnd = RandomGen::Instance();
@@ -340,8 +370,6 @@ void FermiMover::LoadConfig(void)
   fNuclModel = 0;
 
   RgKey nuclkey = "NuclearModel";
-//  RgAlg nuclalg = fConfig->GetAlgDef(nuclkey, gc->GetAlg(nuclkey));
-//  LOG("FermiMover", pINFO) << "Loading nuclear model: " << nuclalg;
 
   fNuclModel = dynamic_cast<const NuclearModelI *> (this->SubAlg(nuclkey));
   assert(fNuclModel);

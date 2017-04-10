@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -207,46 +207,6 @@ void GAstroFlux::SetDetectorPosition(
   double zdc = radius * costheta;
 
   fDetCenter.SetXYZ(xdc,ydc,zdc);
-
-  //
-  // Compute detector volume solid angle acceptance across the
-  // face of the Earth to use as pdf for generating neutrino positions.
-  //
-
-  if(fSolidAngleAcceptance) delete fSolidAngleAcceptance;
-
-  fSolidAngleAcceptance = new TH2D("fSolidAngleAcceptance","",
-      kAstroNPhiBins,0.,2.*kPi,kAstroNCosThetaBins,-1,1);
-  fSolidAngleAcceptance->SetDirectory(0);
-
-  for(int i = 1; i <= kAstroNPhiBins; i++) {
-    for(int j = 1; j <= kAstroNCosThetaBins; j++) {
-
-       double phi      = fSolidAngleAcceptance->GetXaxis()->GetBinCenter(i);
-       double costheta = fSolidAngleAcceptance->GetYaxis()->GetBinCenter(j);
-       double sintheta = TMath::Sqrt(1-costheta*costheta);
-       double cosphi   = TMath::Cos(phi);
-       double sinphi   = TMath::Sin(phi);
-
-       double REarth   = constants::kREarth/units::km;
-
-       double x = REarth*sintheta*cosphi;
-       double y = REarth*sintheta*sinphi;
-       double z = REarth*costheta;
-
-       double r2 = TMath::Power(x-fDetCenter.X(), 2.) +
-                   TMath::Power(y-fDetCenter.Y(), 2.) +
-                   TMath::Power(z-fDetCenter.Z(), 2.);
-
-       double dArea  = kPi*TMath::Power(fDetSize, 2.);
-       double dOmega = dArea / r2;
-
-       fSolidAngleAcceptance->Fill(phi,costheta,dOmega);
-    }//costheta
-  }//phi
-  // normalize
-  double max = fSolidAngleAcceptance->GetMaximum();
-  fSolidAngleAcceptance->Scale(1./max);
 
   //
   // Coordinate System Rotation:

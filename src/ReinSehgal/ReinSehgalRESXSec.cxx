@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -220,6 +220,10 @@ void ReinSehgalRESXSec::LoadConfig(void)
   // Get GSL integration type & relative tolerance
   fGSLIntgType = fConfig->GetStringDef("gsl-integration-type",  "adaptive");
   fGSLRelTol   = fConfig->GetDoubleDef("gsl-relative-tolerance", 0.01);
+  fGSLNCalls   = fConfig->GetIntDef("gsl-ncalls", 100000);
+  fGSLThreshold= fConfig->GetDoubleDef("gsl-threshold", 50);
+  fGSLNCallsFactor= fConfig->GetDoubleDef("gsl-ncalls-factor", 1);
+  
 
   // Get upper E limit on res xsec spline (=f(E)) before assuming xsec=const
   fEMax = fConfig->GetDoubleDef("ESplineMax", 100);

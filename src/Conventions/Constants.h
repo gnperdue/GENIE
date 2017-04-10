@@ -10,7 +10,7 @@
 
 \created   May 03, 2004
 
-\cpright   Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright   Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
            For the full text of the license visit http://copyright.genie-mc.org
            or see $GENIE/LICENSE
 */
@@ -40,8 +40,9 @@ static const double kPi2   = TMath::Power(kPi,2);
 static const double kPi3   = TMath::Power(kPi,3);
 static const double kPi4   = TMath::Power(kPi,4);
 static const double kSqrtPi= TMath::Sqrt(kPi);
-static const double ke     = 2.7182818;
-static const double kSqrte = TMath::Sqrt(ke);
+
+static const double kNapierConst     = 2.7182818;
+static const double kSqrtNapierConst = TMath::Sqrt(kNapierConst);
 
 //
 // Avogadro number, compton wavelength and such...
@@ -76,6 +77,9 @@ static const double kProtonMass     =  0.9382720;           // GeV
 static const double kNeutronMass    =  0.9395653;           // GeV
 static const double kNucleonMass    =  (kProtonMass+kNeutronMass)/2.;
 static const double kLightestChmHad =  1.870;               // GeV ~lightest charm hadron+
+static const double kPhotontest     =  1E-6;                // GeV
+
+
 
 static const double kElectronMass2  =  TMath::Power(kElectronMass,2); // GeV^2
 static const double kMuonMass2      =  TMath::Power(kMuonMass,2);     // GeV^2
@@ -95,6 +99,11 @@ static const double kMz2            =  TMath::Power(kMz,2);  // GeV^2
 //
 static const double kNucRo      = 1.2E-15 * units::m;            // Ro in nuclear radius formula R=Ro*A^(1/3), in GeV^-1
 static const double kNucDensity = 2.3E+17 * units::kg/units::m3; // Nuclear density (in nuclear core), in GeV^4
+
+
+//FMTOGEV
+static const double FMTOGEV= 5.0761421;
+
 
 //
 // Earth consts
@@ -148,7 +157,7 @@ static const double k3_Sqrt40  =  0.47434165;
 static const double kSqrt2_3   =  0.81649658;
 static const double kSqrt2_5   =  0.63245553;
 static const double kSqrt2_6   =  0.57735027;
-static const double kSqrt2_7   =  0.28571429;
+static const double kSqrt2_7   =  0.53452248;
 static const double kSqrt2_15  =  0.36514837;
 static const double kSqrt3_2   =  1.2247449;
 static const double kSqrt3_4   =  0.8660254;
@@ -165,7 +174,7 @@ static const double kSqrt5_3   =  1.2909944;
 static const double kSqrt5_8   =  0.79056942;
 static const double kSqrt5_12  =  0.64549722;
 static const double kSqrt6_5   =  1.0954451;
-static const double kSqrt6_35  =  0.17142857;
+static const double kSqrt6_35  =  0.41403934;
 static const double kSqrt9_10  =  0.9486833;
 static const double kSqrt9_40  =  0.47434165;
 static const double kSqrt18_5  =  1.8973666;

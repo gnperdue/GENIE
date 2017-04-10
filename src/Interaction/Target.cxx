@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -18,7 +18,10 @@
    the ROOT Streamer. 
  @ Nov 28, 2011 - CA
    Now a nucleon-cluster ID is an accepted option for SetHitNucPdg().
-
+ @ Mar 18, 2016 - JJ (SD)
+   Added methods to store and retrieve the struck nucleon position. Position
+   is stored as a double, indicating the distance from the center of the
+   nucleus.
 */
 //____________________________________________________________________________
 
@@ -65,18 +68,18 @@ TObject()
   this->SetId(pdgc);
 }
 //___________________________________________________________________________
-Target::Target(int Z, int A) :
+Target::Target(int ZZ, int AA) :
 TObject()
 {
   this->Init();
-  this->SetId(Z,A);
+  this->SetId(ZZ,AA);
 }
 //___________________________________________________________________________
-Target::Target(int Z, int A, int hit_nucleon_pdgc) :
+Target::Target(int ZZ, int AA, int hit_nucleon_pdgc) :
 TObject()
 {
   this->Init();
-  this->SetId(Z,A);
+  this->SetId(ZZ,AA);
   this->SetHitNucPdg(hit_nucleon_pdgc);
 }
 //___________________________________________________________________________
@@ -119,6 +122,7 @@ void Target::Init(void)
   fHitQrkPDG = 0;
   fHitSeaQrk = false;
   fHitNucP4  = new TLorentzVector(0,0,0,kNucleonMass);
+  fHitNucRad = 0.;
 }
 //___________________________________________________________________________
 void Target::CleanUp(void)
@@ -138,6 +142,7 @@ void Target::Copy(const Target & tgt)
      fHitQrkPDG = tgt.fHitQrkPDG; // struck quark PDG
      fHitSeaQrk = tgt.fHitSeaQrk; // struck quark is from sea?
      (*fHitNucP4) = (*tgt.fHitNucP4);
+     fHitNucRad = tgt.fHitNucRad;
 
      // look-up the nucleus in the isotopes chart
      this->ForceNucleusValidity(); 
@@ -160,11 +165,11 @@ void Target::SetId(int pdgc)
   //this->AutoSetHitNuc();      // struck nuc := tgt for free nucleon tgt
 }
 //___________________________________________________________________________
-void Target::SetId(int Z, int A)
+void Target::SetId(int ZZ, int AA)
 {
-  fTgtPDG = pdg::IonPdgCode(A,Z);
-  fZ = Z;
-  fA = A;
+  fTgtPDG = pdg::IonPdgCode(AA,ZZ);
+  fZ = ZZ;
+  fA = AA;
 
   this->ForceNucleusValidity(); // search at the isotopes chart
   //this->AutoSetHitNuc();      // struck nuc := tgt for free nucleon tgt
@@ -207,6 +212,11 @@ void Target::ForceHitNucOnMassShell(void)
      double e = TMath::Sqrt(p*p+m*m);
      this->HitNucP4Ptr()->SetE(e);     
   }
+}
+//___________________________________________________________________________
+void Target::SetHitNucPosition(double r)
+{
+  fHitNucRad = r;
 }
 //___________________________________________________________________________
 double Target::Charge(void) const
@@ -319,9 +329,9 @@ bool Target::IsValidNucleus(void) const
 bool Target::IsEvenEven(void) const
 {
   if( this->IsNucleus() ) {
-    int N = this->N();
-    int Z = this->Z();
-    if( N % 2 == 0 && Z % 2 == 0 ) return true;
+    int NN = this->N();
+    int ZZ = this->Z();
+    if( NN % 2 == 0 && ZZ % 2 == 0 ) return true;
   }
   return false;
 }
@@ -337,9 +347,9 @@ bool Target::IsEvenOdd(void) const
 bool Target::IsOddOdd(void) const
 {
   if( this->IsNucleus() ) {
-    int N = this->N();
-    int Z = this->Z();
-    if( N % 2 == 1 && Z % 2 == 1 ) return true;
+    int NN = this->N();
+    int ZZ = this->Z();
+    if( NN % 2 == 1 && ZZ % 2 == 1 ) return true;
   }
   return false;
 }

@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -183,22 +183,6 @@ double GReWeightNuXSecNCRES::CalcWeight(const genie::EventRecord & event)
   }
 
   return 1.;
-}
-//_______________________________________________________________________________________
-double GReWeightNuXSecNCRES::CalcChisq()
-{
-  double chisq = 0.;
-  if(fMode==kModeMaMv) {   
-     chisq += TMath::Power(fMaTwkDial, 2.);
-     chisq += TMath::Power(fMvTwkDial, 2.);
-  }
-  else
-  if(fMode==kModeNormAndMaMvShape) { 
-     chisq += TMath::Power(fNormTwkDial, 2.);
-     chisq += TMath::Power(fMaTwkDial,   2.);
-     chisq += TMath::Power(fMvTwkDial,   2.);
-  }
-  return chisq;
 }
 //_______________________________________________________________________________________
 void GReWeightNuXSecNCRES::Init(void)

@@ -13,7 +13,7 @@
 
 \created  May 03, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -35,7 +35,14 @@ class TRootIOCtor;
 
 namespace genie {
 
+class Target;
+ostream & operator << (ostream & stream, const Target & t); 
+
 class Target : public TObject {
+
+using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+using TObject::Compare;
+using TObject::Copy;
 
 public:
   Target();
@@ -52,6 +59,7 @@ public:
   void SetId                  (int Z, int A);
   void SetHitNucPdg           (int pdgc);
   void SetHitNucP4            (const TLorentzVector & p4);
+  void SetHitNucPosition        (double r);
   void SetHitQrkPdg           (int pdgc);
   void SetHitSeaQrk           (bool tf);
   void ForceHitNucOnMassShell (void);
@@ -79,6 +87,7 @@ public:
   int    HitNucPdg      (void) const;
   int    HitQrkPdg      (void) const;
   double HitNucMass     (void) const;
+  double HitNucPosition (void) const { return fHitNucRad; }
 
   const TLorentzVector & HitNucP4    (void) const { return *this->HitNucP4Ptr(); }
   TLorentzVector *       HitNucP4Ptr (void) const;
@@ -113,8 +122,9 @@ private:
   int  fHitQrkPDG;            ///< hit quark PDG code
   bool fHitSeaQrk;            ///< hit quark from sea?
   TLorentzVector * fHitNucP4; ///< hit nucleon 4p
+  double fHitNucRad;          ///< hit nucleon position
 
-ClassDef(Target,1)
+ClassDef(Target,2)
 };
 
 }      // genie namespace

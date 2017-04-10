@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -177,7 +177,7 @@ bool ReinSehgalCOHPiPXSec::ValidProcess(const Interaction * interaction) const
   if (!proc_info.IsCoherent())  return false;
   if (!proc_info.IsWeak())      return false;
   if (target.HitNucIsSet())     return false;
-  if (!target.A()>1)            return false;
+  if (!(target.A()>1))          return false;
   if (!pdg::IsNeutrino(nu) && !pdg::IsAntiNeutrino(nu)) return false;
 
   return true;

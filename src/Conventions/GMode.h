@@ -10,7 +10,7 @@
 
 \created  Nov 10, 2011
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -27,7 +27,8 @@ typedef enum EGEvGenMode {
   kGMdLeptonNucleus,   // chg.lepton/neutrino + nucleon/nucleus scattering
   kGMdHadronNucleus,   // hadron + nucleon/nucleus scattering
   kGMdPhotonNucleus,   // photon + nucleon/nucleus scattering
-  kGMdNucleonDecay     // nucleon decay
+  kGMdNucleonDecay,    // nucleon decay
+  kGMdNeutronOsc       // neutron oscillation
 
 } GEvGenMode_t;
 

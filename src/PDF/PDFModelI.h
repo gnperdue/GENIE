@@ -16,7 +16,7 @@
 
 \created  May 04, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -38,16 +38,16 @@ public:
 
   //-- define PDFModelI interface
 
-  virtual double UpValence   (double x, double q2) const = 0;
-  virtual double DownValence (double x, double q2) const = 0;
-  virtual double UpSea       (double x, double q2) const = 0;
-  virtual double DownSea     (double x, double q2) const = 0;
-  virtual double Strange     (double x, double q2) const = 0;
-  virtual double Charm       (double x, double q2) const = 0;
-  virtual double Bottom      (double x, double q2) const = 0;
-  virtual double Top         (double x, double q2) const = 0;
-  virtual double Gluon       (double x, double q2) const = 0;
-  virtual PDF_t  AllPDFs     (double x, double q2) const = 0;
+  virtual double UpValence   (double x, double Q2) const = 0;
+  virtual double DownValence (double x, double Q2) const = 0;
+  virtual double UpSea       (double x, double Q2) const = 0;
+  virtual double DownSea     (double x, double Q2) const = 0;
+  virtual double Strange     (double x, double Q2) const = 0;
+  virtual double Charm       (double x, double Q2) const = 0;
+  virtual double Bottom      (double x, double Q2) const = 0;
+  virtual double Top         (double x, double Q2) const = 0;
+  virtual double Gluon       (double x, double Q2) const = 0;
+  virtual PDF_t  AllPDFs     (double x, double Q2) const = 0;
 
 protected:
 

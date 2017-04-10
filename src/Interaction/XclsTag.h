@@ -10,7 +10,7 @@
 
 \created  December 08, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -31,9 +31,15 @@ using std::string;
 
 namespace genie {
 
-class XclsTag : public TObject {
+class XclsTag;
+ostream & operator << (ostream& stream, const XclsTag & xcls); 
 
+class XclsTag : public TObject {
+  
 public:
+  using TObject::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TObject::Copy;
+
   XclsTag();
   XclsTag(const XclsTag & xcls);
  ~XclsTag();
@@ -86,11 +92,11 @@ private:
   int         fCharmedHadronPdg; ///< charmed hadron pdg-code
   bool        fIsStrangeEvent;   ///< true if we have strange production
   int         fStrangeHadronPdg; ///< strange hadron pdg-code
-  int         fNProtons;         ///< # of p's in the f/s hadronic system
-  int         fNNeutrons;        ///< # of n's in the f/s hadronic system
-  int         fNPi0;             ///< # of pi^0's in the f/s hadronic system
-  int         fNPiPlus;          ///< # of pi^+'s in the f/s hadronic system
-  int         fNPiMinus;         ///< # of pi^-'s in the f/s hadronic system
+  int         fNProtons;         ///< # of p's in the hadronic system after this Xcls reaction (before FSI)
+  int         fNNeutrons;        ///< # of n's in the hadronic system after this Xcls reaction (before FSI)
+  int         fNPi0;             ///< # of pi^0's in the hadronic system after this Xcls reaction (before FSI)
+  int         fNPiPlus;          ///< # of pi^+'s in the hadronic system after this Xcls reaction (before FSI)
+  int         fNPiMinus;         ///< # of pi^-'s in the hadronic system after this Xcls reaction (before FSI)
   Resonance_t fResonance;        ///< baryon resonance excited by probe
   int         fDecayMode;
 

@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -178,9 +178,9 @@ void StrumiaVissaniIBDPXSec::LoadConfig(void)
    AlgConfigPool * confp = AlgConfigPool::Instance();
    const Registry * gc = confp->GlobalParameterList();
 
-   // cabbibo angle
+   // cabibbo angle
    const double cab = fConfig->GetDoubleDef(
-      "CabbiboAngle", gc->GetDouble("CabbiboAngle"));
+      "CabibboAngle", gc->GetDouble("CabibboAngle"));
    const double cosCab = TMath::Cos(cab);
    fCosCabibbo2 = cosCab*cosCab;
    
@@ -204,7 +204,7 @@ void StrumiaVissaniIBDPXSec::LoadConfig(void)
       "EpsilonMag", fConfig->GetInt("EpsilonMag"));
    fEpsilon = TMath::Power(10.000, -1.000 * static_cast<double>(epmag));
    
-   LOG("StrumiaVissani", pINFO) << "*** USING: cos2(Cabbibo)=" 
+   LOG("StrumiaVissani", pINFO) << "*** USING: cos2(Cabibbo)=" 
 				<< fCosCabibbo2
 				<< ", g1(0)=" << fg1of0
 				<< ", Ma^2=" << fMa2

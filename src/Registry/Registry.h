@@ -11,7 +11,7 @@
 
 \created  May 04, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -41,7 +41,6 @@ using std::ostream;
 
 namespace genie {
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Type definitions
 //
 typedef map <RgKey, RegistryItemI *>                 RgIMap;
@@ -50,7 +49,7 @@ typedef map <RgKey, RegistryItemI *>::size_type      RgIMapSizeType;
 typedef map <RgKey, RegistryItemI *>::iterator       RgIMapIter;
 typedef map <RgKey, RegistryItemI *>::const_iterator RgIMapConstIter;
 typedef vector<RgKey>                                RgKeyList;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Templated utility methods to set/get registry items
 //
 class Registry;
@@ -59,7 +58,10 @@ template<class T>
 template<class T> 
   T GetValueOrUseDefault(
      Registry * r, RgKey key, T def, bool set_def=true);
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//
+//
+ostream & operator << (ostream & stream, const Registry & registry);
 
 class Registry {
 
@@ -135,6 +137,8 @@ public:
   RgDbl  GetDoubleDef (RgKey key, RgDbl  def_opt, bool set_def=true);
   RgStr  GetStringDef (RgKey key, RgStr  def_opt, bool set_def=true);
   RgAlg  GetAlgDef    (RgKey key, RgAlg  def_opt, bool set_def=true);
+  
+  RgIMapConstIter SafeFind  (RgKey key) const;
 
   int    NEntries     (void) const;                     ///< get number of items
   bool   Exists       (RgKey key) const;                ///< item with input key exists?

@@ -10,7 +10,7 @@
 
 \created  October 1, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -38,11 +38,17 @@ using std::vector;
 
 namespace genie {
 
+class GHepRecord;
 class GHepParticle;
+
+ostream & operator << (ostream & stream, const GHepRecord & event);
 
 class GHepRecord : public TClonesArray {
 
 public :
+  using TClonesArray::Print; // suppress clang 'hides overloaded virtual function [-Woverloaded-virtual]' warnings
+  using TClonesArray::Copy;
+
   GHepRecord();
   GHepRecord(int size);
   GHepRecord(const GHepRecord & record);
@@ -148,8 +154,9 @@ public :
   // Set mask
   void SetUnphysEventMask(const TBits & mask);
 
-  // Set print level
+  // Set/Get print level
   static void SetPrintLevel(int print_level);
+  static int  GetPrintLevel();
 
   // Methods & operators to print the record
 

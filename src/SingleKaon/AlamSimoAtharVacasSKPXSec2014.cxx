@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -50,7 +50,7 @@ AlamSimoAtharVacasSKPXSec2014::~AlamSimoAtharVacasSKPXSec2014()
 }
 //____________________________________________________________________________
 double AlamSimoAtharVacasSKPXSec2014::XSec(
-                  const Interaction * interaction, KinePhaseSpace_t kps) const
+              const Interaction * interaction, KinePhaseSpace_t /*kps*/) const
 {
   // Check whether interaction is valid
   if(! this -> ValidProcess    (interaction) ) return 0.;

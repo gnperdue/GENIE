@@ -15,7 +15,7 @@
 
 \created  June 22, 2009
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -79,7 +79,7 @@ private:
   double FinalStateCorr(const double Ee) const;
 
   // variables
-  double                  fCosCabibbo2;    //  cos^2(cabbibo)
+  double                  fCosCabibbo2;    //  cos^2(cabibbo)
   double                  fg1of0;          //  axial form factor at q2=0
   double                  fMa2;            //  axial mass squared
   double                  fMv2;            //  vector mass squared

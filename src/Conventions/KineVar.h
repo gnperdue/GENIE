@@ -10,7 +10,7 @@
 
 \created  May 06, 2004
 
-\cpright  Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -48,7 +48,11 @@ typedef enum EKineVar {
   kKVSelTk,
   kKVSelTl,
   kKVSelctl,
-  kKVSelphikq
+  kKVSelphikq,
+  kKVSelRad,
+  // put all new enum names right before this line
+  // do not change any previous ordering (neither insert nor delete)
+  kNumOfKineVar
 
 } KineVar_t;
 
@@ -81,6 +85,7 @@ public:
       case(kKVSelTl)   : return "*Selected* ASK lepton kinetic energy";  break;
       case(kKVSelctl)  : return "*Selected* ASK cosine lepton theta";    break;
       case(kKVSelphikq): return "*Selected* ASK phi kq";                 break;
+      case(kKVSelRad)  : return "*Selected* Struck particle position";   break;
  
       default          : return "** Unknown kinematic variable **";      break;
     }

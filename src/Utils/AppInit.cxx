@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -53,7 +53,7 @@ void genie::utils::app_init::XSecTable (string inpfile, bool require_table)
 
   // file was specified & exists - load table
   if(utils::system::FileExists(expandedinpfile)) {
-    XSecSplineList * xspl = XSecSplineList::Instance();
+    xspl = XSecSplineList::Instance();
     XmlParserStatus_t status = xspl->LoadFromXml(expandedinpfile);
     if(status != kXmlOK) {
       LOG("AppInit", pFATAL)

@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -1133,9 +1133,9 @@ void ROOTGeomAnalyzer::MaxPathLengthsBoxMethod(void)
     //  << "\n  |----o 4-momentum : " << utils::print::P4AsString(&nup4)
     //  << "\n  |----o 4-position : " << utils::print::X4AsString(&nux4);
 
-    const PathLengthList & pl = this->ComputePathLengths(nux4, nup4);
+    const PathLengthList & pllst = this->ComputePathLengths(nux4, nup4);
 
-    for (pl_iter = pl.begin(); pl_iter != pl.end(); ++pl_iter) {
+    for (pl_iter = pllst.begin(); pl_iter != pllst.end(); ++pl_iter) {
        int    pdgc = pl_iter->first;
        double pl   = pl_iter->second;
 

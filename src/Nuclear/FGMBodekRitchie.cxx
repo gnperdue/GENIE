@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2016, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -55,7 +55,7 @@ NuclearModelI("genie::FGMBodekRitchie", config)
 FGMBodekRitchie::~FGMBodekRitchie()
 {
   map<string, TH1D*>::iterator iter = fProbDistroMap.begin();
-  for( ; iter != fProbDistroMap.begin(); ++iter) {
+  for( ; iter != fProbDistroMap.end(); ++iter) {
     TH1D * hst = iter->second;
     if(hst) {
       delete hst;
@@ -107,15 +107,15 @@ bool FGMBodekRitchie::GenerateNucleon(const Target & target) const
   return true;
 }
 //____________________________________________________________________________
-double FGMBodekRitchie::Prob(double p, double w, const Target & target) const
+double FGMBodekRitchie::Prob(double mom, double w, const Target & target) const
 {
   if(w<0) {
-     TH1D * prob = this->ProbDistro(target);
-     int bin = prob->FindBin(p);
-     double y  = prob->GetBinContent(bin);
-     double dx = prob->GetBinWidth(bin);
-     double p  = y*dx;
-     return p;
+     TH1D * prob_distr = this->ProbDistro(target);
+     int bin = prob_distr->FindBin(mom);
+     double y  = prob_distr->GetBinContent(bin);
+     double dx = prob_distr->GetBinWidth(bin);
+     double prob = y*dx;
+     return prob;
   }
   return 1;
 }
