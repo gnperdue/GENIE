@@ -196,7 +196,6 @@ ROOT_LIBRARIES = $(shell root-config --glibs) \
                         -lMinuit -lGeom -lEG -lEGPythia8 -lGenVector
 ROOT_VERSION = $(shell root-config --version )
 ROOT_MAJOR   = $(shell root-config --version | cut -d. -f1 )
->>>>>>> community
 
 #-------------------------------------------------------------------
 #                   PROFILING / DEBUGING OPTIONS
