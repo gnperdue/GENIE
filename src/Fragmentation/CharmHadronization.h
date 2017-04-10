@@ -26,8 +26,8 @@
 #include <TGenPhaseSpace.h>
 
 #include "Fragmentation/HadronizationModelI.h"
+#include "Fragmentation/PythiaSingleton.h"
 
-class TPythia8;
 class TF1;
 
 namespace genie {
@@ -73,7 +73,7 @@ private:
   Spline *                       fDsFracSpl;   ///< nu charm fraction vs Ev: Ds+
   double                         fD0BarFrac;   ///< nubar \bar{D0} charm fraction
   double                         fDmFrac;      ///< nubar D- charm fraction
-  mutable TPythia8 *             fPythia8;     ///< remnant (non-charm) hadronizer
+  mutable PythiaSingleton *       fPythia8;     ///< remnant (non-charm) hadronizer
 };
 
 }         // genie namespace

@@ -21,9 +21,8 @@
 #ifndef _PYTHIA_DECAYER_I_H_
 #define _PYTHIA_DECAYER_I_H_
 
-#include <TPythia8.h>
-
 #include "Decay/DecayModelI.h"
+#include "Fragmentation/PythiaSingleton.h"
 
 namespace genie {
 
@@ -55,7 +54,7 @@ private:
   int    FindPythiaDecayChannel (int pdgc, TDecayChannel* dc) const;
   bool   MatchDecayChannels     (int pdgc, int ichannel, TDecayChannel * dc) const;
 
-  mutable TPythia8 * fPythia8;  ///< PYTHIA8 wrapper class
+  mutable PythiaSingleton * fPythia8;   ///< PYTHIA8 wrapper class
   mutable double fWeight;
 //bool fForceDecay;
 };

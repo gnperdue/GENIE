@@ -96,12 +96,17 @@ void GLRESGenerator::ProcessEventRecord(GHepRecord * event) const
   //
 
   double mass = p4_W.M();
-  fPythia8->ReadString("Print:quiet           = on");
-  fPythia8->ReadString("PDF:lepton            = off");
-  fPythia8->ReadString("WeakBosonExchange:all = on");
-  fPythia8->Initialize(-12, 11, mass); // nu_ebar + e-
-  fPythia8->GenerateEvent();
-  fPythia8->EventListing();
+  fPythia8->Pythia8()->readString("Print:quiet           = on");
+  fPythia8->Pythia8()->readString("PDF:lepton            = off");
+  fPythia8->Pythia8()->readString("WeakBosonExchange:all = on");
+
+  fPythia8->Pythia8()->settings.mode("Beams:idA", -12); // nu_ebar
+  fPythia8->Pythia8()->settings.mode("Beams:idB", 11); // e-
+  fPythia8->Pythia8()->settings.mode("Beams:frameType", 1);
+  fPythia8->Pythia8()->settings.parm("Beams:eCM", mass);
+
+  fPythia8->Pythia8()->next();
+  fPythia8->Pythia8()->event.list();
 
   // copy PYTHIA container to a new TClonesArray so as to transfer ownership
   // of the container and of its elements to the calling method
@@ -144,10 +149,10 @@ void GLRESGenerator::Configure(string config)
 //____________________________________________________________________________
 void GLRESGenerator::LoadConfig(void)
 {
- fPythia8 = TPythia8::Instance();
+  fPythia8 = PythiaSingleton::Instance();
 
- // sync GENIE/PYTHIA8 seed number
- RandomGen::Instance();
+  // sync GENIE/PYTHIA8 seed number
+  RandomGen::Instance();
 }
 //____________________________________________________________________________
 

@@ -75,10 +75,10 @@ CharmHadronization::~CharmHadronization()
 //____________________________________________________________________________
 void CharmHadronization::Initialize(void) const
 {
-  fPythia8 = TPythia8::Instance();
+  fPythia8 = PythiaSingleton::Instance();
 
-  fPythia8->ReadString("ProcessLevel:all = off");
-  fPythia8->ReadString("Print:quiet      = on");
+  fPythia8->Pythia8()->readString("ProcessLevel:all = off");
+  fPythia8->Pythia8()->readString("Print:quiet      = on");
   fPythia8->Pythia8()->init();
 }
 //____________________________________________________________________________

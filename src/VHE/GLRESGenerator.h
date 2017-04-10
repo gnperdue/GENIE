@@ -19,7 +19,7 @@
 #ifndef _GLASHOW_RESONANCE_GENERATOR_H_
 #define _GLASHOW_RESONANCE_GENERATOR_H_
 
-#include <TPythia8.h>
+#include "Fragmentation/PythiaSingleton.h"
 
 #include "EVGCore/EventRecordVisitorI.h"
 
@@ -44,7 +44,7 @@ private:
 
   void LoadConfig(void);
 
-  mutable TPythia8 * fPythia8;   ///< PYTHIA8 wrapper class
+  mutable PythiaSingleton * fPythia8;   ///< PYTHIA8 wrapper class
 };
 
 }      // genie namespace

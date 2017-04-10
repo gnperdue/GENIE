@@ -19,7 +19,7 @@
 #include <cstdlib>
 
 #include <TSystem.h>
-#include <TPythia8.h>
+#include "Fragmentation/PythiaSingleton.h"
 
 #include "Conventions/Controls.h"
 #include "Messenger/Messenger.h"
@@ -113,9 +113,9 @@ void RandomGen::SetSeed(long int seed)
   gRandom ->SetSeed (seed);
 
   // Set the PYTHIA8 seed number
-  TPythia8 * pythia8 = TPythia8::Instance();
-  pythia8->Pythia8()->readString("Random:setSeed = on");
-  pythia8->Pythia8()->settings.mode("Random:seed", seed);
+  PythiaSingleton * pythia8 = PythiaSingleton::Instance();
+  pythia8->Pythia8()->readString("ProcessLevel:all = off");
+  pythia8->Pythia8()->readString("Print:quiet      = on");
 
   LOG("Rndm", pINFO) << "RndKine  seed = " << this->RndKine ().GetSeed();
   LOG("Rndm", pINFO) << "RndHadro seed = " << this->RndHadro().GetSeed();

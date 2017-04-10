@@ -77,10 +77,10 @@ bool PythiaDecayer::IsHandled(int code) const
 //____________________________________________________________________________
 void PythiaDecayer::Initialize(void) const
 {
-  fPythia8 = TPythia8::Instance();
+  fPythia8 = PythiaSingleton::Instance();
   fWeight = 1.;
-  fPythia8->ReadString("ProcessLevel:all = off");
-  fPythia8->ReadString("Print:quiet      = on");
+  fPythia8->Pythia8()->readString("ProcessLevel:all = off");
+  fPythia8->Pythia8()->readString("Print:quiet      = on");
 
   // sync GENIE/PYTHIA8 seeds
   RandomGen::Instance();
