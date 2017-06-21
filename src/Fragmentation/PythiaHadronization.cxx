@@ -26,7 +26,6 @@
 */
 //____________________________________________________________________________
 
-#include "Fragmentation/GMCParticle.h"
 #include <TClonesArray.h>
 #include <TMath.h>
 #include <TH1D.h>
@@ -36,6 +35,8 @@
 #include "Conventions/GBuild.h"
 #include "Decay/DecayModelI.h"
 #include "Fragmentation/PythiaHadronization.h"
+#include "GHEP/GHepStatus.h"
+#include "GHEP/GHepParticle.h"
 #include "Interaction/Interaction.h"
 #include "Messenger/Messenger.h"
 #include "Numerical/RandomGen.h"
@@ -307,19 +308,20 @@ TClonesArray *
   int ioff = 0;
   if (fEvent[0].id() == 90) ioff = -1;
 
-  TClonesArray * particle_list = new TClonesArray("GMCParticle", numpart);
+  // TODO(shivesh): GHepParticle not compatible with TClonesArray!!!
+  TClonesArray * particle_list = new TClonesArray("GHepParticle", numpart);
   particle_list->SetOwner(true);
 
   for (int i = 1; i < numpart; ++i) {
     /*
      * Convert Pythia8 status code to Pythia6
      * Initial quark has a pythia6 status code of 12
-     * The initial diquark and the fragmented particles have a pythia6 code of 11
-     * Final state particles have a negative pythia8 code and a pythia6 code of 1
+     * The initial diquark and the fragmented particles have a pythia6 code of 11 (kIStNucleonTarget)
+     * Final state particles have a positive pythia8 code and a pythia6 code of 1 (kIStStableFinalState)
      */
-    int gStatus;
-    if (i == 1) gStatus = 12;
-    else gStatus = (fEvent[i].status()>0) ? 1 : 11;
+    GHepStatus_t gStatus;
+    if (i == 1) gStatus = kIStDISPreFragmHadronicState;
+    else gStatus = (fEvent[i].status()>0) ? kIStStableFinalState : kIStNucleonTarget;
 
     LOG("PythiaHad", pDEBUG)
         << "Adding final state particle pdgc = " << fEvent[i].id()
@@ -336,24 +338,21 @@ TClonesArray *
       }
     }
 
-    new((*particle_list)[i]) GMCParticle(
-            gStatus,
+    new((*particle_list)[i]) GHepParticle(
             fEvent[i].id(),
+            gStatus,
             fEvent[i].mother1()   + ioff,
+            fEvent[i].mother2()   + ioff,
             fEvent[i].daughter1() + ioff,
             fEvent[i].daughter2() + ioff,
             fEvent[i].px(),       // [GeV/c]
             fEvent[i].py(),       // [GeV/c]
             fEvent[i].pz(),       // [GeV/c]
             fEvent[i].e(),        // [GeV]
-            fEvent[i].m(),        // [GeV]
             fEvent[i].xProd(),    // [mm]
             fEvent[i].yProd(),    // [mm]
             fEvent[i].zProd(),    // [mm]
-            fEvent[i].tProd(),    // [mm/c]
-            fEvent[i].tau(),      // [mm/c]
-            fEvent[i].col(),
-            fEvent[i].acol());
+            fEvent[i].tProd());   // [mm/c]
   }
 
   utils::fragmrec::Print(particle_list);
@@ -377,12 +376,12 @@ PDGCodeList *
   PDGCodeList * pdgcv = new PDGCodeList(allowdup);
   pdgcv->reserve(particle_list->GetEntries());
 
-  GMCParticle * particle = 0;
+  GHepParticle * particle = 0;
   TIter particle_iter(particle_list);
 
-  while ((particle = (GMCParticle *) particle_iter.Next())) 
+  while ((particle = (GHepParticle *) particle_iter.Next())) 
   {
-    if (particle->GetKS()==1) pdgcv->push_back(particle->GetKF());
+    if (particle->Status()==kIStStableFinalState) pdgcv->push_back(particle->Pdg());
   }
   particle_list->Delete();
   delete particle_list;
@@ -404,7 +403,7 @@ TH1D * PythiaHadronization::MultiplicityProb(
   TH1D * mult_prob = this->CreateMultProbHist(maxmult);
 
   const int nev=500;
-  GMCParticle * particle = 0;
+  GHepParticle * particle = 0;
 
   for(int iev=0; iev<nev; iev++) {
 
@@ -415,9 +414,9 @@ TH1D * PythiaHadronization::MultiplicityProb(
 
      int n = 0;
      TIter particle_iter(particle_list);
-     while ((particle = (GMCParticle *) particle_iter.Next())) 
+     while ((particle = (GHepParticle *) particle_iter.Next())) 
      {
-       if (particle->GetKS()==1) n++;
+       if (particle->Status()==kIStStableFinalState) n++;
      }   
      particle_list->Delete();
      delete particle_list;
@@ -671,13 +670,13 @@ void PythiaHadronization::HandleDecays(TClonesArray * plist) const
 
   //-- loop through the fragmentation event record & decay unstables
   int idecaying   = -1; // position of decaying particle
-  GMCParticle * p =  0; // current particle
+  GHepParticle * p =  0; // current particle
 
   TIter piter(plist);
-  while ( (p = (GMCParticle *) piter.Next()) ) {
+  while ( (p = (GHepParticle *) piter.Next()) ) {
      idecaying++;
-     int status = p->GetKS();
-     int pdg    = p->GetKF();
+     GHepStatus_t status = p->Status();
+     int pdg    = p->Pdg();
 
      bool decay_it = (status<10) && 
                      ( pdg == kPdgLambda ||
@@ -699,35 +698,35 @@ void PythiaHadronization::HandleDecays(TClonesArray * plist) const
      if(decay_it) {
 
           LOG("PythiaHad", pINFO)
-                     << "Decaying particle with pdgc = " << p->GetKF();
+                     << "Decaying particle with pdgc = " << p->Pdg();
 
           DecayerInputs_t dinp;
 
           TLorentzVector p4;
-          p4.SetPxPyPzE(p->GetPx(), p->GetPy(), p->GetPz(), p->GetEnergy());
+          p4.SetPxPyPzE(p->Px(), p->Py(), p->Pz(), p->Energy());
 
-          dinp.PdgCode = p->GetKF();
+          dinp.PdgCode = p->Pdg();
           dinp.P4      = &p4;
 
           TClonesArray * decay_products = fDecayer->Decay(dinp);
           if(decay_products) {
                   //--  mark the parent particle as decayed & set daughters
-                  p->SetKS(11);
+                  p->SetStatus(kIStNucleonTarget);
 
                   int nfp = plist->GetEntries();          // n. fragm. products
                   int ndp = decay_products->GetEntries(); // n. decay products
 
-                  p->SetFirstChild ( nfp );          // decay products added at
-                  p->SetLastChild  ( nfp + ndp -1 ); // the end of the fragm.rec.
+                  p->SetFirstDaughter ( nfp );          // decay products added at
+                  p->SetLastDaughter  ( nfp + ndp -1 ); // the end of the fragm.rec.
 
                   //--  add decay products to the fragmentation record
-                  GMCParticle * dp = 0;
+                  GHepParticle * dp = 0;
                   TIter dpiter(decay_products);
 
-                  while ( (dp = (GMCParticle *) dpiter.Next()) ) {
-  	  	     if(dp->GetKS()>10) continue;
-                     dp->SetParent(idecaying);
-                     new ( (*plist)[plist->GetEntries()] ) GMCParticle(*dp);
+                  while ( (dp = (GHepParticle *) dpiter.Next()) ) {
+  	  	     if(dp->Status()>10) continue;
+                     dp->SetFirstMother(idecaying);
+                     new ( (*plist)[plist->GetEntries()] ) GHepParticle(*dp);
                   }
 
                   //-- clean up decay products

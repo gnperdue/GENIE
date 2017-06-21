@@ -21,8 +21,6 @@
 */
 //____________________________________________________________________________
 
-#include "Fragmentation/GMCParticle.h"
-
 #include "Algorithm/AlgConfigPool.h"
 #include "BaryonResonance/BaryonResonance.h"
 #include "BaryonResonance/BaryonResUtils.h"
@@ -185,20 +183,20 @@ void RESHadronicSystemGenerator::AddResonanceDecayProducts(
      resonance->SetStatus(kIStDecayedState);
 
      // loop over the daughter and add them to the event record
-     GMCParticle * dpmc = 0;
+     GHepParticle * dpmc = 0;
      TObjArrayIter decay_iter(decay_products);
 
-     while( (dpmc = (GMCParticle *) decay_iter.Next()) ) {
+     while( (dpmc = (GHepParticle *) decay_iter.Next()) ) {
 
-        int dppdg = dpmc->GetKF();
-        double px = dpmc->GetPx();
-        double py = dpmc->GetPy();
-        double pz = dpmc->GetPz();
-        double E  = dpmc->GetEnergy();
+        int dppdg = dpmc->Pdg();
+        double px = dpmc->Px();
+        double py = dpmc->Py();
+        double pz = dpmc->Pz();
+        double E  = dpmc->Energy();
         TLorentzVector p4(px,py,pz,E);
 
        //-- Only add the decay products - the mother particle already exists
-       if(dpmc->GetKS()==1) {
+       if(dpmc->Status()==kIStStableFinalState) {
          evrec->AddParticle(dppdg,dpist,irpos,-1,-1,-1, p4, x4);
        }
      }

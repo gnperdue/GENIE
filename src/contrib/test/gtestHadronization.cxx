@@ -31,7 +31,6 @@
 #include <string>
 #include <vector>
 
-#include "Fragmentation/GMCParticle.h"
 #include <TFile.h>
 #include <TDirectory.h>
 #include <TTree.h>
@@ -46,6 +45,7 @@
 #include "Algorithm/Algorithm.h"
 #include "Algorithm/AlgFactory.h"
 #include "Fragmentation/HadronizationModelI.h"
+#include "GHEP/GHepParticle.h"
 #include "Interaction/ProcessInfo.h"
 #include "Interaction/InitialState.h"
 #include "Interaction/Interaction.h"
@@ -265,7 +265,7 @@ int main(int argc, char ** argv)
                 br_model=0;
                 br_nstrst=0;
 
-                GMCParticle * particle = 0;
+                GHepParticle * particle = 0;
                 TIter particle_iter(plist);
 
                 unsigned int i=0;
@@ -274,32 +274,32 @@ int main(int argc, char ** argv)
 
                 pythia.event.clear();
 
-                while( (particle = (GMCParticle *) particle_iter.Next()) ) {
-                   br_pdg[i] = particle->GetKF();
-                   br_ist[i] = particle->GetKS();
-                   br_px[i]  = particle->GetPx();
-                   br_py[i]  = particle->GetPy();
-                   br_pz[i]  = particle->GetPz();
-                   br_KE[i]  = particle->GetEnergy() - particle->GetMass();
-                   br_E[i]   = particle->GetEnergy();
-                   br_M[i]   = particle->GetMass();
-                   br_pL[i]  = particle->GetPz();
-                   br_pT2[i] = TMath::Power(particle->GetPx(),2) + 
-      		               TMath::Power(particle->GetPy(),2);
-                   br_xF[i]  = particle->GetPz() / (W[iw]/2); 
-		   br_z[i]   = particle->GetEnergy() / W[iw];
+                while( (particle = (GHepParticle *) particle_iter.Next()) ) {
+                   br_pdg[i] = particle->Pdg();
+                   br_ist[i] = particle->Status();
+                   br_px[i]  = particle->Px();
+                   br_py[i]  = particle->Py();
+                   br_pz[i]  = particle->Pz();
+                   br_KE[i]  = particle->Energy() - particle->Mass();
+                   br_E[i]   = particle->Energy();
+                   br_M[i]   = particle->Mass();
+                   br_pL[i]  = particle->Pz();
+                   br_pT2[i] = TMath::Power(particle->Px(),2) + 
+      		               TMath::Power(particle->Py(),2);
+                   br_xF[i]  = particle->Pz() / (W[iw]/2); 
+		   br_z[i]   = particle->Energy() / W[iw];
 
-                   if(particle->GetKF() == kPdgString || particle->GetKF() == kPdgCluster || particle->GetKF() == kPdgIndep) {
+                   if(particle->Pdg() == kPdgString || particle->Pdg() == kPdgCluster || particle->Pdg() == kPdgIndep) {
 			if(model_set) exit(1);
                         model_set = true;
                         // TODO : Pythia8 does not use string particles
                         br_model=1;
-                        if      (particle->GetKF() == kPdgString ) br_model=1;
-                        else if (particle->GetKF() == kPdgCluster) br_model=2;
-                        else if (particle->GetKF() == kPdgIndep  ) br_model=3;
+                        if      (particle->Pdg() == kPdgString ) br_model=1;
+                        else if (particle->Pdg() == kPdgCluster) br_model=2;
+                        else if (particle->Pdg() == kPdgIndep  ) br_model=3;
 
-                        daughter1 = particle->GetFirstChild();
-                        daughter2 = particle->GetLastChild();
+                        daughter1 = particle->FirstDaughter();
+                        daughter2 = particle->LastDaughter();
                         br_nstrst = daughter2-daughter1+1;
                    }
 
@@ -310,7 +310,7 @@ int main(int argc, char ** argv)
                       br_dec[i] = 0;
                    }
 
-                   pythia.event.append(br_pdg[i],br_ist[i],particle->GetColor(),particle->GetAntiColor(),
+                   pythia.event.append(br_pdg[i],br_ist[i],0,0,
                            br_px[i],br_py[i],br_pz[i],br_E[i],br_M[i]);
 
                    i++;

@@ -32,12 +32,12 @@
 #include <TLorentzVector.h>
 #include <TDecayChannel.h>
 
-#include "Fragmentation/GMCParticle.h"
-
 #include "BaryonResonance/BaryonResUtils.h"
 #include "Conventions/Units.h"
 #include "Conventions/Constants.h"
 #include "Decay/PythiaDecayer.h"
+#include "GHEP/GHepStatus.h"
+#include "GHEP/GHepParticle.h"
 #include "Messenger/Messenger.h"
 #include "Numerical/RandomGen.h"
 #include "PDG/PDGLibrary.h"
@@ -134,34 +134,31 @@ TClonesArray * PythiaDecayer::Decay(const DecayerInputs_t & inp) const
   int ioff = 0;
   if (fEvent[0].id() == 90) ioff = -1;
 
-  TClonesArray * pl = new TClonesArray("GMCParticle", numpart);
+  TClonesArray * pl = new TClonesArray("GHepParticle", numpart);
   if(!pl) return 0;
 
   for (int i = 1; i < numpart; ++i) {
     /*
      * Convert Pythia8 status code to Pythia6
-     * Decayed/fragmented particle has a pytahi6 code of 11
-     * Final state particles have a negative pythia8 code and a pythia6 code of 1
+     * Decayed/fragmented particle has a pytahi6 code of 11 (kIStNucleonTarget)
+     * Final state particles have a negative pythia8 code and a pythia6 code of 1 (kIStStableFinalState)
      */
-    int gStatus = (fEvent[i].status()>0) ? 1 : 11;
-    new((*pl)[i]) GMCParticle(
-            gStatus,
+    GHepStatus_t gStatus = (fEvent[i].status()>0) ? kIStStableFinalState : kIStNucleonTarget;
+    new((*pl)[i]) GHepParticle(
             fEvent[i].id(),
+            gStatus,
             fEvent[i].mother1()   + ioff,
+            fEvent[i].mother2()   + ioff,
             fEvent[i].daughter1() + ioff,
             fEvent[i].daughter2() + ioff,
             fEvent[i].px(),       // [GeV/c]
             fEvent[i].py(),       // [GeV/c]
             fEvent[i].pz(),       // [GeV/c]
             fEvent[i].e(),        // [GeV]
-            fEvent[i].m(),        // [GeV]
             fEvent[i].xProd(),    // [mm]
             fEvent[i].yProd(),    // [mm]
             fEvent[i].zProd(),    // [mm]
-            fEvent[i].tProd(),    // [mm/c]
-            fEvent[i].tau(),      // [mm/c]
-            fEvent[i].col(),
-            fEvent[i].acol());
+            fEvent[i].tProd());   // [mm/c]
   }
 
   //-- transfer ownership and return

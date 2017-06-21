@@ -7,7 +7,6 @@
 #pragma link C++ namespace genie;
 #pragma link C++ namespace genie::utils::frgmfunc;
 
-#pragma link C++ class GMCParticle;
 #pragma link C++ class PythiaSingleton;
 
 #pragma link C++ class genie::HadronizationModelI;

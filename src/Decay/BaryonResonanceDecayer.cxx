@@ -19,12 +19,13 @@
 
 #include <TClonesArray.h>
 #include <TDecayChannel.h>
-#include "Fragmentation/GMCParticle.h"
 #include <TMath.h>
 
 #include "BaryonResonance/BaryonResUtils.h"
 #include "Conventions/Controls.h"
 #include "Decay/BaryonResonanceDecayer.h"
+#include "GHEP/GHepStatus.h"
+#include "GHEP/GHepParticle.h"
 #include "Messenger/Messenger.h"
 #include "PDG/PDGLibrary.h"
 #include "Numerical/RandomGen.h"
@@ -379,8 +380,8 @@ while(1){  //start a loop until break;
   }
 
 //  //-- Create the event record
-//  TClonesArray * particle_list = new TClonesArray("GMCParticle", 1+nd);
-//  TClonesArray * temp_particle_list = new TClonesArray("GMCParticle", 1+nd);//A temprary record.
+//  TClonesArray * particle_list = new TClonesArray("GHepParticle", 1+nd);
+//  TClonesArray * temp_particle_list = new TClonesArray("GHepParticle", 1+nd);//A temprary record.
 
   //-- Add the mother particle to the event record (KS=11 as in PYTHIA)
   TParticlePDG * mother = PDGLibrary::Instance()->Find(pdg_code);
@@ -394,7 +395,7 @@ while(1){  //start a loop until break;
   if(twobody){vcheckdelta.SetPxPyPzE(px,py,pz,E);}  // restore mother particle's 4-momentum.
 
   new ( (*temp_particle_list)[0] )
-                    GMCParticle(11,pdg_code,0,0,0,px,py,pz,E,M,0,0,0,0,0); //restore mother particle to the temp_particle list.
+                    GHepParticle(pdg_code,kIStNucleonTarget,0,0,0,0,px,py,pz,E,0,0,0,0); //restore mother particle to the temp_particle list.
 
   //-- Add the daughter particles to the event record
   for(unsigned int id = 0; id < nd; id++) {
@@ -428,7 +429,7 @@ while(1){  //start a loop until break;
 	   }  //end twobody
 
        new ( (*temp_particle_list)[1+id] )
-                         GMCParticle(1,pdgc[id],0,0,0,px,py,pz,E,M,0,0,0,0,0);
+                         GHepParticle(pdgc[id],kIStStableFinalState,0,0,0,0,px,py,pz,E,0,0,0,0);
   }//end daughter particle loop
 
   if(!twobody) break;
