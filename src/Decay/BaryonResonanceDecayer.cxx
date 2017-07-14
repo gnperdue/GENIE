@@ -380,8 +380,8 @@ while(1){  //start a loop until break;
   }
 
 //  //-- Create the event record
-//  TClonesArray * particle_list = new TClonesArray("GHepParticle", 1+nd);
-//  TClonesArray * temp_particle_list = new TClonesArray("GHepParticle", 1+nd);//A temprary record.
+//  TClonesArray * particle_list = new TClonesArray("genie::GHepParticle", 1+nd);
+//  TClonesArray * temp_particle_list = new TClonesArray("genie::GHepParticle", 1+nd);//A temprary record.
 
   //-- Add the mother particle to the event record (KS=11 as in PYTHIA)
   TParticlePDG * mother = PDGLibrary::Instance()->Find(pdg_code);

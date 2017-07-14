@@ -134,7 +134,7 @@ TClonesArray * PythiaDecayer::Decay(const DecayerInputs_t & inp) const
   int ioff = 0;
   if (fEvent[0].id() == 90) ioff = -1;
 
-  TClonesArray * pl = new TClonesArray("GHepParticle", numpart);
+  TClonesArray * pl = new TClonesArray("genie::GHepParticle", numpart);
   if(!pl) return 0;
 
   for (int i = 1; i < numpart; ++i) {

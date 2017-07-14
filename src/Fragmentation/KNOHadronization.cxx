@@ -710,7 +710,7 @@ TClonesArray * KNOHadronization::DecayMethod1(
   LOG("KNOHad", pINFO) << "** Using Hadronic System Decay method 1";
 
   TLorentzVector p4had(0,0,0,W);
-  TClonesArray * plist = new TClonesArray("GHepParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("genie::GHepParticle", pdgv.size());
 
   // do the decay
   bool ok = this->PhaseSpaceDecay(*plist, p4had, pdgv, 0, reweight_decays); 
@@ -760,7 +760,7 @@ TClonesArray * KNOHadronization::DecayMethod2(
   }
 
   // Create the particle list
-  TClonesArray * plist = new TClonesArray("GHepParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("genie::GHepParticle", pdgv.size());
 
   RandomGen * rnd = RandomGen::Instance();
   TLorentzVector p4had(0,0,0,W);
@@ -853,7 +853,7 @@ TClonesArray * KNOHadronization::DecayBackToBack(
   RandomGen * rnd = RandomGen::Instance();
 
   // Create the particle list
-  TClonesArray * plist = new TClonesArray("GHepParticle", pdgv.size());
+  TClonesArray * plist = new TClonesArray("genie::GHepParticle", pdgv.size());
 
   // Get xF,pT2 distribution (y-) maxima for the rejection method
   double xFo  = 1.1 * fBaryonXFpdf ->GetMaximum(-1,1);

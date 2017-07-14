@@ -20,7 +20,6 @@
 
 #include <cstring>
 
-#include "Fragmentation/GMCParticle.h"
 #include <TClonesArray.h>
 #include <TMath.h>
 

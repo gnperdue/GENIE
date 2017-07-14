@@ -312,7 +312,7 @@ TClonesArray * CharmHadronization::Hadronize(
   //
   if(fCharmOnly) {
     // Create particle list (fragmentation record)
-    TClonesArray * particle_list = new TClonesArray("GHepParticle", 2);
+    TClonesArray * particle_list = new TClonesArray("genie::GHepParticle", 2);
     particle_list->SetOwner(true);
 
     // insert the generated particles
@@ -331,7 +331,7 @@ TClonesArray * CharmHadronization::Hadronize(
   //
   if(used_lowW_strategy) {
     // Create particle list (fragmentation record)
-    TClonesArray * particle_list = new TClonesArray("GHepParticle", 3);
+    TClonesArray * particle_list = new TClonesArray("genie::GHepParticle", 3);
     particle_list->SetOwner(true);
 
     // insert the generated particles
@@ -355,7 +355,7 @@ TClonesArray * CharmHadronization::Hadronize(
   // Insert the generated charm hadron & the hadronic (non-charm) blob.
   // In this case the hadronic blob is entered as a pre-fragm. state.
 
-  TClonesArray * particle_list = new TClonesArray("GHepParticle");
+  TClonesArray * particle_list = new TClonesArray("genie::GHepParticle");
   particle_list->SetOwner(true);
 
   new ((*particle_list)[0]) GHepParticle (ch_pdg,kIStStableFinalState,

@@ -309,7 +309,7 @@ TClonesArray *
   if (fEvent[0].id() == 90) ioff = -1;
 
   // TODO(shivesh): GHepParticle not compatible with TClonesArray!!!
-  TClonesArray * particle_list = new TClonesArray("GHepParticle", numpart);
+  TClonesArray * particle_list = new TClonesArray("genie::GHepParticle", numpart);
   particle_list->SetOwner(true);
 
   for (int i = 1; i < numpart; ++i) {
