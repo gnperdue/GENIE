@@ -1,8 +1,10 @@
 # NOTICE
 
-This is an _unofficial_ repository for release 2.12.8 of the GENIE Neutrino 
+This is an _unofficial_ repository for the trunk branch of the GENIE Neutrino 
 Event MC generator. Please see the [official webpage](http://genie.hepforge.org)
 for code that is appropriate for publications-level physics analysis. 
+
+This branch is current with trunk as of SVN commit 7219.
 
 ## Versioning and Releases
 
@@ -18,9 +20,9 @@ You can see the list of available branches with
 
 You can check out a branch directly with, for example, 
 
-    git checkout R-2_12_8
+    git checkout trunk
 
-to get the `R-2_12_8` branch.
+to get the `trunk` branch.
 
 ## About GENIE
 
