@@ -73,24 +73,24 @@ double NievesSimoVacasMECPXSec2016::XSec(
 
         if( Arequest == 4 && Zrequest == 2 ){
             tensorpdg = kPdgTgtC12;
-	    // This is for helium 4, but use carbon tensor
-	    // the use of nuclear density parameterization is suspicious
-	    // but some users (MINERvA) need something not nothing.
-	    // The pn will be exactly 1/3, but pp and nn will be ~1/4
-	    // Because the combinatorics are different.
+            // This is for helium 4, but use carbon tensor
+            // the use of nuclear density parameterization is suspicious
+            // but some users (MINERvA) need something not nothing.
+            // The pn will be exactly 1/3, but pp and nn will be ~1/4
+            // Because the combinatorics are different.
             // Could do lithium beryllium boron which you don't need
         }
         else if (Arequest < 9){
-            // refuse to do D, T, He3, Li, and some Be, B      
-	    // actually it would work technically, maybe except D, T
-            MAXLOG("NievesSimoVacasMEC", pWARN, 10) 
-                << "Asked to scale to deuterium through boron " 
+            // refuse to do D, T, He3, Li, and some Be, B
+            // actually it would work technically, maybe except D, T
+            MAXLOG("NievesSimoVacasMEC", pWARN, 10)
+                << "Asked to scale to deuterium through boron "
                 << targetpdg << " nope, lets not do that.";
             return 0;
         }
         else if( Arequest >= 9 && Arequest < 15){
             tensorpdg = kPdgTgtC12;
-            //} 
+            //}
             // could explicitly put in nitrogen for air
             //else if ( Arequest >= 14 && A < 15) { // AND CHANGE <=14 to <14.
             //  tensorpdg = kPdgTgtN14;
@@ -136,8 +136,8 @@ double NievesSimoVacasMECPXSec2016::XSec(
     double Q3    = 0;
     genie::utils::mec::Getq0q3FromTlCostl(Tl, costl, Ev, ml, Q0, Q3);
     const vector <genie::BLI2DNonUnifGrid *> &
-         tensor_table = hadtensor->TensorTable(
-              tensorpdg, MECHadronTensor::kMHTValenciaFullAll);
+        tensor_table = hadtensor->TensorTable(
+                tensorpdg, MECHadronTensor::kMHTValenciaFullAll);
     double Q0min = tensor_table[0]->XMin();
     double Q0max = tensor_table[0]->XMax();
     double Q3min = tensor_table[0]->YMin();
@@ -210,6 +210,9 @@ double NievesSimoVacasMECPXSec2016::XSec(
 
     double xsec = (pn) ? xsec_pn : xsec_all;
 
+    // Apply given scaling factor
+    xsec *= fXSecScale;
+
     if(kps!=kPSTlctl) {
         LOG("NievesSimoVacasMEC", pWARN)
             << "Doesn't support transformation from "
@@ -254,13 +257,18 @@ void NievesSimoVacasMECPXSec2016::Configure(string config)
 //_________________________________________________________________________
 void NievesSimoVacasMECPXSec2016::LoadConfig(void)
 {
-  //AlgConfigPool * confp = AlgConfigPool::Instance();
-  //const Registry * gc = confp->GlobalParameterList();
+    AlgConfigPool * confp = AlgConfigPool::Instance();
+    const Registry * gc = confp->GlobalParameterList();
+
+    // Cross section scaling factor
+    fXSecScale = fConfig->GetDoubleDef( "XSecScale",
+            gc->GetDouble("MEC-CC-XSecScale"));
+
     fXSecIntegrator =
         dynamic_cast<const XSecIntegratorI *> (
                 this->SubAlg("NumericalIntegrationAlg"));
     assert(fXSecIntegrator);
 
-  //fQ3Max = fConfig->GetDoubleDef("NSV-Q3Max", gc->GetDouble("NSV-Q3Max"));
+    //fQ3Max = fConfig->GetDoubleDef("NSV-Q3Max", gc->GetDouble("NSV-Q3Max"));
 }
 //_________________________________________________________________________

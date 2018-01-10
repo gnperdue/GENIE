@@ -29,6 +29,7 @@
 #include "Utils/SystemUtils.h"
 #include "Utils/AppInit.h"
 #include "Utils/StringUtils.h"
+#include "Utils/XmlParserUtils.h"
 
 using namespace genie;
 
@@ -48,30 +49,44 @@ void genie::utils::app_init::XSecTable (string inpfile, bool require_table)
   XSecSplineList * xspl = XSecSplineList::Instance();
   xspl->AutoLoad(); // display warning for usage $GSPLOAD no longer supported
 
-  // expand in case of embedded env var or ~
-  string expandedinpfile = gSystem->ExpandPathName(inpfile.c_str());
+  // don't try to expand if no filename actually given ...
+  string expandedinpfile = "";
+  string fullinpfile     = "";
+  if ( inpfile != "" ) {
+    // expand in case of embedded env var or ~
+    expandedinpfile = gSystem->ExpandPathName(inpfile.c_str());
+    if (utils::system::FileExists(expandedinpfile)) {
+      // use the file as given if possible
+      fullinpfile   = expandedinpfile;
+    } else {
+      // look for file in $GXMLPATH, then $GENIE/config
+      // return input name if not found any of those places (thus allowing CWD)
+      fullinpfile   = genie::utils::xml::GetXMLFilePath(expandedinpfile);
+    }
+  }
 
   // file was specified & exists - load table
-  if(utils::system::FileExists(expandedinpfile)) {
+  if (utils::system::FileExists(fullinpfile)) {
     xspl = XSecSplineList::Instance();
-    XmlParserStatus_t status = xspl->LoadFromXml(expandedinpfile);
-    if(status != kXmlOK) {
+    XmlParserStatus_t status = xspl->LoadFromXml(fullinpfile);
+    if (status != kXmlOK) {
       LOG("AppInit", pFATAL)
          << "Problem reading file: " << expandedinpfile;
        gAbortingInErr = true;
        exit(1);
     }
-  } 
+  }
 
   // file doesn't exist
   else {
     // if one was specified, report & exit
-    if(inpfile.size() > 0) {
+    if (inpfile.size() > 0) {
        LOG("AppInit", pFATAL)
-          << "Input cross-section file [" << inpfile << "] does not exist!";
+          << "Input cross-section file [" << inpfile << "] does not exist!\n"
+          << "looked for " << expandedinpfile << " in $GXMLPATH locations ";
        gAbortingInErr = true;
        exit(1);
-    } 
+    }
     // if one was not specified, warn and decide whether to exit based on the
     // input `require_table' flag
     else {
@@ -98,8 +113,8 @@ void genie::utils::app_init::MesgThresholds(string filelist)
       Messenger * m = Messenger::Instance();
       bool ok = m->SetPrioritiesFromXmlFile(inp_file);
       if(!ok) {
-        LOG("AppInit", pWARN) 
-          << "Could not load customized mesg thresholds from: " 
+        LOG("AppInit", pWARN)
+          << "Could not load customized mesg thresholds from: "
           << inp_file;
       }
     }

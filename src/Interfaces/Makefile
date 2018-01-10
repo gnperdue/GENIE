@@ -13,8 +13,8 @@ MAKEFILE = Makefile
 include $(GENIE)/src/make/Make.include
 
 PACKAGE           = Interfaces
-DICTIONARY        = 
-LIBNAME           = 
+DICTIONARY        = GENIE_DUMMY_DICT
+LIBNAME           = GENIE_DUMMY_LIB
 EXTRA_EXT_LIBS    = 
 
 all     : 

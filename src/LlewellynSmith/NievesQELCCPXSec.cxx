@@ -53,7 +53,6 @@ using namespace genie;
 using namespace genie::constants;
 using namespace genie::controls;
 using namespace genie::utils;
-using namespace genie::units;
 
 //____________________________________________________________________________
 NievesQELCCPXSec::NievesQELCCPXSec() :
@@ -253,6 +252,9 @@ double NievesQELCCPXSec::XSec(const Interaction * interaction,
   // Calculate xsec
   double xsec = Gfactor*coulombFactor*LmunuAnumuResult;
 
+  // Apply given scaling factor
+  xsec *= fXSecScale;
+
   LOG("Nieves",pDEBUG) << "TESTING: RPA=" << fRPA 
 		       << ", Coulomb=" << fCoulomb
 		       << ", q2 = " << q2 << ", xsec = " << xsec;
@@ -419,8 +421,12 @@ void NievesQELCCPXSec::LoadConfig(void)
                               "CabibboAngle", gc->GetDouble("CabibboAngle"));
   fCos8c2 = TMath::Power(TMath::Cos(thc), 2);
 
+  // Cross section scaling factor
+  fXSecScale = fConfig->GetDoubleDef(
+        	       "XSecScale", gc->GetDouble("QEL-CC-XSecScale"));
+
   // hbarc for unit conversion, GeV*fm
-  fhbarc = kLightSpeed*kPlankConstant/fermi;
+  fhbarc = kLightSpeed*kPlankConstant/units::fermi;
 
    // load QEL form factors model
   fFormFactorsModel = dynamic_cast<const QELFormFactorsModelI *> (
