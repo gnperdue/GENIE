@@ -63,7 +63,7 @@
 
 \created September 27, 2005
 
-\cpright Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
+\cpright Copyright (c) 2003-2018, The GENIE Collaboration
          For the full text of the license visit http://copyright.genie-mc.org
          or see $GENIE/LICENSE
 */
@@ -74,15 +74,15 @@
 
 #include <TMath.h>
 
-#include "EVGDrivers/PathLengthList.h"
-#include "Geo/ROOTGeomAnalyzer.h"
-#include "Messenger/Messenger.h"
-#include "Numerical/RandomGen.h"
-#include "Utils/CmdLnArgParser.h"
-#include "Utils/UnitUtils.h"
-#include "Utils/PrintUtils.h"
-#include "Utils/AppInit.h"
-#include "Utils/RunOpt.h"
+#include "Framework/EventGen/PathLengthList.h"
+#include "Tools/Geometry/ROOTGeomAnalyzer.h"
+#include "Framework/Messenger/Messenger.h"
+#include "Framework/Numerical/RandomGen.h"
+#include "Framework/Utils/CmdLnArgParser.h"
+#include "Framework/Utils/UnitUtils.h"
+#include "Framework/Utils/PrintUtils.h"
+#include "Framework/Utils/AppInit.h"
+#include "Framework/Utils/RunOpt.h"
 
 using std::string;
 

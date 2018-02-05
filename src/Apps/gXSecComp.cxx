@@ -33,7 +33,7 @@
 
 \created June 06, 2008 
 
-\cpright Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
+\cpright Copyright (c) 2003-2018, The GENIE Collaboration
          For the full text of the license visit http://copyright.genie-mc.org
          or see $GENIE/LICENSE
 */
@@ -58,14 +58,14 @@
 #include <TLegend.h>
 #include <TObjString.h>
 
-#include "Conventions/GBuild.h"
-#include "Messenger/Messenger.h"
-#include "Numerical/RandomGen.h"
-#include "PDG/PDGUtils.h"
-#include "PDG/PDGCodes.h"
-#include "Utils/CmdLnArgParser.h"
-#include "Utils/StringUtils.h"
-#include "Utils/Style.h"
+#include "Framework/Conventions/GBuild.h"
+#include "Framework/Messenger/Messenger.h"
+#include "Framework/Numerical/RandomGen.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#include "Framework/ParticleData/PDGCodes.h"
+#include "Framework/Utils/CmdLnArgParser.h"
+#include "Framework/Utils/StringUtils.h"
+#include "Framework/Utils/Style.h"
 
 using std::ostringstream;
 using std::string;

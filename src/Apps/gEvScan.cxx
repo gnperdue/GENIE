@@ -26,7 +26,7 @@
 
 \created August 13, 2008
 
-\cpright Copyright (c) 2003-2017, GENIE Neutrino MC Generator Collaboration
+\cpright Copyright (c) 2003-2018, The GENIE Collaboration
          For the full text of the license visit http://copyright.genie-mc.org
          or see $GENIE/LICENSE
 */
@@ -46,20 +46,20 @@
 #include <TH1D.h>
 #include <TLorentzVector.h>
 
-#include "Conventions/Constants.h"
-#include "EVGCore/EventRecord.h"
-#include "GHEP/GHepParticle.h"
-#include "Ntuple/NtpMCFormat.h"
-#include "Ntuple/NtpMCTreeHeader.h"
-#include "Ntuple/NtpMCEventRecord.h"
-#include "PDG/PDGLibrary.h"
-#include "PDG/PDGCodes.h"
-#include "PDG/PDGUtils.h"
-#include "PDG/PDGCodeList.h"
-#include "Messenger/Messenger.h"
-#include "Utils/NuclearUtils.h"
-#include "Utils/CmdLnArgParser.h"
-#include "Utils/RunOpt.h"
+#include "Framework/Conventions/Constants.h"
+#include "Framework/EventGen/EventRecord.h"
+#include "Framework/GHEP/GHepParticle.h"
+#include "Framework/Ntuple/NtpMCFormat.h"
+#include "Framework/Ntuple/NtpMCTreeHeader.h"
+#include "Framework/Ntuple/NtpMCEventRecord.h"
+#include "Framework/ParticleData/PDGLibrary.h"
+#include "Framework/ParticleData/PDGCodes.h"
+#include "Framework/ParticleData/PDGUtils.h"
+#include "Framework/ParticleData/PDGCodeList.h"
+#include "Framework/Messenger/Messenger.h"
+#include "Physics/NuclearState/NuclearUtils.h"
+#include "Framework/Utils/CmdLnArgParser.h"
+#include "Framework/Utils/RunOpt.h"
 
 using std::ostringstream;
 using std::ofstream;
