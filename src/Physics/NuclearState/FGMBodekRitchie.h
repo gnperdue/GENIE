@@ -39,6 +39,9 @@ public:
   FGMBodekRitchie(string config);
   virtual ~FGMBodekRitchie();
 
+  using NuclearModelI::GenerateNucleon;  // inherit versions not overridden here
+  using NuclearModelI::Prob;
+
   //-- implement the NuclearModelI interface
   bool           GenerateNucleon (const Target & t) const;
   double         Prob            (double mom, double w, const Target & t) const;
@@ -63,6 +66,7 @@ private:
   double fPMax;
   double fPCutOff;
   string fKFTable;
+  bool fUseParametrization;
 };
 
 }         // genie namespace

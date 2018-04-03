@@ -7,9 +7,6 @@
    <config alg="genie::FermiMover">                  FermiMover.xml                  </config>
    <config alg="genie::HadronTransporter">           HadronTransporter.xml           </config>
    <config alg="genie::HAIntranuke">                 HAIntranuke.xml                 </config>
-   <config alg="genie::HNIntranuke">                 HNIntranuke.xml                 </config>
-   <config alg="genie::HAIntranuke2014">             HAIntranuke2014.xml              </config>
-   <config alg="genie::HNIntranuke2014">             HNIntranuke2014.xml              </config>
    <config alg="genie::HAIntranuke2015">             HAIntranuke2015.xml              </config>
    <config alg="genie::HNIntranuke2015">             HNIntranuke2015.xml              </config>
    <config alg="genie::UnstableParticleDecayer">     UnstableParticleDecayer.xml     </config>
@@ -19,6 +16,7 @@
    <config alg="genie::InitialStateAppender">        InitialStateAppender.xml        </config>
    <config alg="genie::VertexGenerator">             VertexGenerator.xml             </config>
    <config alg="genie::QELEventGenerator">           QELEventGenerator.xml           </config>
+   <config alg="genie::QELEventGeneratorSM">         QELEventGeneratorSM.xml         </config>
    <config alg="genie::QELPrimaryLeptonGenerator">   QELPrimaryLeptonGenerator.xml   </config>
    <config alg="genie::DISPrimaryLeptonGenerator">   DISPrimaryLeptonGenerator.xml   </config>
    <config alg="genie::RESPrimaryLeptonGenerator">   RESPrimaryLeptonGenerator.xml   </config>
@@ -83,7 +81,8 @@
 
    <!-- ****** CONFIGURATION FOR PARTON DENSITY FUNCTION ALGORITHMS ****** -->
    <config alg="genie::GRV98LO">                     GRV98LO.xml                     </config>
-   <config alg="genie::PDFLIB">                      PDFLIB.xml                      </config>
+   <config alg="genie::LHAPDF6">                     LHAPDF6.xml                     </config>
+   <config alg="genie::LHAPDF5">                     LHAPDF5.xml                     </config>
    <config alg="genie::BYPDF">                       BYPDF.xml                       </config>
 
    <!-- ****** CONFIGURATION FOR PARTICLE DECAY ALGORITHMS****** -->
@@ -94,6 +93,7 @@
    <config alg="genie::DipoleELFormFactorsModel">                DipoleELFormFactorsModel.xml                </config>
    <config alg="genie::BBA03ELFormFactorsModel">                 BBA03ELFormFactorsModel.xml                 </config>
    <config alg="genie::BBA05ELFormFactorsModel">                 BBA05ELFormFactorsModel.xml                 </config>
+   <config alg="genie::BBA07ELFormFactorsModel">                 BBA07ELFormFactorsModel.xml                 </config>
    <config alg="genie::DipoleAxialFormFactorModel">              DipoleAxialFormFactorModel.xml              </config>
    <config alg="genie::ZExpAxialFormFactorModel">                ZExpAxialFormFactorModel.xml                </config>
    <config alg="genie::KuzminNaumov2016AxialFormFactorModel">    KuzminNaumov2016AxialFormFactorModel.xml    </config>
@@ -111,6 +111,7 @@
 
    <!--  ****** CONFIGURATION GENERIC CROSS SECTION INTEGRATORS ****** -->
    <config alg="genie::QELXSec">                     QELXSec.xml                     </config>
+   <config alg="genie::SmithMonizQELCCXSec">         SmithMonizQELCCXSec.xml         </config>
    <config alg="genie::DISXSec">                     DISXSec.xml                     </config>
    <config alg="genie::COHXSec">                     COHXSec.xml                     </config>
    <config alg="genie::COHXSecAR">                   COHXSecAR.xml                   </config>
@@ -128,6 +129,7 @@
    <config alg="genie::BergerSehgalFMCOHPiPXSec2015">       BergerSehgalFMCOHPiPXSec2015.xml       </config> 
    <config alg="genie::LwlynSmithQELCCPXSec">               LwlynSmithQELCCPXSec.xml               </config>
    <config alg="genie::NievesQELCCPXSec">                   NievesQELCCPXSec.xml                   </config>
+   <config alg="genie::SmithMonizQELCCPXSec">               SmithMonizQELCCPXSec.xml               </config>
    <config alg="genie::QPMDISPXSec">                        QPMDISPXSec.xml                        </config>
    <config alg="genie::AivazisCharmPXSecLO">                AivazisCharmPXSecLO.xml                </config>
    <config alg="genie::SlowRsclCharmDISPXSecLO">            SlowRsclCharmDISPXSecLO.xml            </config>
@@ -155,6 +157,7 @@
    <config alg="genie::StrumiaVissaniIBDPXSec">             StrumiaVissaniIBDPXSec.xml             </config>
    <config alg="genie::DummyPXSec">                         Default.xml                            </config>
    <config alg="genie::NNBarOscDummyPXSec">                 Default.xml                            </config>
+   <config alg="genie::ReinSehgalRESXSecFast">              ReinSehgalRESXSecFast.xml              </config>
 
    <!--  ****** CONFIGURATION FOR NUCLEAR ENV. ALGORITHMS ****** -->
    <config alg="genie::NuclearModelMap">             NuclearModelMap.xml             </config>
@@ -163,6 +166,7 @@
    <config alg="genie::EffectiveSF">                 EffectiveSF.xml                 </config>
    <config alg="genie::SpectralFunc1d">              SpectralFunc1d.xml              </config>
    <config alg="genie::SpectralFunc">                SpectralFunc.xml                </config>
+   <config alg="genie::SmithMonizUtils">             SmithMonizUtils.xml             </config>
 
    <!-- ****** CONFIGURATION FOR MODELS IN MUELOSS UTILITY PACKAGE ****** -->
    <config alg="genie::mueloss::BetheBlochModel">         BetheBlochModel.xml        </config>

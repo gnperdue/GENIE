@@ -39,6 +39,9 @@ public:
   SpectralFunc1d(string config);
   virtual ~SpectralFunc1d();
 
+  using NuclearModelI::GenerateNucleon;  // inherit versions not overridden here
+  using NuclearModelI::Prob;
+
   //-- implement the NuclearModelI interface
   bool           GenerateNucleon (const Target & t) const;
   double         Prob            (double p, double w, const Target & t) const;
@@ -60,7 +63,7 @@ private:
   // Hopefully, analytical expressions for spectral functions will become available soon.
   //
   bool   fUseRFGRemovalE;
-  bool   fUseRFGMomentumCutoff;
+  bool   fUseRFGMomentumCutoff ;
   double fPCutOff;
   map<int, Spline *> fSFk;     ///< All available spectral funcs integrated over removal energy
   map<int, Spline *> fSFw;     ///< Average nucleon removal as a function of pF - computed from the spectral function

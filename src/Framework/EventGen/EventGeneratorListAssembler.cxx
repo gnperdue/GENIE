@@ -17,11 +17,13 @@
 #include <sstream>
 
 #include "Framework/Algorithm/AlgFactory.h"
+#include "Framework/Algorithm/AlgConfigPool.h"
 #include "Framework/EventGen/EventGeneratorListAssembler.h"
 #include "Framework/EventGen/EventGeneratorList.h"
 #include "Framework/EventGen/EventGeneratorI.h"
 #include "Framework/Messenger/Messenger.h"
 #include "Framework/Utils/PrintUtils.h"
+#include "Framework/Utils/RunOpt.h"
 
 using std::ostringstream;
 
@@ -51,16 +53,25 @@ EventGeneratorList * EventGeneratorListAssembler::AssembleGeneratorList()
             << utils::print::PrintFramedMesg(
                            "Loading requested Event Generators", 0, '-');
 
+  if ( RunOpt::Instance() -> EventGeneratorList() == "Default" ) {
+    AddTopRegistry( AlgConfigPool::Instance() -> TuneGeneratorList(), false ) ;
+    
+    SLOG("EvGenListAssembler", pNOTICE) 
+      << "** Using Tune Generator List: " ;
+
+  }
+  
+
   EventGeneratorList * evgl = new EventGeneratorList;
   
-  if (!fConfig) {
-    SLOG("EvGenListAssembler", pFATAL) 
-      << "Cannot instantiate EventGeneratorList with no config.";
-    gAbortingInErr = true;
-    exit(-1);
-  }
+//  if (!fConfig) {
+//    SLOG("EvGenListAssembler", pFATAL)
+//      << "Cannot instantiate EventGeneratorList with no config.";
+//    gAbortingInErr = true;
+//    exit(-1);
+//  }
 
-  int nproc = fConfig->GetIntDef("NGenerators", 0);
+  int nproc = GetConfig().GetInt("NGenerators");
   assert(nproc > 0);
 
   //-- Loop over the event generators for all requested processes
@@ -73,6 +84,8 @@ EventGeneratorList * EventGeneratorListAssembler::AssembleGeneratorList()
 //___________________________________________________________________________
 const EventGeneratorI * EventGeneratorListAssembler::LoadGenerator(int ip)
 {
+
+
   ostringstream alg_key;
   alg_key << "Generator-" << ip;
 

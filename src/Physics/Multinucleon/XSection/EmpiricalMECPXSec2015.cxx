@@ -316,37 +316,40 @@ void EmpiricalMECPXSec2015::Configure(string config)
 //____________________________________________________________________________
 void EmpiricalMECPXSec2015::LoadConfig(void)
 {
-  AlgConfigPool * confp = AlgConfigPool::Instance();
-  const Registry * gc = confp->GlobalParameterList();
-
   fXSecAlgCCQE = 0;
   fXSecAlgNCQE = 0;
   fXSecAlgEMQE = 0;
 
-  fMq2d = fConfig->GetDoubleDef("EmpiricalMEC-Mq2d", gc->GetDouble("EmpiricalMEC-Mq2d"));
-  fMass = fConfig->GetDoubleDef("EmpiricalMEC-Mass", gc->GetDouble("EmpiricalMEC-Mass"));
-  fWidth = fConfig->GetDoubleDef("EmpiricalMEC-Width", gc->GetDouble("EmpiricalMEC-Width"));
-  fFracCCQE = fConfig->GetDoubleDef("EmpiricalMEC-FracCCQE",
-          gc->GetDouble("EmpiricalMEC-FracCCQE"));
-  fFracNCQE = fConfig->GetDoubleDef("EmpiricalMEC-FracNCQE",
-          gc->GetDouble("EmpiricalMEC-FracNCQE"));
-  fFracEMQE = fConfig->GetDoubleDef("EmpiricalMEC-FracEMQE",
-          gc->GetDouble("EmpiricalMEC-FracEMQE"));
-  fFracPN_NC = fConfig->GetDoubleDef("EmpiricalMEC-FracPN_NC",
-          gc->GetDouble("EmpiricalMEC-FracPN_NC"));
-  fFracPN_CC = fConfig->GetDoubleDef("EmpiricalMEC-FracPN_CC",
-          gc->GetDouble("EmpiricalMEC-FracPN_CC"));
+  GetParam( "EmpiricalMEC-Mq2d", fMq2d ) ;
+  GetParam( "EmpiricalMEC-Mass", fMass ) ;
+  GetParam( "EmpiricalMEC-Width", fWidth ) ;
+  GetParam( "EmpiricalMEC-FracCCQE", fFracCCQE ) ;
+  GetParam( "EmpiricalMEC-FracNCQE", fFracNCQE ) ;
+  GetParam( "EmpiricalMEC-FracEMQE", fFracEMQE ) ;
+  GetParam( "EmpiricalMEC-FracPN_NC", fFracPN_NC ) ;
+  GetParam( "EmpiricalMEC-FracPN_CC", fFracPN_CC ) ;
 
   // Get the specified NCQE cross section model
+  Registry* algos = AlgConfigPool::Instance() -> GlobalParameterList() ;
+  string key_head = "XSecModel@genie::EventGenerator/" ;
+
+  RgAlg ncel = algos -> GetAlg( key_head + "QEL-NC" ) ;
+  RgAlg ccqe = algos -> GetAlg( key_head + "QEL-CC" ) ;
+  RgAlg ncem = algos -> GetAlg( key_head + "QEL-EM" ) ;
+
   fXSecAlgNCQE = 
-     dynamic_cast<const XSecAlgorithmI *> (this->SubAlg("NCQEXSecModel"));
+     dynamic_cast<const XSecAlgorithmI *> ( 
+       AlgFactory::Instance() -> GetAlgorithm( ncel.name, ncel.config ) ) ; 
   assert(fXSecAlgNCQE);
-  // Get the specified CCQE cross section model
+
   fXSecAlgCCQE = 
-     dynamic_cast<const XSecAlgorithmI *> (this->SubAlg("CCQEXSecModel"));
+     dynamic_cast<const XSecAlgorithmI *> (
+       AlgFactory::Instance() -> GetAlgorithm( ccqe.name, ccqe.config ) ) ; 
   assert(fXSecAlgCCQE);
+
   fXSecAlgEMQE = 
-     dynamic_cast<const XSecAlgorithmI *> (this->SubAlg("EMQEXSecModel"));
+     dynamic_cast<const XSecAlgorithmI *> (
+       AlgFactory::Instance() -> GetAlgorithm( ncem.name, ncem.config ) ) ; 
   assert(fXSecAlgEMQE);
 }
 //____________________________________________________________________________

@@ -334,7 +334,8 @@ TClonesArray * BaryonResonanceDecayer::DecayExclusive(
 
 
   //-- Create the event record
-  TClonesArray * particle_list = new TClonesArray("TMCParticle", 1+nd);
+  //TClonesArray * particle_list = new TClonesArray("TMCParticle", 1+nd);
+  TClonesArray * particle_list = 0;
   TClonesArray * temp_particle_list = new TClonesArray("TMCParticle", 1+nd);//A temprary record.
 
 
@@ -362,7 +363,7 @@ while(1){  //start a loop until break;
      RandomGen * rnd = RandomGen::Instance();
      wmax *= 2;
      bool accept_decay=false;
-     register unsigned int itry=0;
+     unsigned int itry=0;
 
      while(!accept_decay)
      {
@@ -513,6 +514,9 @@ void BaryonResonanceDecayer::LoadConfig(void)
 // Read configuration options or set defaults
 
   //-- Generated weighted or un-weighted hadronic systems
-  fGenerateWeighted = fConfig->GetBoolDef("generate-weighted", false);
+
+  // note that this variable is not present in any of the xml configuration files
+  fGenerateWeighted = false ;
+  //GetParam( "generate-weighted", fGenerateWeighted, false );  decomment this line if the variable needs to be taken from configurations
 }
 //____________________________________________________________________________

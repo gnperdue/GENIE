@@ -41,6 +41,7 @@
   <priority msgstream="Bardin">                INFO   </priority>
   <priority msgstream="BodekYang">             INFO   </priority>
   <priority msgstream="BodekRitchie">          WARN   </priority>
+  <priority msgstream="SmithMoniz">            WARN   </priority>
   <priority msgstream="Cache">                 WARN   </priority>
   <priority msgstream="CharmHad">              NOTICE </priority>
   <priority msgstream="CFracTab">              INFO   </priority>
@@ -91,20 +92,14 @@
   <priority msgstream="IntLst">                NOTICE </priority>
   <priority msgstream="Interaction">           NOTICE </priority>
   <priority msgstream="Intranuke">             NOTICE </priority>
-  <priority msgstream="Intranuke2014">         NOTICE </priority>
   <priority msgstream="Intranuke2015">         NOTICE </priority>
   <priority msgstream="HAIntranuke">           NOTICE </priority>
-  <priority msgstream="HAIntranuke2014">       NOTICE </priority>
   <priority msgstream="HAIntranuke2015">       NOTICE </priority>
   <priority msgstream="TwoBodyCollision">      NOTICE </priority>
-  <priority msgstream="HNIntranuke">           NOTICE </priority>
-  <priority msgstream="HNIntranuke2014">       NOTICE </priority>
   <priority msgstream="HNIntranuke2015">       NOTICE </priority>
   <priority msgstream="INukeData">             NOTICE </priority>
   <priority msgstream="INukeData2015">         NOTICE </priority>
-  <priority msgstream="INukeData2015">         NOTICE </priority>
   <priority msgstream="INukeUtils">            NOTICE </priority> <!-- notice-->
-  <priority msgstream="INukeUtils2014">        NOTICE </priority> <!-- notice-->
   <priority msgstream="INukeUtils2015">        NOTICE </priority> <!-- notice-->
   <priority msgstream="INukeNucleonCorr">      NOTICE </priority> 
   <priority msgstream="ISApp">                 INFO   </priority>
@@ -151,6 +146,8 @@
   <priority msgstream="ReinSehgalRes">         WARN   </priority>
   <priority msgstream="ReinSehgalResT">        NOTICE </priority>
   <priority msgstream="ReinSehgalResC">        NOTICE </priority>
+  <priority msgstream="ReinSehgalResTF">       NOTICE </priority>
+  <priority msgstream="ReinSehgalResCF">       NOTICE </priority>
   <priority msgstream="ReinSehgalSpp">         NOTICE </priority>
   <priority msgstream="RSHAmpl">               WARN   </priority>
   <priority msgstream="Registry">              WARN   </priority>
@@ -160,6 +157,7 @@
   <priority msgstream="RESSelector">           NOTICE </priority>
   <priority msgstream="Rndm">                  NOTICE </priority>
   <priority msgstream="Rosenbluth">            NOTICE </priority>
+  <priority msgstream="SMQELXSec">             NOTICE </priority>
   <priority msgstream="StrumiaVissani">        NOTICE </priority>
   <priority msgstream="SpectralFunc1">         NOTICE </priority>
   <priority msgstream="SpectralFunc">          NOTICE </priority>

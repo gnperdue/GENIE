@@ -51,6 +51,7 @@ RunOpt::RunOpt()
 //____________________________________________________________________________
 RunOpt::~RunOpt()
 {
+  if( fUnphysEventMask )         delete fUnphysEventMask;
   fInstance = 0;
 }
 //____________________________________________________________________________
@@ -77,7 +78,8 @@ void RunOpt::Init(void)
   fMCJobStatusRefreshRate = 50;
   fEventRecordPrintLevel  = 3;
   fEventGeneratorList     = "Default";
-  fTune                   = "Default";
+  fCGC                    = "G00_00a";
+  fTune                   = "" ;
 }
 //____________________________________________________________________________
 void RunOpt::ReadFromCommandLine(int argc, char ** argv)
@@ -141,12 +143,20 @@ void RunOpt::ReadFromCommandLine(int argc, char ** argv)
 		fTune = tune ;
 	}
 
-	if ( ! parser.OptionExists("event-generator-list")  ) {
-		LOG("RunOpt", pINFO) << " Setting event generator list: " << fCGC  ;
-		fEventGeneratorList = fCGC ;
-	}
-
   }  // if( parser.OptionExists("tune") )
+  else {
+
+	string cgc( "G00_00a" ) ;
+
+	string path = std::getenv( "GENIE" ) ;
+	path += "/config/" + cgc ;
+
+	assert( utils::system::DirectoryExixsts( path.c_str() ) );
+
+	fCGC  = cgc  ;
+	LOG("RunOpt", pINFO) << " Comprehensive configuration " << cgc << " set" ;
+
+  }// else ( parser.OptionExists("tune") )
 
   if( parser.OptionExists("unphysical-event-mask") ) {
     const char * bitfield = 

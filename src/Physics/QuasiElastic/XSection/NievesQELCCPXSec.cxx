@@ -414,19 +414,15 @@ void NievesQELCCPXSec::Configure(string config)
 //____________________________________________________________________________
 void NievesQELCCPXSec::LoadConfig(void)
 {
-  AlgConfigPool * confp = AlgConfigPool::Instance();
-  const Registry * gc = confp->GlobalParameterList();
-  
-  double thc = fConfig->GetDoubleDef(
-                              "CabibboAngle", gc->GetDouble("CabibboAngle"));
+  double thc;
+  GetParam( "CabibboAngle", thc ) ;
   fCos8c2 = TMath::Power(TMath::Cos(thc), 2);
 
   // Cross section scaling factor
-  fXSecScale = fConfig->GetDoubleDef(
-        	       "XSecScale", gc->GetDouble("QEL-CC-XSecScale"));
+  GetParam( "QEL-CC-XSecScale", fXSecScale ) ;
 
   // hbarc for unit conversion, GeV*fm
-  fhbarc = kLightSpeed*kPlankConstant/units::fermi;
+  fhbarc = kLightSpeed*kPlankConstant/genie::units::fermi;
 
    // load QEL form factors model
   fFormFactorsModel = dynamic_cast<const QELFormFactorsModelI *> (
@@ -442,12 +438,12 @@ void NievesQELCCPXSec::LoadConfig(void)
   // Load settings for RPA and Coulomb effects
 
   // RPA corrections will not effect a free nucleon
-  fRPA = fConfig->GetBoolDef("RPA",true);
-  
+  GetParamDef("RPA", fRPA, true ) ;
+
   // Coulomb Correction- adds a correction factor, and alters outgoing lepton 
   // 3-momentum magnitude (but not direction)
   // Correction only becomes sizeable near threshold and/or for heavy nuclei
-  fCoulomb = fConfig->GetBoolDef("Coulomb",true);
+  GetParamDef( "Coulomb", fCoulomb, true ) ;
 
   LOG("Nieves",pNOTICE) << "RPA=" << fRPA << ", useCoulomb=" << fCoulomb;
 
@@ -460,30 +456,30 @@ void NievesQELCCPXSec::LoadConfig(void)
   fLFG = fNuclModel->ModelType(Target()) == kNucmLocalFermiGas;
   
   if(!fLFG){
-    // get the Fermi momentum table for relativistic Fermi gas
-    fKFTableName = fConfig->GetStringDef ("FermiMomentumTable",
-					  gc->GetString("FermiMomentumTable"));
-    fKFTable = 0;
-    
-    FermiMomentumTablePool * kftp = FermiMomentumTablePool::Instance();
-    fKFTable = kftp->GetTable(fKFTableName);
-    assert(fKFTable);
+	  // get the Fermi momentum table for relativistic Fermi gas
+	  GetParam( "FermiMomentumTable", fKFTableName ) ;
+
+	  fKFTable = 0;
+	  FermiMomentumTablePool * kftp = FermiMomentumTablePool::Instance();
+	  fKFTable = kftp->GetTable(fKFTableName);
+	  assert(fKFTable);
   }
 
   // Always average over initial nucleons if the nuclear model is LFG
-  fDoAvgOverNucleonMomentum =
-    fLFG || fConfig->GetBoolDef("IntegralAverageOverNucleonMomentum", false);
+  bool average_over_nuc_mom ;
+  GetParamDef( "IntegralAverageOverNucleonMomentum", average_over_nuc_mom, false ) ;
+  fDoAvgOverNucleonMomentum = fLFG || average_over_nuc_mom ;
 
   fEnergyCutOff = 0.;
 
   if(fDoAvgOverNucleonMomentum) {
     // Get averaging cutoff energy
-    fEnergyCutOff = 
-      fConfig->GetDoubleDef("IntegralNuclearInfluenceCutoffEnergy", 2.0);
+	  GetParamDef( "IntegralNuclearInfluenceCutoffEnergy", fEnergyCutOff, 2.0 ) ;
+
   }
 
   // TESTING CODE
-  fCompareNievesTensors = fConfig->GetBoolDef("PrintDebugData",false);
+  GetParamDef( "PrintDebugData", fCompareNievesTensors, false ) ;
   // END TESTING CODE
 }
 //___________________________________________________________________________
@@ -635,9 +631,10 @@ std::complex<double> NievesQELCCPXSec::relLindhardIm(double q0, double dq,
  USES: ruLinRelX, relLindhardIm
  */
 //Takes inputs in GeV (with imU in GeV^2), and gives output in GeV^2
-std::complex<double> NievesQELCCPXSec::relLindhard(double q0gev, 
-		        double dqgev, double kFgev, double M, 
-			bool isNeutrino, std::complex<double> relLindIm) const
+std::complex<double> NievesQELCCPXSec::relLindhard(double q0gev,
+                        double dqgev, double kFgev, double M,
+                        bool isNeutrino,
+                        std::complex<double> relLindIm) const
 {
   double q0 = q0gev/fhbarc;
   double qm = dqgev/fhbarc;
@@ -883,13 +880,13 @@ int NievesQELCCPXSec::leviCivita(int input[]) const{
 // Calculates the constraction of the leptonic and hadronic tensors. The
 // initial nucleon must be at rest, and q must be in the z direction.
 double NievesQELCCPXSec::LmunuAnumu(const TLorentzVector neutrinoMom,
-				    const TLorentzVector inNucleonMom,
-				    const TLorentzVector leptonMom,
-				    const TLorentzVector outNucleonMom,
-				    double M, double r, bool is_neutrino, 
-				    bool tgtIsNucleus,
-				    int tgt_pdgc, int A, int Z, int N,
-				    bool hitNucIsProton) const
+                                    const TLorentzVector inNucleonMom,
+                                    const TLorentzVector leptonMom,
+                                    const TLorentzVector outNucleonMom,
+                                    double M, double r, bool is_neutrino,
+                                    bool tgtIsNucleus,
+                                    int tgt_pdgc, int A, int Z, int N,
+                                    bool hitNucIsProton) const
 {
   const double k[4] = {neutrinoMom.E(),neutrinoMom.Px(),neutrinoMom.Py(),neutrinoMom.Pz()};
   const double kPrime[4] = {leptonMom.E(),leptonMom.Px(),

@@ -122,6 +122,13 @@ bool AlgConfigPool::LoadAlgConfig(void)
   //-- read Common Parameters lists
   if( ! LoadCommonParamLists() ) return false ;
 
+
+  //-- read Tune Generator List for the tune, if available
+  if( ! LoadTuneGeneratorList() ) {
+
+    SLOG( "AlgConfigPool", pWARN ) << "Tune generator List not available" ;
+  }
+
   //-- loop over all XML config files and read all named configuration
   //   sets for each algorithm
   map<string, string>::const_iterator conf_file_iter;
@@ -173,7 +180,7 @@ bool AlgConfigPool::LoadMasterConfig(void)
   if(xml_root==NULL) {
      SLOG("AlgConfigPool", pERROR)
              << "The XML doc is empty! (filename : " << fMasterConfig << ")";
-     xmlFree(xml_doc);
+     xmlFreeDoc(xml_doc);
      return false;
   }
 
@@ -181,6 +188,7 @@ bool AlgConfigPool::LoadMasterConfig(void)
      SLOG("AlgConfigPool", pERROR)
               << "The XML doc has invalid root element! "
                                    << "(filename : " << fMasterConfig << ")";
+     xmlFreeDoc(xml_doc);
      return false;
   }
 
@@ -200,8 +208,8 @@ bool AlgConfigPool::LoadMasterConfig(void)
     }
     xml_ac = xml_ac->next;
   }
-  xmlFree(xml_ac);
-  xmlFree(xml_doc);
+  xmlFreeNode(xml_ac);
+  xmlFreeDoc(xml_doc);
   return true;
 }
 //____________________________________________________________________________
@@ -213,7 +221,7 @@ bool AlgConfigPool::LoadGlobalParamLists(void)
   SLOG("AlgConfigPool", pINFO) << "Loading global parameter lists";
 
   // -- get the user config XML file using GXMLPATH + default locations
-  string glob_params = utils::xml::GetXMLFilePath("UserPhysicsOptions.xml");
+  string glob_params = utils::xml::GetXMLFilePath("ModelConfiguration.xml");
 
   // fixed key prefix
   string key_prefix = "GlobalParameterList";
@@ -238,6 +246,23 @@ bool AlgConfigPool::LoadCommonParamLists(void)
   return this->LoadRegistries(key_prefix, glob_params, "common_param_list");
 }
 //____________________________________________________________________________
+bool AlgConfigPool::LoadTuneGeneratorList(void)
+{
+// Load the common parameter list 
+//
+  SLOG("AlgConfigPool", pINFO) << "Loading Tune Gerator List";
+
+  // -- get the user config XML file using GXMLPATH + default locations
+  string generator_list_file = utils::xml::GetXMLFilePath("TuneGeneratorList.xml");
+
+  // fixed key prefix
+  string key_prefix = "TuneGeneratorList";
+
+  // load and report status
+  return this->LoadRegistries(key_prefix, generator_list_file, "tune_generator_list");
+}
+//____________________________________________________________________________
+
 bool AlgConfigPool::LoadSingleAlgConfig(string alg_name, string file_name)
 {
 // Loads all configuration sets for the input algorithm that can be found in 
@@ -275,12 +300,15 @@ bool AlgConfigPool::LoadRegistries(
   if(xml_cur==NULL) {
      SLOG("AlgConfigPool", pERROR)
              << "The XML document is empty! (filename : " << file_name << ")";
+     xmlFreeDoc(xml_doc);
      return false;
   }
   if( xmlStrcmp(xml_cur->name, (const xmlChar *) root.c_str()) ) {
      SLOG("AlgConfigPool", pERROR)
               << "The XML document has invalid root element! "
                                         << "(filename : " << file_name << ")";
+     xmlFreeNode(xml_cur);
+     xmlFreeDoc(xml_doc);
      return false;
   }
 
@@ -322,8 +350,8 @@ bool AlgConfigPool::LoadRegistries(
         }
         xml_param = xml_param->next;
       }
-      xmlFree(xml_param);
-
+      //xmlFree(xml_param);
+      xmlFreeNode(xml_param);
       config->SetName(param_set);
       config->Lock();
 
@@ -334,8 +362,10 @@ bool AlgConfigPool::LoadRegistries(
     }
     xml_cur = xml_cur->next;
   }
-  xmlFree(xml_cur);
-  xmlFree(xml_doc);
+  //xmlFree(xml_cur);
+  xmlFreeNode(xml_cur);
+  //xmlFree(xml_doc);
+  xmlFreeDoc(xml_doc);
 
   return true;
 }
@@ -526,6 +556,15 @@ Registry * AlgConfigPool::CommonParameterList( const string & name ) const
 
   ostringstream key;
   key << "CommonParameterList/" << name;
+
+  return this->FindRegistry(key.str());
+}
+//____________________________________________________________________________
+Registry * AlgConfigPool::TuneGeneratorList( void ) const
+{
+
+  ostringstream key;
+  key << "TuneGeneratorList/Default"; 
 
   return this->FindRegistry(key.str());
 }

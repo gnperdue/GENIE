@@ -44,7 +44,7 @@
 
 using namespace genie;
 using namespace genie::constants;
-using namespace genie::units;
+//using namespace genie::units;
 
 //____________________________________________________________________________
 ReinSehgalRESXSec::ReinSehgalRESXSec() :
@@ -109,7 +109,7 @@ double ReinSehgalRESXSec::Integrate(
       double xsec = spl->Evaluate(Ev);
       SLOG("ReinSehgalResT", pNOTICE)  
          << "XSec[RES/" << utils::res::AsString(res)<< "/free] (Ev = " 
-               << Ev << " GeV) = " << xsec/(1E-38 *cm2)<< " x 1E-38 cm^2";
+         << Ev << " GeV) = " << xsec/(1E-38 *genie::units::cm2) << " x 1E-38 cm^2";
       if(! interaction->TestBit(kIAssumeFreeNucleon) ) {
         int NNucl = (pdg::IsProton(nucleon_pdgc)) ? target.Z() : target.N();
         xsec *= NNucl;
@@ -127,7 +127,7 @@ double ReinSehgalRESXSec::Integrate(
   // at any subsequent call.
   //
   bool bare_xsec_pre_calc = RunOpt::Instance()->BareXSecPreCalc();
-  if(bare_xsec_pre_calc) {
+  if(bare_xsec_pre_calc && !fUsePauliBlocking) {
      Cache * cache = Cache::Instance();
      string key = this->CacheBranchName(res, it, nu_pdgc, nucleon_pdgc);
      LOG("ReinSehgalResT", pINFO) 
@@ -159,7 +159,7 @@ double ReinSehgalRESXSec::Integrate(
 
     SLOG("ReinSehgalResT", pNOTICE)  
        << "XSec[RES/" << utils::res::AsString(res)<< "/free] (Ev = " 
-               << Ev << " GeV) = " << rxsec/(1E-38 *cm2)<< " x 1E-38 cm^2";
+       << Ev << " GeV) = " << rxsec/(1E-38 *genie::units::cm2) << " x 1E-38 cm^2";
 
      if( interaction->TestBit(kIAssumeFreeNucleon) ) return rxsec;
 
@@ -187,8 +187,7 @@ double ReinSehgalRESXSec::Integrate(
         new utils::gsl::d2XSec_dWdQ2_E(model, interaction);
     ROOT::Math::IntegrationMultiDim::Type ig_type = 
         utils::gsl::IntegrationNDimTypeFromString(fGSLIntgType);
-    ROOT::Math::IntegratorMultiDim ig(ig_type);
-    ig.SetRelTolerance(fGSLRelTol);   
+    ROOT::Math::IntegratorMultiDim ig(ig_type,0,fGSLRelTol,fGSLMaxEval); 
     ig.SetFunction(*func);
     double kine_min[2] = { rW.min, rQ2.min };
     double kine_max[2] = { rW.max, rQ2.max };
@@ -214,34 +213,20 @@ void ReinSehgalRESXSec::Configure(string config)
 //____________________________________________________________________________
 void ReinSehgalRESXSec::LoadConfig(void)
 {
-  AlgConfigPool * confp = AlgConfigPool::Instance();
-  const Registry * gc = confp->GlobalParameterList();
-
   // Get GSL integration type & relative tolerance
-  fGSLIntgType = fConfig->GetStringDef("gsl-integration-type",  "adaptive");
-  fGSLRelTol   = fConfig->GetDoubleDef("gsl-relative-tolerance", 0.01);
-  fGSLNCalls   = fConfig->GetIntDef("gsl-ncalls", 100000);
-  fGSLThreshold= fConfig->GetDoubleDef("gsl-threshold", 50);
-  fGSLNCallsFactor= fConfig->GetDoubleDef("gsl-ncalls-factor", 1);
-  
-
+  GetParamDef( "gsl-integration-type", fGSLIntgType, string("adaptive") ) ;
+  GetParamDef( "gsl-relative-tolerance", fGSLRelTol, 0.01 ) ;
+  GetParamDef( "gsl-max-eval", fGSLMaxEval, 100000 ) ;
+  GetParam("UsePauliBlockingForRES", fUsePauliBlocking);
   // Get upper E limit on res xsec spline (=f(E)) before assuming xsec=const
-  fEMax = fConfig->GetDoubleDef("ESplineMax", 100);
-  fEMax = TMath::Max(fEMax,20.); // don't accept user Emax if less than 20 GeV
+  GetParamDef( "ESplineMax", fEMax, 100. ) ;
+  fEMax = TMath::Max(fEMax, 20.); // don't accept user Emax if less than 20 GeV
 
   // Create the baryon resonance list specified in the config.
   fResList.Clear();
-  string resonances = fConfig->GetStringDef(
-                   "ResonanceNameList", gc->GetString("ResonanceNameList"));
+  string resonances ;
+  GetParam( "ResonanceNameList", resonances ) ;
   fResList.DecodeFromNameList(resonances);
 
-  // Use algorithm within a DIS/RES join scheme. If yes get Wcut
-  fUsingDisResJoin = fConfig->GetBoolDef(
-                           "UseDRJoinScheme", gc->GetBool("UseDRJoinScheme"));
-  fWcut = 999999;
-  if(fUsingDisResJoin) {
-    fWcut = fConfig->GetDoubleDef("Wcut",gc->GetDouble("Wcut"));
-  }
 }
 //____________________________________________________________________________
-

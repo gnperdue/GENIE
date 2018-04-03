@@ -101,7 +101,7 @@ void PauliBlocker::ProcessEventRecord(GHepRecord * evrec) const
     bool is_p = pdg::IsProton(nucleon_pdgc);
     double numNuc = (is_p) ? (double)tgt->Z():(double)tgt->N();
     double radius = hit->X4()->Vect().Mag();
-    double hbarc = kLightSpeed*kPlankConstant/units::fermi;
+    double hbarc = kLightSpeed*kPlankConstant/genie::units::fermi;
     kf= TMath::Power(3*kPi2*numNuc*
 		     genie::utils::nuclear::Density(radius,A),1.0/3.0) *hbarc;
   }else{
@@ -169,8 +169,8 @@ void PauliBlocker::LoadModelType(void){
   
   if(!fLFG){
     // get the Fermi momentum table for relativistic Fermi gas
-    fKFTableName = fConfig->GetStringDef ("FermiMomentumTable",
-					  gc->GetString("FermiMomentumTable"));
+	GetParam( "FermiMomentumTable", fKFTableName ) ;
+
     fKFTable = 0;
     
     FermiMomentumTablePool * kftp = FermiMomentumTablePool::Instance();
