@@ -97,6 +97,7 @@
 #include "Framework/Numerical/RandomGen.h"
 #include "Framework/ParticleData/PDGCodes.h"
 #include "Framework/ParticleData/PDGCodeList.h"
+#include "Framework/Utils/XSecSplineList.h"
 #include "Tools/ReWeight/GReWeightI.h"
 #include "Tools/ReWeight/GSystSet.h"
 #include "Tools/ReWeight/GSyst.h"
@@ -149,6 +150,14 @@ int main(int argc, char ** argv)
   utils::app_init::MesgThresholds(RunOpt::Instance()->MesgThresholdFiles());
   utils::app_init::RandGen(gOptRanSeed);
   GHepRecord::SetPrintLevel(RunOpt::Instance()->EventRecordPrintLevel());
+
+  if ( ! RunOpt::Instance() -> Tune() ) {
+    LOG("greweight", pFATAL) << " No TuneId in RunOption";
+    exit(-1);
+  }
+  RunOpt::Instance() -> Tune() -> Build() ;
+  XSecSplineList::Instance() -> SetCurrentTune( RunOpt::Instance() -> Tune() -> Name() ) ;
+
 
   // Get the input event sample
   TTree *           tree = 0;

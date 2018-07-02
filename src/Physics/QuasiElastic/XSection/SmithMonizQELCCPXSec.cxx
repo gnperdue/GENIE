@@ -117,6 +117,12 @@ void SmithMonizQELCCPXSec::Configure(const Registry & config)
 void SmithMonizQELCCPXSec::Configure(string config)
 {
   Algorithm::Configure(config);
+
+  Registry r( "SmithMonizQELCCPXSec_specific", false ) ;
+  r.Set("sm_utils_algo", RgAlg("genie::SmithMonizUtils","Default") ) ;
+
+  Algorithm::Configure(r) ;
+
   this->LoadConfig();
 }
 //____________________________________________________________________________
@@ -141,8 +147,9 @@ void SmithMonizQELCCPXSec::LoadConfig(void)
       dynamic_cast<const XSecIntegratorI *> (this->SubAlg("XSec-Integrator"));
   assert(fXSecIntegrator);
   
-  AlgFactory * algf = AlgFactory::Instance();
-  sm_utils = const_cast<genie::SmithMonizUtils *>(dynamic_cast<const genie::SmithMonizUtils *>(algf->GetAlgorithm("genie::SmithMonizUtils","Default")));
+  sm_utils = const_cast<genie::SmithMonizUtils *>(
+               dynamic_cast<const genie::SmithMonizUtils *>(
+                 this -> SubAlg( "sm_utils_algo" ) ) ) ;
   
 }
 //____________________________________________________________________________
@@ -392,7 +399,28 @@ double SmithMonizQELCCPXSec::dsQES_dQ2_SM(const Interaction * interaction) const
   int NNucl = (pdg::IsProton(nucpdgc)) ? target.Z() : target.N(); 
 
   xsec *= NNucl; // nuclear xsec
+  
+  // Apply radiative correction to the cross section for IBD processes
+  // Refs: 
+  // 1) I.S. Towner, Phys. Rev. C 58 (1998) 1288;
+  // 2) J.F. Beacom, S.J. Parke, Phys. Rev. D 64 (2001) 091302;
+  // 3) A. Kurylov, M.J. Ramsey-Musolf, P. Vogel, Phys. Rev. C 65 (2002) 055501;
+  // 4) A. Kurylov, M.J. Ramsey-Musolf, P. Vogel, Phys. Rev. C 67 (2003) 035502.
+  double rc = 1.0;
+  if ( (target.IsProton() && pdg::IsAntiNuE(init_state.ProbePdg())) || (target.IsNeutron() && pdg::IsNuE(init_state.ProbePdg()) ))
+  {
+	  const double mp  = kProtonMass;
+      const double mp2 = kProtonMass2;
+      const double mn2 = kNeutronMass2;
+	  const double Ee  = E + ( (q2 - mn2 + mp2) / 2.0 / mp ); 
+	  assert(Ee > 0.0); // must be non-zero and positive
+	  rc  = 6.0 + (1.5 * TMath::Log(kProtonMass / 2.0 / Ee));
+	  rc += 1.2 * TMath::Power((kElectronMass / Ee), 1.5);
+	  rc *= kAem / kPi;
+	  rc += 1.0;
+  }
 
+  xsec *= rc;
   return xsec;
 }
 

@@ -111,6 +111,7 @@
 #include "Framework/Utils/AppInit.h"
 #include "Framework/Utils/StringUtils.h"
 #include "Framework/Utils/PrintUtils.h"
+#include "Framework/Utils/XSecSplineList.h"
 #include "Framework/Utils/RunOpt.h"
 #include "Framework/Utils/CmdLnArgParser.h"
 
@@ -157,6 +158,13 @@ int main(int argc, char ** argv)
 {
   // Parse command line arguments
   GetCommandLineArgs(argc,argv);
+
+  if ( ! RunOpt::Instance() -> Tune() ) {
+    LOG("gmkspl", pFATAL) << " No TuneId in RunOption";
+    exit(-1);
+  }
+  RunOpt::Instance() -> Tune() -> Build() ;
+  XSecSplineList::Instance() -> SetCurrentTune( RunOpt::Instance() -> Tune() -> Name() ) ;
 
   // Init random number generator generator with user-specified seed number,
   // set user-specified mesg thresholds, set user-specified GHEP print-level
@@ -240,23 +248,23 @@ const EventRecordVisitorI * GetIntranuke(void)
      sconf = "Default";
   }
   else
-  if(gOptMode.compare("hA2014")==0) {
-     sname = "genie::HAIntranuke2014"; 
+  if(gOptMode.compare("hA2019")==0) {
+     sname = "genie::HAIntranuke2019"; 
      sconf = "Default";
   }
   else 
-  if(gOptMode.compare("hN2014")==0) {
-     sname = "genie::HNIntranuke2014"; 
+  if(gOptMode.compare("hN2019")==0) {
+     sname = "genie::HNIntranuke2019"; 
      sconf = "Default";
   }
   else
-  if(gOptMode.compare("hA2015")==0) {
-     sname = "genie::HAIntranuke2015"; 
+  if(gOptMode.compare("hA2018")==0) {
+     sname = "genie::HAIntranuke2018"; 
      sconf = "Default";
   }
   else 
-  if(gOptMode.compare("hN2015")==0) {
-     sname = "genie::HNIntranuke2015"; 
+  if(gOptMode.compare("hN2018")==0) {
+     sname = "genie::HNIntranuke2018"; 
      sconf = "Default";
   }
   else {

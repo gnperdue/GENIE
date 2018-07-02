@@ -22,6 +22,8 @@
 #include <iostream>
 #include <string>
 
+#include "Framework/Utils/TuneId.h"
+
 class TBits;
 
 using std::ostream;
@@ -40,8 +42,7 @@ public:
   void ReadFromCommandLine(int argc, char ** argv);
 
   // Get options set.
-  string Tune                   (void) const { return fTune;                   }
-  string CGC					(void) const { return fCGC ;                   }
+  TuneId * Tune                 (void) const { return fTune;                  }
   string EventGeneratorList     (void) const { return fEventGeneratorList;     }
   string CacheFile              (void) const { return fCacheFile;              }
   string MesgThresholdFiles     (void) const { return fMesgThresholds;         }
@@ -49,6 +50,7 @@ public:
   int    EventRecordPrintLevel  (void) const { return fEventRecordPrintLevel;  }
   int    MCJobStatusRefreshRate (void) const { return fMCJobStatusRefreshRate; }
   bool   BareXSecPreCalc        (void) const { return fEnableBareXSecPreCalc;  }  
+  string XMLPath                (void) const { return fXMLPath;  }  
 
   // If a user accesses the GENIE objects directly, then most of the options above
   // can be set directly to the relevant objects (Messenger, Cache, etc).
@@ -64,8 +66,7 @@ private:
   void Init (void);
 
   // options
-  string fTune;                      ///< GENIE comprehensive neutrino interaction model tune.
-  string fCGC ;                      ///< GENIE comprehensive global configuration that may contain the tune configuration.
+  TuneId * fTune;                    ///< GENIE comprehensive neutrino interaction model tune.
   string fEventGeneratorList;        ///< Name of event generator list to be loaded by the event generation drivers. 
   string fCacheFile;                 ///< Name of cache file, is cache is to be re-used. 
   string fMesgThresholds;            ///< List of files (delimited with : if more than one) with custom mesg stream thresholds. 
@@ -74,6 +75,8 @@ private:
   int    fMCJobStatusRefreshRate;    ///< MC job status file refresh rate. 
   bool   fEnableBareXSecPreCalc;     ///< Cache calcs relevant to free-nucleon xsecs before any nuclear xsec computation? 
                                      ///< The option switches on/off cacheing calculations which interfere with event reweighting.
+  string fXMLPath;                   ///< An path to look for XML in. Higher priority than GXMLPATH
+  
   // Self
   static RunOpt * fInstance;
 

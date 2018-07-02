@@ -44,6 +44,8 @@
 #include "Framework/Registry/RegistryItemTypeDef.h"
 #include "Framework/Utils/XmlParserUtils.h"
 
+#include "Framework/Utils/StringUtils.h"
+
 using std::setw;
 using std::setfill;
 using std::endl;
@@ -329,7 +331,7 @@ bool AlgConfigPool::LoadRegistries(
       fConfigKeyList.push_back(key.str());
 
       // create a new Registry and fill it with the configuration params
-      Registry * config = new Registry();
+      Registry * config = new Registry(param_set,false);
 
       xmlNodePtr xml_param = xml_cur->xmlChildrenNode;
       while (xml_param != NULL) {
@@ -535,7 +537,7 @@ Registry * AlgConfigPool::FindRegistry(string key) const
                                                    fRegistryPool.find(key);
      return config_entry->second;
   } else {
-     LOG("AlgConfigPool", pWARN) << "No config registry for key " << key;
+     LOG("AlgConfigPool", pDEBUG) << "No config registry for key " << key;
      return 0;
   }
   return 0;

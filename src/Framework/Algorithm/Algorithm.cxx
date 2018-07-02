@@ -82,12 +82,12 @@ void Algorithm::Configure(const Registry & config)
   Registry* rp = ExtractLocalConfig( config ) ;
   if ( rp ) { 
    
-    AddTopRegistry( rp ) ;
-    LOG("Algorithm", pNOTICE) << fID.Name() << " acquired new local configuration: " << *rp;
-    // The memory hadnled by this pointer now belongs to the algorithm and there is no need to keep track of it
+    MergeTopRegistry( *rp ) ;
+    LOG("Algorithm", pNOTICE) << fID.Name() << " merged with external configuration: " << *rp;
     
+    // The memory handled by this pointer has been copied and needs to be cleared
+    delete rp ;
   }
-
 
   if(!fOwnsSubstruc) return;              // doesn't own substructure
   if(fOwnedSubAlgMp->size()==0) return;   // no sub-algorithms
@@ -152,7 +152,7 @@ void Algorithm::FindConfig(void)
     if ( config ) {
       if ( config -> NEntries() > 0 ) {
 	AddTopRegistry( config, false ) ;
-	LOG("Algorithm", pDEBUG) << "\n" << *fConfig;
+	LOG("Algorithm", pDEBUG) << "\n" << *config;
       }
     }
   } 
@@ -168,7 +168,7 @@ void Algorithm::FindConfig(void)
   else {
     if ( config -> NEntries() > 0 ) {
       AddTopRegistry( config, false ) ;
-      LOG("Algorithm", pDEBUG) << "\n" << *fConfig;
+      LOG("Algorithm", pDEBUG) << "\n" << config;
     }
   }
   
@@ -202,9 +202,9 @@ void Algorithm::FindConfig(void)
 	exit(0) ;
       }
       else  {
-	AddTopRegistry( config, false ) ;
+	AddLowRegistry( config, false ) ;
 	
-	LOG("Algorithm", pDEBUG) << "Loading Commom Param registry " << list[i] << " \n" << *fConfig;
+	LOG("Algorithm", pDEBUG) << "Loading Commom Param registry " << list[i] << " \n" << config;
       }
       
     }
@@ -216,7 +216,7 @@ void Algorithm::FindConfig(void)
   if ( config ) {
     if ( config -> NEntries() > 0 ) {
       AddTopRegistry( config, false ) ;
-      LOG("Algorithm", pDEBUG) << "Loading Tunable registry \n" << *fConfig;
+      LOG("Algorithm", pDEBUG) << "Loading Tunable registry \n" << config;
     }
   }
   else {
@@ -246,7 +246,21 @@ const Registry & Algorithm::GetConfig(void) const {
     fConfig -> Append( * fConfVect[i] ) ;
   } 
 
-  //should we loop over the owned algos to add their subconfig ?
+  if ( fOwnsSubstruc ) {
+
+    for ( AlgMapConstIter iter = fOwnedSubAlgMp -> begin() ;
+    	  iter != fOwnedSubAlgMp -> end() ; ++iter ) {
+
+      Algorithm * subalg = iter -> second ;
+
+      LOG("Algorithm", pDEBUG) << "Appending config from " << iter -> first << " -> " << subalg -> Id() ;
+      const Registry & r = subalg->GetConfig();
+      RgKey prefix = iter -> first + "/";
+      fConfig -> Append(r,prefix);
+
+    }
+
+  } //if owned substructure
 
   return * fConfig ;
 }
@@ -344,7 +358,7 @@ const Algorithm * Algorithm::SubAlg(const RgKey & registry_key) const
      return 0;
   }
 
-  //-- if the algorithm dowes not own its substructure:
+  //-- if the algorithm does not own its substructure:
   //      return the sub-algorithm from the AlgFactory's pool
   RgAlg alg ;
   GetParam( registry_key, alg ) ;
@@ -389,9 +403,9 @@ void Algorithm::AdoptSubstructure(void)
   LOG("Algorithm", pNOTICE) 
      << "Algorithm: " << this->Id().Key() << " is adopting its substructure";
 
-  Registry deep_config;
-  deep_config.UnLock();
-  deep_config.SetName(this->Id().Key());
+//  Registry deep_config;
+//  deep_config.UnLock();
+//  deep_config.SetName(this->Id().Key());
 
   //  deep_config.SetName(this->Id().Config() + ";D");
   //  fID.SetConfig(this->Id().Config() + ";D");
@@ -425,18 +439,16 @@ void Algorithm::AdoptSubstructure(void)
         AlgMapPair key_alg_pair(reg_key, subalg);
         fOwnedSubAlgMp->insert(key_alg_pair);
 
-        LOG("Algorithm", pDEBUG) << "Appending its config";
-        const Registry & r = subalg->GetConfig();
-        RgKey prefix = reg_key + "/";
-        deep_config.Append(r,prefix);
-
-    } else {
-       LOG("Algorithm", pDEBUG) << "Adding parameter with key = " << reg_key;
-       RgIMapPair key_item_pair(reg_key, ri->Clone());
-       deep_config.Set(key_item_pair);
     }
+
   }
-  this->Configure( deep_config );
+
+
+  if ( fConfig ) {
+    delete fConfig ;
+    fConfig = 0 ;
+  }
+
 }
 //____________________________________________________________________________
 void Algorithm::DeleteConfig(void)
@@ -566,6 +578,59 @@ int Algorithm::AddTopRegistry( Registry * rp, bool own ) {
   return fConfVect.size() ;
 
 }
+
+//____________________________________________________________________________
+
+int Algorithm::AddLowRegistry( Registry * rp, bool own ) {
+
+  fConfVect.push_back( rp ) ;
+  fOwnerships.push_back( own ) ;
+
+  if ( fConfig ) {
+    delete fConfig ;
+    fConfig = 0 ;
+  }
+
+  return fConfVect.size() ;
+
+}
+
+//____________________________________________________________________________
+
+
+int  Algorithm::MergeTopRegistry( const Registry & r )  {
+
+  if ( fOwnerships.empty() ) {
+
+	// this algorithm is not configured right now, the incoming registry is the only configuration
+    Registry * p = new Registry( r ) ;
+	AddTopRegistry( p ) ;
+
+	return 1 ;
+  }
+
+  if ( fOwnerships[0] ) {
+	//the top registry is owned: it can be changed with no consequences for other algorithms
+    fConfVect[0] -> Merge( r ) ;
+  }
+  else {
+	// The top registry is not owned so it cannot be changed
+	// The registry will be added with top priority
+
+	Registry * p = new Registry( r ) ;
+	AddTopRegistry( p ) ;
+  }
+
+  // The configuration has changed so the summary is not updated anymore and must be deleted
+  if ( fConfig ) {
+     delete fConfig ;
+     fConfig = 0 ;
+  }
+
+  return fConfVect.size() ;
+}
+
+//____________________________________________________________________________
 
 
 int Algorithm::AddTopRegisties( const vector<Registry*> & rs, bool own ) {

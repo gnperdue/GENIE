@@ -55,6 +55,7 @@
 #include "Framework/Ntuple/NtpMCTreeHeader.h"
 #include "Framework/Ntuple/NtpMCEventRecord.h"
 #include "Framework/Messenger/Messenger.h"
+#include "Framework/ParticleData/PDGLibrary.h"
 #include "Framework/Utils/CmdLnArgParser.h"
 #include "Framework/Utils/RunOpt.h"
 
@@ -81,7 +82,10 @@ int main(int argc, char ** argv)
 
   // set print level
   GHepRecord::SetPrintLevel(RunOpt::Instance()->EventRecordPrintLevel());
-
+  
+  // Add a dummy value to Dark Matter to allow reading DarkMatter files
+  PDGLibrary::Instance()->AddDarkMatter( 1.0, 0.5 );
+  
   //
   // open the ROOT file and get the TTree & its header
   //
@@ -280,6 +284,7 @@ void GetCommandLineArgs(int argc, char ** argv)
     gOptNEvtH = -1;
   }
 
+  
 }
 //_________________________________________________________________________________
 void PrintSyntax(void)

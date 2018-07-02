@@ -34,8 +34,8 @@ fi
 if test "$GOPT_ENABLE_NNBAR_OSCILLATION" = "YES"; then
   phys_libs="$phys_libs -lGPhNNBarOsc"
 fi
-if test "$GOPT_ENABLE_BOOSTED_DARK_MATTER" = "YES"; then
-  phys_libs="$phys_libs -lGPhBDM"
+if test "$GOPT_ENABLE_BOOSTED_DARK_MATTER" = "YES"; then   
+  phys_libs="$phys_libs -lGPhBDMXS -lGPhBDMEG"
 fi
 
 # Libraries from GENIE/Generator/Tools
@@ -60,7 +60,7 @@ libs="-L$libdir $fmwk_libs $phys_libs $tool_libs "
 
 ### Usage
 usage="\
-Usage: genie-config [--libs] [--libdir] [--topsrcdir]"
+Usage: genie-config [--libs] [--libdir] [--topsrcdir] [--version]"
 
 if test $# -eq 0; then
    echo "${usage}" 1>&2
@@ -87,6 +87,10 @@ while test $# -gt 0; do
     --topsrcdir)
       ### Output GENIE top level src directory
       out="$out $srcdir"
+      ;;
+    --version)
+      ### Output version
+      out="$out $(cat ${GENIE}/VERSION)"
       ;;
   esac
   shift

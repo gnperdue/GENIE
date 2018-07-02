@@ -11,6 +11,7 @@
 #  [--tune]            : Tune option
 #  [--add-list]        : additional file list to be included when the total_xsec.xml file is created
 #  [--root-output]     : Create an output file with all the splines
+#  [--def-nu-list]     : Default list of neutrino PDG to be used if that cannot be derived from local files. Default 14
 #  [--evet-gen-list]   : Event generator list used in the root file output
 #  [--add-nucleons]    : When the ROOT file is created, also splines for proton and neutrons are created
 #  [--save-space]      : remove intermadiate xml files
@@ -24,12 +25,14 @@ foreach (@ARGV) {
   if($_ eq '--add-list')        { $add_list       = $ARGV[$iarg+1]; }
   if($_ eq '--root-output')     { $root_output    = 1 ; }
   if($_ eq '--event-gen-list')  { $event_gen_list = $ARGV[$iarg+1]; }
+  if($_ eq '--def-nu-list')     { $def_nu_list    = $ARGV[$iarg+1]; }
   if($_ eq '--add-nucleons')    { $add_nucleons   = 1 ; }
   if($_ eq '--save-space' )     { $save_space     = 1 ; } 
   $iarg++;
 }
 
-$dir=$ENV{'PWD'}   unless defined $dir;
+$dir=$ENV{'PWD'}      unless defined $dir;
+$def_nu_list = "14"   unless defined $def_nu_list ;
 
 opendir(DIR, $dir) or die $!;
 
@@ -150,10 +153,22 @@ foreach my $tgt ( keys %tgts ) {
 
   $tmp_tgt_file = "$dir/".$tgt.".xml"; 
 
-  $gspladd_opt    = " -o $tmp_tgt_file -f $nu_file_list ";
-  $gspladd_cmd    = "gspladd $gspladd_opt";
-  print "$gspladd_cmd \n \n";
-  `$gspladd_cmd \n`;
+  $nus_size = keys %nus ;
+
+  if ( $nus_size > 1 ) { 
+    $gspladd_opt    = " -o $tmp_tgt_file -f $nu_file_list ";
+    $gspladd_cmd    = "gspladd $gspladd_opt";
+    print "$gspladd_cmd \n \n";
+    `$gspladd_cmd \n`;
+  }
+  elsif ( $nus_size == 1 ) {
+    $cp_cmd = "cp $nu_file_list $tmp_tgt_file ";
+    print "$cp_cmd \n \n";
+    `$cp_cmd \n`;  
+  }
+  elsif ( $nus_size == 0 ) {
+    print "\nError: No Neutrino flavours \n";
+  }
 
   if ( -f $tmp_tgt_file ) {
     $tgt_file_list .= "," if ( $tgt_file_list ne "" );
@@ -162,7 +177,7 @@ foreach my $tgt ( keys %tgts ) {
     $tgt_list .= "$tmp_tgt";
   }
   else { 
-    print "Error: $tmp_tgt_file not created \n";
+    print "\nError: $tmp_tgt_file not created \n";
   }
   
 }  ##tgt loop
@@ -210,13 +225,19 @@ if ( defined $root_output ) {
 ##
 ## Create an output file with all the splines in root format
 ##
+    
+  if ( $nu_list eq "" ) {
+    $nu_list = $def_nu_list ;
+  }
 
   if ( index($tgt_list, "1000010010") == -1 ) {
-    $tgt_list .= ",1000010010";
+    $tgt_list .= "," unless ( $tgt_list eq "" ) ;
+    $tgt_list .= "1000010010" ;
   }
 
   if ( index($tgt_list, "1000000010") == -1 ) {
-    $tgt_list .= ",1000000010";
+    $tgt_list .= "," unless ( $tgt_list eq "" ) ;
+    $tgt_list .= "1000000010";
   }
 
   my $cmd = "gspl2root ";

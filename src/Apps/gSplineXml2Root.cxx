@@ -155,10 +155,21 @@ int main(int argc, char ** argv)
 {
   GetCommandLineArgs(argc,argv);
 
+  if ( ! RunOpt::Instance() -> Tune() ) {
+    LOG("gslp2root", pFATAL) << " No TuneId in RunOption";
+    exit(-1);
+  }
+  RunOpt::Instance() -> Tune() -> Build() ;
+  XSecSplineList::Instance() -> SetCurrentTune( RunOpt::Instance() -> Tune() -> Name() ) ;
+
   utils::app_init::MesgThresholds(RunOpt::Instance()->MesgThresholdFiles());
 
   // load the x-section splines xml file specified by the user
   LoadSplines();
+
+  if ( ! XSecSplineList::Instance() -> HasSplineFromTune(RunOpt::Instance() -> Tune() -> Name() ) ) {
+    LOG("gspl2root", pWARN) << "No splines loaded for tune " << RunOpt::Instance() -> Tune() -> Name() ;
+  }
 
   for (unsigned int indx_p = 0; indx_p < gOptProbePdgList.size(); ++indx_p ) {
     for (unsigned int indx_t = 0; indx_t < gOptTgtPdgList.size(); ++indx_t ) {

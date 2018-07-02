@@ -34,7 +34,6 @@
 
 #include "Framework/Utils/StringUtils.h"
 #include "Framework/Utils/RunOpt.h"
-//#include "Framework/Messenger/Messenger.h"
 
 
 class TFile;
@@ -51,114 +50,38 @@ namespace utils {
 namespace xml   {
 
 #if !defined(__CINT__) && !defined(__MAKECINT__)
-  inline string TrimSpaces(xmlChar * xmls)
-  {
-   // trim the leading/trailing spaces from an parsed xml string like in:
-   //
-   // "      I am a string with lots of spaces      " ---->
-   //                                  "I am a string with lots of spaces"
-   //
-   // In this method, "\n" is treated as 'empty space' so as to trim not only
-   // empty spaces in the line that contains the string but also all leading
-   // and trailing empty lines
-  
-    string str = string( (const char *) xmls );
-    return utils::str::TrimSpaces(str);
-  }
 
+  string TrimSpaces(xmlChar * xmls) ;
+  // trim the leading/trailing spaces from an parsed xml string like in:
+  //
+  // "      I am a string with lots of spaces      " ---->
+  //                                  "I am a string with lots of spaces"
+  //
+  // In this method, "\n" is treated as 'empty space' so as to trim not only
+  // empty spaces in the line that contains the string but also all leading
+  // and trailing empty lines
+  
   //_________________________________________________________________________
-  inline string GetAttribute(xmlNodePtr xml_cur, string attr_name)
-  {
-    xmlChar * xmls = xmlGetProp(xml_cur, (const xmlChar *) attr_name.c_str());    
-    string str = TrimSpaces(xmls);
-    xmlFree(xmls);
-    return str;
-  }
+
+  string GetAttribute(xmlNodePtr xml_cur, string attr_name) ;
 #endif
 
   //_________________________________________________________________________
-  inline string GetXMLPathList()   {
-
-    // Get a colon separated list of potential locations for xml files
-    // e.g. ".:$MYSITEXML:/path/to/exp/version:$GALGCONF:$GENIE/config"
-    // user additions should be in $GXMLPATH
-
-    string pathlist; 
-    const char* p1 = std::getenv( "GXMLPATH" );
-    if ( p1 ) { pathlist = std::string(p1) + ":" ; }
-    const char* p2 = std::getenv( "GXMLPATHS" );  // handle extra 's'
-    if ( p2 ) { pathlist = std::string(p2) + ":" ; }
-
-    // add originally supported alternative path
-    const char* p3 = std::getenv( "GALGCONF" );
-    if ( p3 ) { pathlist = std::string(p3) + ":" ; }
-
-    std::string tune = RunOpt::Instance() -> Tune() ;
-    if ( ! tune.empty() ) {
-    	std::string path_to_tune = std::getenv( "GENIE" ) ;
-
-    	if ( path_to_tune[path_to_tune.length()-1] != '/' )
-    		path_to_tune += '/' ;
-
-    	path_to_tune += "config/" ;
-
-    	path_to_tune += RunOpt::Instance() -> CGC() + '/' + tune ;
-    	pathlist += path_to_tune + ':' ;
-    }
-
-    std::string cgc = RunOpt::Instance() -> CGC() ;
-    if ( ! cgc.empty() ) {
-       	std::string path_to_conf = std::getenv( "GENIE" ) ;
-
-       	if ( path_to_conf[path_to_conf.length()-1] != '/' )
-       		path_to_conf += '/' ;
-
-       	path_to_conf += "config/" ;
-
-       	path_to_conf += RunOpt::Instance() -> CGC() ;
-       	pathlist += path_to_conf + ':' ;
-    }
-
-    pathlist += "$GENIE/config";  // standard path in case no env
-    pathlist += ":$GENIE/src/FluxDrivers/GNuMINtuple";  // special case
-
-    return pathlist;
-  }
+  string GetXMLPathList( bool add_tune = true ) ;
+  // Get a colon separated list of potential locations for xml files
+  // e.g. ".:$MYSITEXML:/path/to/exp/version:$GALGCONF:$GENIE/config"
+  // user additions should be in $GXMLPATH
 
   //_________________________________________________________________________
-  inline string GetXMLFilePath(string basename)
-  {
-    // return a full path to a real XML file
-    // e.g. passing in "GNuMIFlux.xml"
-    //   will return   "/blah/GENIE/HEAD/config/GNuMIFlux.xml"
-    // allow ::colon:: ::semicolon:: and ::comma:: as path item separators
+  inline string GetXMLDefaultPath() { return "$GENIE/config" ; }
+  //standard path in case no env variable are set
 
-    // empty basename should just be returned
-    // otherwise one will end up with a directory rather than a file
-    // as  AccessPathName() isn't checking file vs. directory
-    if ( basename == "" ) return basename;
-
-    std::string pathlist = genie::utils::xml::GetXMLPathList();
-    std::vector<std::string> paths = genie::utils::str::Split(pathlist,":;,");
-    // expand any wildcards, etc.
-    size_t np = paths.size();
-    for ( size_t i=0; i< np; ++i ) {
-      const char* tmppath = paths[i].c_str();
-      std::string onepath = gSystem->ExpandPathName(tmppath);
-      onepath += "/";
-      onepath += basename;
-      bool noAccess = gSystem->AccessPathName(onepath.c_str());
-      if ( ! noAccess ) {
-    //	  LOG("XmlParserUtils", pDEBUG ) << onepath ;
-    	  return onepath;  // found one
-      }
-    }
-    // didn't find any, return basename in case it is in "." and that
-    // wasn't listed in the XML path list.   If you want "." to take
-    // precedence then it needs to be explicitly listed in $GXMLPATH.
-    return basename;
-  }
-
+  //_________________________________________________________________________
+  string GetXMLFilePath(string basename) ;
+  // return a full path to a real XML file
+  // e.g. passing in "GNuMIFlux.xml"
+  //   will return   "/blah/GENIE/HEAD/config/GNuMIFlux.xml"
+  // allow ::colon:: ::semicolon:: and ::comma:: as path item separators
   //_________________________________________________________________________
 
 #if !defined(__CINT__) && !defined(__MAKECINT__)

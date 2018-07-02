@@ -16,6 +16,7 @@
 #include "Framework/Algorithm/AlgConfigPool.h"
 #include "Physics/XSectionIntegration/XSecIntegratorI.h"
 #include "Framework/Messenger/Messenger.h"
+#include "Framework/ParticleData/PDGUtils.h"
 #include "Framework/Utils/KineUtils.h"
 #include "Physics/InverseBetaDecay/XSection/Constants.h"
 #include "Physics/InverseBetaDecay/XSection/StrumiaVissaniIBDPXSec.h"
@@ -57,10 +58,6 @@ double StrumiaVissaniIBDPXSec::XSec(
   const double         Ev     = init_state.ProbeE(kRfHitNucRest);
   const Target &       target = init_state.Tgt();
   const bool           isProt = target.IsProton();
-  if (isProt==false && target.IsNeutron()==false) {
-     LOG("StrumiaVissani", pERROR) << "*** Target is neither proton nor neutron!";
-     return 0;
-  }
   const Kinematics &   kine   = interaction->Kine();
   const double         q2     = kine.q2();
   const double         mp     = (isProt) ? kProtonMass   : kNeutronMass;
@@ -135,10 +132,11 @@ bool StrumiaVissaniIBDPXSec::ValidProcess(const Interaction * interaction) const
   if (interaction->ProcInfo().IsInverseBetaDecay()) {
   
      const InitialState & init_state = interaction -> InitState();
-     if (init_state.IsNuN() || init_state.IsNuBarP()) return true;
-     
-  }
-  
+     const Target & target = init_state.Tgt();
+     if ( (target.IsProton() && pdg::IsAntiNuE(init_state.ProbePdg())) || (target.IsNeutron() && pdg::IsNuE(init_state.ProbePdg()) )) 
+		return true;
+  }	
+  LOG("StrumiaVissani", pERROR) << "*** Should be IBD processes either nu_e + n or anu_e + p!";
   return false;
 }
 //____________________________________________________________________________

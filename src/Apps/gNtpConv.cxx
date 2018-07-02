@@ -236,6 +236,8 @@ int main(int argc, char ** argv)
 
   GHepRecord::SetPrintLevel(RunOpt::Instance()->EventRecordPrintLevel());
 
+  PDGLibrary::Instance()->AddDarkMatter( 1.0, 0.5 ) ;
+  
   // Call the appropriate conversion function
   switch(gOptOutFileFormat) {
 
@@ -3048,7 +3050,7 @@ void GetCommandLineArgs(int argc, char ** argv)
     LOG("gntpc", pINFO) << "Unspecified random number seed - Using default";
     gOptRanSeed = -1;
   }
-
+ 
   LOG("gntpc", pNOTICE) << "Input filename  = " << gOptInpFileName;
   LOG("gntpc", pNOTICE) << "Output filename = " << gOptOutFileName;
   LOG("gntpc", pNOTICE) << "Conversion to format = " << gOptRanSeed 

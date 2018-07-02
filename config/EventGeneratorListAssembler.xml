@@ -441,5 +441,23 @@ Generator-%d                alg     No
   </param_set>
 
 
+  <!-- BDM module -->
+
+  <param_set name="DMEL">
+     <param type="int" name="NGenerators">   1                              </param>
+     <param type="alg" name="Generator-0">   genie::EventGenerator/DMEL     </param>
+  </param_set>
+
+  <param_set name="DMDIS">
+     <param type="int" name="NGenerators">   1                              </param>
+     <param type="alg" name="Generator-0">   genie::EventGenerator/DMDIS    </param>
+  </param_set>
+
+  <param_set name="DM">
+     <param type="int" name="NGenerators">   2                              </param>
+     <param type="alg" name="Generator-0">   genie::EventGenerator/DMEL     </param>
+     <param type="alg" name="Generator-1">   genie::EventGenerator/DMDIS    </param>
+  </param_set>
+
 </alg_conf>
 

@@ -5,7 +5,7 @@
  or see $GENIE/LICENSE
 
  Author: Costas Andreopoulos <costas.andreopoulos \at stfc.ac.uk>
-         University of Liverpool & STFC Rutherford Appleton Lab 
+         University of Liverpool & STFC Rutherford Appleton Lab
 
  For the class documentation see the corresponding header file.
 
@@ -26,7 +26,9 @@
 #include "Framework/Utils/CmdLnArgParser.h"
 #include "Framework/Utils/RunOpt.h"
 #include "Framework/Utils/SystemUtils.h"
+#include "Framework/Utils/XSecSplineList.h"
 #include "Framework/Messenger/Messenger.h"
+
 
 using std::cout;
 using std::endl;
@@ -42,7 +44,7 @@ ostream & operator << (ostream & stream, const RunOpt & opt)
 //____________________________________________________________________________
 RunOpt * RunOpt::fInstance = 0;
 //____________________________________________________________________________
-RunOpt::RunOpt()
+RunOpt::RunOpt() : fTune(0)
 {
   fInstance = 0;
 
@@ -51,7 +53,8 @@ RunOpt::RunOpt()
 //____________________________________________________________________________
 RunOpt::~RunOpt()
 {
-  if( fUnphysEventMask )         delete fUnphysEventMask;
+  if ( fTune )                    delete fTune ;
+  if ( fUnphysEventMask )         delete fUnphysEventMask ;
   fInstance = 0;
 }
 //____________________________________________________________________________
@@ -67,6 +70,7 @@ RunOpt * RunOpt::Instance()
 //____________________________________________________________________________
 void RunOpt::Init(void)
 {
+  fTune = 0 ;
   fEnableBareXSecPreCalc = true;
   fCacheFile = "";
   fMesgThresholds = "";
@@ -78,8 +82,7 @@ void RunOpt::Init(void)
   fMCJobStatusRefreshRate = 50;
   fEventRecordPrintLevel  = 3;
   fEventGeneratorList     = "Default";
-  fCGC                    = "G00_00a";
-  fTune                   = "" ;
+  fXMLPath = "";
 }
 //____________________________________________________________________________
 void RunOpt::ReadFromCommandLine(int argc, char ** argv)
@@ -88,7 +91,7 @@ void RunOpt::ReadFromCommandLine(int argc, char ** argv)
 
   if( parser.OptionExists("enable-bare-xsec-pre-calc") ) {
     fEnableBareXSecPreCalc = true;
-  } else 
+  } else
   if( parser.OptionExists("disable-bare-xsec-pre-calc") ) {
     fEnableBareXSecPreCalc = false;
   }
@@ -113,61 +116,28 @@ void RunOpt::ReadFromCommandLine(int argc, char ** argv)
   if( parser.OptionExists("event-generator-list") ) {
     fEventGeneratorList = parser.ArgAsString("event-generator-list");
   }
-
+  
+  if (parser.OptionExists("xml-path")) {
+    fXMLPath = parser.ArgAsString("xml-path");
+  }
+  
   if( parser.OptionExists("tune") ) {
-
-	string tune = parser.ArgAsString("tune");
-
-	//the structure of the tunes names is fixed, see http://tunes.genie-mc.org/
-	string cgc( tune, 0, 7 ) ;
-	string temp_tune( tune, 8 ) ;
-
-	LOG("RunOpt", pINFO) << " Requested tune " << tune << " for CGC " << cgc ;
-
-	string path = std::getenv( "GENIE" ) ;
-	path += "/config/" + cgc ;
-
-	assert( utils::system::DirectoryExixsts( path.c_str() ) );
-
-	fCGC  = cgc  ;
-	LOG("RunOpt", pINFO) << " Comprehensive configuration " << cgc << " set" ;
-
-	if ( tune.size() > 7 && temp_tune != "00_000" ) {
-
-		path += '/' + tune ;
-
-		LOG("RunOpt", pINFO) << " Testing  " << path << " directory" ;
-		assert( utils::system::DirectoryExixsts( path.c_str() ) );
-		LOG("RunOpt", pINFO) << " Tune " << tune << " set" ;
-
-		fTune = tune ;
-	}
-
-  }  // if( parser.OptionExists("tune") )
+    fTune = new TuneId( parser.ArgAsString("tune") ) ;
+  }
   else {
-
-	string cgc( "G00_00a" ) ;
-
-	string path = std::getenv( "GENIE" ) ;
-	path += "/config/" + cgc ;
-
-	assert( utils::system::DirectoryExixsts( path.c_str() ) );
-
-	fCGC  = cgc  ;
-	LOG("RunOpt", pINFO) << " Comprehensive configuration " << cgc << " set" ;
-
+    fTune = new TuneId( "G00_00a_00_000" ) ;
   }// else ( parser.OptionExists("tune") )
 
   if( parser.OptionExists("unphysical-event-mask") ) {
-    const char * bitfield = 
+    const char * bitfield =
        parser.ArgAsString("unphysical-event-mask").c_str();
     unsigned int n = GHepFlags::NFlags();
     unsigned int i = 0;
-    while(i < n) {
+    while (i < n) {
         bool flag = (bitfield[i]=='1');
         fUnphysEventMask->SetBitNumber(n-1-i,flag);
         i++;
-     }//i
+     } //i
   }
 
 }
@@ -175,7 +145,7 @@ void RunOpt::ReadFromCommandLine(int argc, char ** argv)
 void RunOpt::Print(ostream & stream) const
 {
   stream << "Global running options:";
-  stream << "\n GENIE tune: " << fTune;
+  if ( fTune ) stream << "\n GENIE tune: " << *fTune;
   stream << "\n Event generator list: " << fEventGeneratorList;
   stream << "\n User-specified message thresholds : " << fMesgThresholds;
   stream << "\n Cache file : " << fCacheFile;
@@ -185,6 +155,10 @@ void RunOpt::Print(ostream & stream) const
   stream << "\n MC job status file refresh rate: " << fMCJobStatusRefreshRate;
   stream << "\n Pre-calculate all free-nucleon cross-sections? : " 
          << ((fEnableBareXSecPreCalc) ? "Yes" : "No");
+         
+  if (fXMLPath.size()) {
+    stream << "\n XMLPath over-ride : "<<fXMLPath;
+  }
 
   stream << "\n";
 }

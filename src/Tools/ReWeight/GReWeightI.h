@@ -53,7 +53,13 @@ namespace rew   {
   virtual void Reconfigure (void) = 0;            
   
   //! calculate a weight for the input event using the current nuisance param values
-  virtual double CalcWeight (const genie::EventRecord & event) = 0;  
+  virtual double CalcWeight (const genie::EventRecord & event) = 0;
+  
+  //! Should we calculate the old weight ourselves, or use the one from the input tree? Default on.
+  virtual void UseOldWeightFromFile(bool) = 0;
+  
+  //! If using the weight from the file, how many times should we check by calculating it ourself?
+  virtual void SetNWeightChecks(int) = 0;
 
  protected:
 

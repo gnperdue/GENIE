@@ -165,7 +165,6 @@ University of Liverpool
    <param type="double" name="INUKE-NucCEXFac">         1.0   </param>
    <param type="double" name="INUKE-Energy_Pre_Eq">     0.041 </param> 
    <param type="double" name="INUKE-FermiFac">          1.0   </param>
-   <param type="double" name="INUKE-FreeStep">          0.0   </param>
    <param type="double" name="INUKE-FermiMomentum">     0.250 </param>
    <param type="bool"   name="INUKE-DoFermi">           true  </param>
    <param type="bool"   name="INUKE-DoCompoundNucleus"> true  </param>
@@ -302,6 +301,17 @@ University of Liverpool
     <param type="bool" name="ApplyCoulombCorrection"> false </param>
     
   </param_set>
+
+
+  <param_set name="BoostedDarkMatter">
+    <!--
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Set the coupling of dark matter to nucleons
+    -->
+    <param type="double" name="ZpCoupling"> 0.1 </param>
+
+  </param_set>
+
 
   <param_set name="Validation">
     <!-- 

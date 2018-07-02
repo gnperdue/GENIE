@@ -236,6 +236,13 @@ INukeFateHA_t HAIntranuke::HadronFateHA(const GHepParticle * p) const
        double frac_abs      = fHadroData->Frac(pdgc, kIHAFtAbs,     ke);
        double frac_piprod   = fHadroData->Frac(pdgc, kIHAFtPiProd,  ke);
 
+       LOG("HAIntranuke", pINFO) 
+          << "\n frac{" << INukeHadroFates::AsString(kIHAFtCEx)     << "} = " << frac_cex
+          << "\n frac{" << INukeHadroFates::AsString(kIHAFtElas)    << "} = " << frac_elas
+          << "\n frac{" << INukeHadroFates::AsString(kIHAFtInelas)  << "} = " << frac_inel
+	  << "\n frac{" << INukeHadroFates::AsString(kIHAFtAbs)     << "} = " << frac_abs
+          << "\n frac{" << INukeHadroFates::AsString(kIHAFtPiProd)  << "} = " << frac_piprod;
+
        // apply external tweaks to fractions
        frac_cex    *= fPionFracCExScale;
        frac_elas   *= fPionFracElasScale;
@@ -249,7 +256,7 @@ INukeFateHA_t HAIntranuke::HadronFateHA(const GHepParticle * p) const
        frac_abs    *= frac_rescale;
        frac_piprod *= frac_rescale;
 
-       LOG("HAIntranuke", pDEBUG) 
+       LOG("HAIntranuke", pINFO) 
           << "\n frac{" << INukeHadroFates::AsString(kIHAFtCEx)     << "} = " << frac_cex
           << "\n frac{" << INukeHadroFates::AsString(kIHAFtElas)    << "} = " << frac_elas
           << "\n frac{" << INukeHadroFates::AsString(kIHAFtInelas)  << "} = " << frac_inel
@@ -1369,15 +1376,19 @@ bool HAIntranuke::HandleCompoundNucleus(
   return false;
 }
 //___________________________________________________________________________
+void  HAIntranuke::Configure (string param_set) {
+
+  Algorithm::Configure(param_set) ;
+  this -> LoadConfig() ;
+}
+//___________________________________________________________________________
 void HAIntranuke::LoadConfig(void)
 {
    // load hadronic cross sections
   fHadroData = INukeHadroData::Instance();
 
   // fermi momentum setup
-  fAlgf = AlgFactory::Instance();
-  fNuclmodel = dynamic_cast<const NuclearModelI *>
-    (fAlgf->GetAlgorithm("genie::FGMBodekRitchie","Default"));
+  fNuclmodel = dynamic_cast<const NuclearModelI *>( this -> SubAlg("NuclearModel") ) ;
 
   // other intranuke config params
   GetParam( "NUCL-R0",             fR0 );              // fm
@@ -1403,6 +1414,8 @@ void HAIntranuke::LoadConfig(void)
   GetParamDef( "FSI-Pion-MFPScale",              fPionMFPScale,           1.0 ) ;
   GetParamDef( "FSI-Pion-FracCExScale",          fPionFracCExScale,       1.0 ) ;
   GetParamDef( "FSI-Pion-FracAbsScale",          fPionFracAbsScale,       1.0 ) ;
+  GetParamDef( "FSI-Pion-FracElasScale",         fPionFracElasScale,      1.0 ) ;
+  GetParamDef( "FSI-Pion-FracInelScale",         fPionFracInelScale,      1.0 ) ;
   GetParamDef( "FSI-Pion-FracPiProdScale",       fPionFracPiProdScale,    1.0 ) ;
   GetParamDef( "FSI-Nucleon-MFPScale",           fNucleonMFPScale,        1.0 ) ;
   GetParamDef( "FSI-Nucleon-FracCExScale",       fNucleonFracCExScale ,   1.0 ) ;
